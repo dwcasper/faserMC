@@ -1,0 +1,13 @@
+Geant4 must be installed, here assumed to be in /some/path/geant4/geant4-install.
+
+To build and run, create build and run directories next to the checked out source directory:
+
+/path/to> mkdir build run
+/path/to> ls
+build faserMC run
+/path/to> cd build
+/path/to> cmake -DGeant4_DIR=/some/path/geant4/geant4-install/lib64/Geant4-10.3.2 -DCMAKE_INSTALL_PREFIX=/path/to/run ../faserMC
+/path/to/build> make
+/path/to/build> make install
+/path/to/build> cd ../run
+/path/to/run> bin/faser
