@@ -1,6 +1,7 @@
 // adapted from Geant4 example
 
 #include "FaserDetectorConstruction.hh"
+#include "FaserGeometryMessenger.hh"
 
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
@@ -11,19 +12,22 @@
 #include "G4Trd.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4SystemOfUnits.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserDetectorConstruction::FaserDetectorConstruction()
-  : G4VUserDetectorConstruction(), fStereoPlus(nullptr), fStereoMinus(nullptr),
-    fOverlapAngle(nullptr)
+  : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
+    sensor_sizeXY(default_sensor_sizeXY), 
+    sensor_sizeZ(default_sensor_sizeZ),
+    sensor_stereoAngle(default_sensor_stereoAngle),
+    fStereoPlus(nullptr), fStereoMinus(nullptr), fOverlapAngle(nullptr)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserDetectorConstruction::~FaserDetectorConstruction()
 { 
+  if (fGeometryMessenger) delete fGeometryMessenger;
   if (fStereoPlus) delete fStereoPlus;
   if (fStereoMinus) delete fStereoMinus;
   if (fOverlapAngle) delete fOverlapAngle;
@@ -39,7 +43,9 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   
   // sensor stereo angle (+/-)
   //
-  G4double sensor_stereoAngle = 26.0*mrad;
+
+  G4cout << "Stereo angle: " << sensor_stereoAngle/mrad << " mrad" << G4endl;
+  //G4double sensor_stereoAngle = 26.0*mrad;
   fStereoPlus = new G4RotationMatrix;
   fStereoPlus->rotateZ(sensor_stereoAngle);
 
@@ -48,8 +54,8 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 
   // sensor dimensions
   //
-  G4double sensor_sizeXY = 96.64*mm, sensor_sizeZ = 0.32*mm;
-
+  //G4double sensor_sizeXY = 96.64*mm, sensor_sizeZ = 0.32*mm;
+  G4cout << "Sensor dimensions: " << sensor_sizeXY/mm << " mm (XY), " << sensor_sizeZ/mm << " mm (Z)" << G4endl; 
   // sensor
   //
   G4Material* sensor_mat = nist->FindOrBuildMaterial("G4_Si");
@@ -88,7 +94,8 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   // effective half-width of the wafer due to stereo rotation
   G4double wPrime = (sensor_sizeXY/2) / cos(sensor_stereoAngle);
   // overlap angle that will allow maximum x-separation without any gap
-  G4double overlapAngle = atan((module_sizeZ/2)/wPrime);
+  //G4double overlapAngle = atan((module_sizeZ/2)/wPrime);
+  G4double overlapAngle = asin( module_sizeZ/wPrime )/2;
   // corresponding x separation with this angle
   G4double xOffset = wPrime * cos(overlapAngle);
 
