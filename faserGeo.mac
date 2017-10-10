@@ -1,3 +1,16 @@
+#
+# FASER geometry setup
+#
+#
+# This is the width of the (square) Silicon wafers
 /faser/geo/sensorSizeXY 96.64 mm
+#
+# This is the thickness of the Silicon wafers
 /faser/geo/sensorSizeZ 0.32 mm
+#
+# This is the stereo angle (+/-)
+# Wafers on opposite faces are offset by twice this amount with respect to each other
 /faser/geo/stereoAngle 26.0 mrad
+#
+# Thickness of the support structure that the sensors are glued to
+/faser/geo/supportSizeZ 3.3 mm

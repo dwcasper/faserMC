@@ -28,7 +28,7 @@ private:
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_sizeXY;
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_sizeZ;
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_stereoAngle;
-
+  G4UIcmdWithADoubleAndUnit*     cmd_support_sizeZ;
 };
 
 #endif

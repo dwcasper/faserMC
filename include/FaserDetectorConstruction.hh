@@ -17,10 +17,11 @@ class G4LogicalVolume;
 class FaserDetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    FaserDetectorConstruction();
-    virtual ~FaserDetectorConstruction();
+  
+  FaserDetectorConstruction();
+  virtual ~FaserDetectorConstruction();
 
-    virtual G4VPhysicalVolume* Construct();
+  virtual G4VPhysicalVolume* Construct();
     
   virtual void setSensorSizeXY(G4double value) { sensor_sizeXY = value; }
   virtual G4double getSensorSizeXY() { return sensor_sizeXY; }
@@ -31,17 +32,23 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setSensorStereoAngle(G4double value) { sensor_stereoAngle = value; }
   virtual G4double getSensorStereoAngle() { return sensor_stereoAngle; }
 
+  virtual void setSupportSizeZ(G4double value) { support_sizeZ = value; }
+  virtual G4double getSupportSizeZ() { return support_sizeZ; }
+
   static constexpr double default_sensor_sizeXY = 96.64*mm;
   static constexpr double default_sensor_sizeZ = 0.32*mm;
   static constexpr double default_sensor_stereoAngle = 26.0*mrad;
+  static constexpr double default_support_sizeZ = 3.3*mm;
 
   protected:
 
   FaserGeometryMessenger* fGeometryMessenger;
 
+  // tunable (from macro) parameters 
   G4double sensor_sizeXY;
   G4double sensor_sizeZ;
   G4double sensor_stereoAngle;
+  G4double support_sizeZ;
 
   // these are not copied by the volumes that use them,
   // so they must not be changed

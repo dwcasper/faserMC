@@ -20,6 +20,7 @@ FaserDetectorConstruction::FaserDetectorConstruction()
     sensor_sizeXY(default_sensor_sizeXY), 
     sensor_sizeZ(default_sensor_sizeZ),
     sensor_stereoAngle(default_sensor_stereoAngle),
+    support_sizeZ(default_support_sizeZ),
     fStereoPlus(nullptr), fStereoMinus(nullptr), fOverlapAngle(nullptr)
 { }
 
@@ -37,15 +38,22 @@ FaserDetectorConstruction::~FaserDetectorConstruction()
 
 G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 {  
+
+  // Option to switch on/off checking of volumes overlaps
+  //
+  G4bool checkOverlaps = true;
+
   // Get nist material manager
   //
   G4NistManager* nist = G4NistManager::Instance();
   
   // sensor stereo angle (+/-)
   //
-
   G4cout << "Stereo angle: " << sensor_stereoAngle/mrad << " mrad" << G4endl;
-  //G4double sensor_stereoAngle = 26.0*mrad;
+
+  // create rotation matrices for both senses of rotation
+  // we have to hold these pointers (and not change the objects)
+  // until the end of the job
   fStereoPlus = new G4RotationMatrix;
   fStereoPlus->rotateZ(sensor_stereoAngle);
 
@@ -54,9 +62,9 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 
   // sensor dimensions
   //
-  //G4double sensor_sizeXY = 96.64*mm, sensor_sizeZ = 0.32*mm;
   G4cout << "Sensor dimensions: " << sensor_sizeXY/mm << " mm (XY), " << sensor_sizeZ/mm << " mm (Z)" << G4endl; 
-  // sensor
+
+  // sensor volume
   //
   G4Material* sensor_mat = nist->FindOrBuildMaterial("G4_Si");
   G4Box* solidSensor =    
@@ -72,9 +80,10 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   //
   G4double support_sizeX = sensor_sizeXY * (cos(sensor_stereoAngle) + sin(sensor_stereoAngle));
   G4double support_sizeY = support_sizeX + sensor_sizeXY/cos(sensor_stereoAngle);
-  G4double support_sizeZ = 3.3*mm;
+  G4cout << "Support dimensions: " << support_sizeX/mm << " mm (X), "
+	 << support_sizeY/mm << " mm (Y), " << support_sizeZ/mm << " mm (Z)" << G4endl;
 
-  //support
+  //support volume
   //
   G4Material* support_mat = nist->FindOrBuildMaterial("G4_GRAPHITE");
   G4Box* solidSupport =
@@ -90,19 +99,7 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   G4double module_sizeX = support_sizeX, module_sizeY = support_sizeY;
   G4double module_sizeZ = 2 * sensor_sizeZ + support_sizeZ;
 
-
-  // effective half-width of the wafer due to stereo rotation
-  G4double wPrime = (sensor_sizeXY/2) / cos(sensor_stereoAngle);
-  // overlap angle that will allow maximum x-separation without any gap
-  //G4double overlapAngle = atan((module_sizeZ/2)/wPrime);
-  G4double overlapAngle = asin( module_sizeZ/wPrime )/2;
-  // corresponding x separation with this angle
-  G4double xOffset = wPrime * cos(overlapAngle);
-
-  fOverlapAngle = new G4RotationMatrix;
-  fOverlapAngle->rotateY(overlapAngle);
-
-  // module
+  // module volume
   //
   G4Material* module_mat = nist->FindOrBuildMaterial("G4_AIR");
   G4Box* solidModule = 
@@ -113,10 +110,8 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 			module_mat,
 			"Module");
 
-  // Option to switch on/off checking of volumes overlaps
+  // place support inside module volume
   //
-  G4bool checkOverlaps = true;
-
   new G4PVPlacement(0,                     //no rotation
                     G4ThreeVector(),       //at (0,0,0)
                     logicSupport,          //its logical volume
@@ -126,6 +121,9 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                     0,                     //copy number
                     checkOverlaps);        //overlaps checking
   
+  // place sensors inside module volume
+  // the same logical volume is re-used, but it is translated and rotated four different ways
+  //
   new G4PVPlacement(fStereoMinus,
                     G4ThreeVector(0.0, 0.5*sensor_sizeXY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
 	            logicSensor,
@@ -162,7 +160,65 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 		    0,
 		    checkOverlaps);
 
-  /*
+
+  // effective half-width of the wafer due to stereo rotation
+  //
+  G4double wPrime = (sensor_sizeXY/2) / cos(sensor_stereoAngle);
+
+  // overlap angle that will allow maximum x-separation without any gap
+  //
+  G4double overlapAngle = asin( module_sizeZ/wPrime )/2;
+  
+  // corresponding x separation of modules with this angle
+  //
+  G4double xOffset = wPrime * cos(overlapAngle);
+
+  // Rotation matrix for module overlap - again, must preserve unchanged until end of job
+  //
+  fOverlapAngle = new G4RotationMatrix;
+  fOverlapAngle->rotateY(overlapAngle);
+
+  // work out the size of the plane box that will contain both modules
+  //
+  G4double plane_sizeX = 2 * xOffset + module_sizeX * cos(overlapAngle) + module_sizeZ * sin(overlapAngle);
+  G4double plane_sizeY = module_sizeY;
+  G4double plane_sizeZ = module_sizeX * sin(overlapAngle) + module_sizeZ * cos(overlapAngle);
+  G4cout << "Plane dimensions: " << plane_sizeX/mm << " mm (X), "
+	 << plane_sizeY/mm << " mm (Y), " << plane_sizeZ/mm << " mm (Z)" << G4endl;
+
+  // plane volume
+  //
+  G4Material* plane_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Box* solidPlane =
+    new G4Box("Plane", 0.5*plane_sizeX, 0.5*plane_sizeY, 0.5*plane_sizeZ);
+
+  G4LogicalVolume* logicPlane =
+    new G4LogicalVolume(solidPlane,
+                        plane_mat,
+                        "Plane");
+
+  // place modules inside plane
+  //
+  new G4PVPlacement(fOverlapAngle,
+		    G4ThreeVector(-xOffset, 0, 0),
+		    logicModule,
+		    "Module_0",
+		    logicPlane,
+		    false,
+		    0,
+		    checkOverlaps);
+
+  new G4PVPlacement(fOverlapAngle,
+		    G4ThreeVector(+xOffset, 0, 0),
+		    logicModule,
+		    "Module_1",
+		    logicPlane,
+		    false,
+		    0,
+ 		    checkOverlaps);
+
+
+    /*
   // detector width
   //
   G4double detector_sizeXY = 2 * support_sizeXY;
@@ -282,23 +338,15 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                     0,                       //copy number
                     checkOverlaps);          //overlaps checking
 
-  new G4PVPlacement(fOverlapAngle,
-		    G4ThreeVector(-xOffset, 0, 0),
-		    logicModule,
-		    "Module_0",
+  new G4PVPlacement(0,
+		    G4ThreeVector(),
+		    logicPlane,
+		    "Plane_0",
 		    logicEnv,
 		    false,
 		    0,
 		    checkOverlaps);
 
-  new G4PVPlacement(fOverlapAngle,
-		    G4ThreeVector(+xOffset, 0, 0),
-		    logicModule,
-		    "Module_1",
-		    logicEnv,
-		    false,
-		    0,
- 		    checkOverlaps);
   /*
   //     
   // Envelope

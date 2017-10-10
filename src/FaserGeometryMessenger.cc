@@ -31,13 +31,22 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_sensor_stereoAngle->SetUnitCandidates("rad mrad deg");
   cmd_sensor_stereoAngle->AvailableForStates(G4State_PreInit);
 
+  cmd_support_sizeZ = new G4UIcmdWithADoubleAndUnit("/faser/geo/supportSizeZ", this);
+  cmd_support_sizeZ->SetGuidance("Set the thickness of the support strut.");
+  cmd_support_sizeZ->SetParameterName("supportSizeZ", true, true);
+  cmd_support_sizeZ->SetDefaultUnit("mm");
+  cmd_support_sizeZ->SetUnitCandidates("mm micron cm m");
+  cmd_support_sizeZ->AvailableForStates(G4State_PreInit);
+
   fDetectorConstruction->setSensorSizeXY( FaserDetectorConstruction::default_sensor_sizeXY );
   fDetectorConstruction->setSensorSizeZ ( FaserDetectorConstruction::default_sensor_sizeZ );
   fDetectorConstruction->setSensorStereoAngle( FaserDetectorConstruction::default_sensor_stereoAngle );
+  fDetectorConstruction->setSupportSizeZ ( FaserDetectorConstruction::default_support_sizeZ );
 }
 
 FaserGeometryMessenger::~FaserGeometryMessenger()
 {
+  if (cmd_support_sizeZ) delete cmd_support_sizeZ;
   if (cmd_sensor_stereoAngle) delete cmd_sensor_stereoAngle;
   if (cmd_sensor_sizeXY) delete cmd_sensor_sizeXY;
   if (cmd_sensor_sizeZ) delete cmd_sensor_sizeZ;
@@ -59,6 +68,10 @@ void FaserGeometryMessenger::SetNewValue(G4UIcommand* command, G4String newValue
     {
       fDetectorConstruction->setSensorStereoAngle( cmd_sensor_stereoAngle->GetNewDoubleValue(newValues) );
     }
+  else if (command == cmd_support_sizeZ)
+    {
+      fDetectorConstruction->setSupportSizeZ( cmd_support_sizeZ->GetNewDoubleValue(newValues) );
+    }
 }
 
 G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
@@ -76,6 +89,10 @@ G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
   else if (command == cmd_sensor_stereoAngle)
     {
       cv = cmd_sensor_stereoAngle->ConvertToString(fDetectorConstruction->getSensorStereoAngle(), "mrad");
+    }
+  else if (command == cmd_support_sizeZ)
+    {
+      cv = cmd_support_sizeZ->ConvertToString(fDetectorConstruction->getSupportSizeZ(), "mm");
     }
   return cv;
 }
