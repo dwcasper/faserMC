@@ -115,7 +115,7 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   new G4PVPlacement(0,                     //no rotation
                     G4ThreeVector(),       //at (0,0,0)
                     logicSupport,          //its logical volume
-                    "Support",             //its name
+                    "Support_PV",          //its name
                     logicModule,           //its mother  volume
                     false,                 //no boolean operation
                     0,                     //copy number
@@ -127,7 +127,7 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   new G4PVPlacement(fStereoMinus,
                     G4ThreeVector(0.0, 0.5*sensor_sizeXY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
 	            logicSensor,
-	            "Sensor_00",
+	            "Sensor_PV",
 	            logicModule,
 	            false,
 	            0,
@@ -136,28 +136,28 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   new G4PVPlacement(fStereoPlus,
 		    G4ThreeVector(0.0, 0.5*sensor_sizeXY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
 		    logicSensor,
-		    "Sensor_01",
+		    "Sensor_PV",
 		    logicModule,
 		    false,
-		    0,
+		    1,
 		    checkOverlaps);
 
   new G4PVPlacement(fStereoMinus,
 		    G4ThreeVector(0.0, -0.5*sensor_sizeXY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
 		    logicSensor,
-		    "Sensor_10",
+		    "Sensor_PV",
 		    logicModule,
 		    false,
-		    0,
+		    2,
 		    checkOverlaps);
 
   new G4PVPlacement(fStereoPlus,
 		    G4ThreeVector(0.0, -0.5*sensor_sizeXY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
 		    logicSensor,
-		    "Sensor_11",
+		    "Sensor_PV",
 		    logicModule,
 		    false,
-		    0,
+		    3,
 		    checkOverlaps);
 
 
@@ -202,7 +202,7 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   new G4PVPlacement(fOverlapAngle,
 		    G4ThreeVector(-xOffset, 0, 0),
 		    logicModule,
-		    "Module_0",
+		    "Module_PV",
 		    logicPlane,
 		    false,
 		    0,
@@ -211,10 +211,10 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   new G4PVPlacement(fOverlapAngle,
 		    G4ThreeVector(+xOffset, 0, 0),
 		    logicModule,
-		    "Module_1",
+		    "Module_PV",
 		    logicPlane,
 		    false,
-		    0,
+		    1,
  		    checkOverlaps);
 
 
@@ -332,7 +332,7 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   new G4PVPlacement(0,                       //no rotation
                     G4ThreeVector(),         //at (0,0,0)
                     logicEnv,                //its logical volume
-                    "Envelope",              //its name
+                    "Envelope_PV",              //its name
                     logicWorld,              //its mother  volume
                     false,                   //no boolean operation
                     0,                       //copy number
@@ -341,7 +341,7 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   new G4PVPlacement(0,
 		    G4ThreeVector(),
 		    logicPlane,
-		    "Plane_0",
+		    "Plane_PV",
 		    logicEnv,
 		    false,
 		    0,
