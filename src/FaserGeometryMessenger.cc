@@ -15,18 +15,21 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_sensor_sizeXY->SetParameterName("sensorSizeXY", true, true);
   cmd_sensor_sizeXY->SetDefaultUnit("mm");
   cmd_sensor_sizeXY->SetUnitCandidates("mm micron cm m");
+  cmd_sensor_sizeXY->AvailableForStates(G4State_PreInit);
 
   cmd_sensor_sizeZ = new G4UIcmdWithADoubleAndUnit("/faser/geo/sensorSizeZ", this);
   cmd_sensor_sizeZ->SetGuidance("Set the thickness of the silicon wafers.");
   cmd_sensor_sizeZ->SetParameterName("sensorSizeZ", true, true);
   cmd_sensor_sizeZ->SetDefaultUnit("mm");
   cmd_sensor_sizeZ->SetUnitCandidates("mm micron cm m");
+  cmd_sensor_sizeZ->AvailableForStates(G4State_PreInit);
 
   cmd_sensor_stereoAngle = new G4UIcmdWithADoubleAndUnit("/faser/geo/stereoAngle", this);
   cmd_sensor_stereoAngle->SetGuidance("Set the angle wafers on each side are rotated.");
   cmd_sensor_stereoAngle->SetParameterName("sensorStereo", true, true);
   cmd_sensor_stereoAngle->SetDefaultUnit("mrad");
   cmd_sensor_stereoAngle->SetUnitCandidates("rad mrad deg");
+  cmd_sensor_stereoAngle->AvailableForStates(G4State_PreInit);
 
   fDetectorConstruction->setSensorSizeXY( FaserDetectorConstruction::default_sensor_sizeXY );
   fDetectorConstruction->setSensorSizeZ ( FaserDetectorConstruction::default_sensor_sizeZ );

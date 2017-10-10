@@ -6,6 +6,10 @@
 /control/saveHistory
 /run/verbose 2
 #
+# Read FASER detector geometry
+#
+/control/execute faserGeo.mac
+#
 # Change the default number of threads (in multi-threaded mode)
 #/run/numberOfThreads 4
 #

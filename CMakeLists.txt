@@ -48,6 +48,7 @@ target_link_libraries(faser ${Geant4_LIBRARIES})
 set(FASER_SCRIPTS
   init_vis.mac
   vis.mac
+  faserGeo.mac
   )
 
 foreach(_script ${FASER_SCRIPTS})
