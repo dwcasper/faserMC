@@ -2,15 +2,45 @@
 # FASER geometry setup
 #
 #
-# This is the width of the (square) Silicon wafers
-/faser/geo/sensorSizeXY 96.64 mm
+# Number of readout strips
+#
+/faser/geo/readoutStrips 1280
+#
+# Strip pitch
+#
+/faser/geo/stripPitch 75.5 um
+#
+# Length of each row of strips
+#
+/faser/geo/stripLength 48.2 mm
+#
+# Gap between rows of strips
+#
+/faser/geo/sensorGap 269 um
 #
 # This is the thickness of the Silicon wafers
+#
 /faser/geo/sensorSizeZ 0.32 mm
 #
 # This is the stereo angle (+/-)
 # Wafers on opposite faces are offset by twice this amount with respect to each other
+#
 /faser/geo/stereoAngle 26.0 mrad
 #
 # Thickness of the support structure that the sensors are glued to
+#
 /faser/geo/supportSizeZ 3.3 mm
+#
+# Number of detector planes
+#
+/faser/geo/sensorPlanes 5
+#
+# Spacing of detector planes
+#
+/faser/geo/planePitch 1.0 m
+#
+# Length of empty air before first detector plane
+#
+/faser/geo/decayVolumeLength 5.0 m
+
+

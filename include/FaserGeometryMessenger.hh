@@ -25,10 +25,16 @@ private:
 
 private:
   G4UIdirectory*                 geometryDirectory;
-  G4UIcmdWithADoubleAndUnit*     cmd_sensor_sizeXY;
+  G4UIcmdWithAnInteger*          cmd_sensor_readoutStrips;
+  G4UIcmdWithADoubleAndUnit*     cmd_sensor_stripPitch;
+  G4UIcmdWithADoubleAndUnit*     cmd_sensor_stripLength;
+  G4UIcmdWithADoubleAndUnit*     cmd_sensor_gap;
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_sizeZ;
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_stereoAngle;
   G4UIcmdWithADoubleAndUnit*     cmd_support_sizeZ;
+  G4UIcmdWithAnInteger*          cmd_detector_sensorPlanes;
+  G4UIcmdWithADoubleAndUnit*     cmd_detector_planePitch;
+  G4UIcmdWithADoubleAndUnit*     cmd_detector_decayVolumeLength;
 };
 
 #endif

@@ -7,3 +7,7 @@
 # (the tracking planes)
 #
 /run/setCutForRegion Tracker 1.0 um
+#
+# Magnetic field
+#
+/globalField/setValue 0.0 0.1 0.0 tesla

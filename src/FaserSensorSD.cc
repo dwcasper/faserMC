@@ -27,13 +27,17 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4TouchableHandle h = aStep->GetPreStepPoint()->GetTouchableHandle();
   //
   // zero-based identifiers
-  G4int sensor = h->GetCopyNumber(0);  // 0 - 3
-  G4int module = h->GetCopyNumber(1); // 0 - 1
-  G4int plane = h->GetCopyNumber(2);  // 0 - (nPlanese - 1)
+  G4int strip = h->GetReplicaNumber(0);  // 0 - (sensor_readoutStrips - 1)
+  G4int row = h->GetCopyNumber(1);       // 0 - 1
+  G4int sensor = h->GetCopyNumber(2);    // 0 - 3
+  G4int module = h->GetCopyNumber(3);    // 0 - 1
+  G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
 
   newHit->SetPlaneID( plane );
   newHit->SetModuleID( module );
   newHit->SetSensorID( sensor );
+  newHit->SetRowID( row );
+  newHit->SetStripID( strip );
 
   newHit->SetEdep( edep );
   G4ThreeVector worldPosition = aStep->GetPostStepPoint()->GetPosition();

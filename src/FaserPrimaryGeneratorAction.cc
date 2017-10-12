@@ -1,6 +1,7 @@
 // adapted from Geant4 example
 
 #include "FaserPrimaryGeneratorAction.hh"
+#include "FaserDetectorConstruction.hh"
 
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
@@ -17,7 +18,8 @@
 FaserPrimaryGeneratorAction::FaserPrimaryGeneratorAction()
 : G4VUserPrimaryGeneratorAction(),
   fParticleGun(0), 
-  fEnvelopeBox(0)
+  fEnvelopeBox(0),
+  fDetectorConstruction(0)
 {
   G4int n_particle = 1;
   fParticleGun  = new G4ParticleGun(n_particle);
@@ -50,19 +52,20 @@ void FaserPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   // on DetectorConstruction class we get Envelope volume
   // from G4LogicalVolumeStore.
   
-  G4double envSizeXY = 0;
+  G4double envSizeX = 0;
+  G4double envSizeY = 0;
   G4double envSizeZ = 0;
 
   if (!fEnvelopeBox)
   {
     G4LogicalVolume* envLV
-      = G4LogicalVolumeStore::GetInstance()->GetVolume("Envelope");
+      = G4LogicalVolumeStore::GetInstance()->GetVolume("Plane");
     if ( envLV ) fEnvelopeBox = dynamic_cast<G4Box*>(envLV->GetSolid());
   }
 
   if ( fEnvelopeBox ) {
-    envSizeXY = fEnvelopeBox->GetXHalfLength()*2.;
-    envSizeZ = fEnvelopeBox->GetZHalfLength()*2.;
+    envSizeX = fEnvelopeBox->GetXHalfLength()*2.;
+    envSizeY = fEnvelopeBox->GetYHalfLength()*2.;
   }  
   else  {
     G4ExceptionDescription msg;
@@ -73,10 +76,17 @@ void FaserPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
      "MyCode0002",JustWarning,msg);
   }
 
-  G4double size = 0.8; 
-  G4double x0 = size * envSizeXY * (G4UniformRand()-0.5);
-  G4double y0 = size * envSizeXY * (G4UniformRand()-0.5);
-  G4double z0 = -0.35 * envSizeZ;
+  if ( !fDetectorConstruction )
+  {
+      fDetectorConstruction = static_cast<const FaserDetectorConstruction*>(
+					    G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+  }
+
+  envSizeZ = std::max(fDetectorConstruction->getDecayVolumeLength(), fDetectorConstruction->getPlanePitch());
+
+  G4double x0 = envSizeX * (G4UniformRand()-0.5);
+  G4double y0 = envSizeY * (G4UniformRand()-0.5);
+  G4double z0 = -0.99 * envSizeZ;
   
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
 

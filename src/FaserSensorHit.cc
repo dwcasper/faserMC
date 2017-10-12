@@ -15,6 +15,8 @@ FaserSensorHit::FaserSensorHit()
     fPlaneID(-1),
     fModuleID(-1),
     fSensorID(-1),
+    fRowID(-1),
+    fStripID(-1),
     fEdep(0.0),
     fGlobalPos(G4ThreeVector()),
     fLocalPos(G4ThreeVector())
@@ -29,6 +31,8 @@ FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   fPlaneID = right.fPlaneID;
   fModuleID = right.fModuleID;
   fSensorID = right.fSensorID;
+  fRowID = right.fRowID;
+  fStripID = right.fStripID;
   fEdep = right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
@@ -40,6 +44,8 @@ const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
   fPlaneID = right.fPlaneID;
   fModuleID = right.fModuleID;
   fSensorID = right.fSensorID;
+  fRowID = right.fRowID;
+  fStripID = right.fStripID;
   fEdep =right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
@@ -70,7 +76,8 @@ void FaserSensorHit::Draw()
 void FaserSensorHit::Print()
 {
   G4cout 
-    << "  trackID: " << fTrackID << " sensorID: " << (100*fPlaneID + 10*fModuleID + fSensorID) 
+    << "  trackID: " << fTrackID << " sensorID: " 
+    << (10000000*fPlaneID + 1000000*fModuleID + 100000*fSensorID + 10000*fRowID + fStripID) 
     << " Edep: " 
     << std::setw(7) << G4BestUnit(fEdep, "Energy")
     << " Global: " 

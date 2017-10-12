@@ -15,6 +15,8 @@
 // planeID
 // moduleID
 // sensorID
+// rowID
+// stripID
 // energy deposit
 // global position
 // local position
@@ -42,6 +44,8 @@ class FaserSensorHit : public G4VHit
     void SetPlaneID(G4int plane)               { fPlaneID = plane; };
     void SetModuleID(G4int module)             { fModuleID = module; };
     void SetSensorID(G4int sensor)             { fSensorID = sensor; };
+    void SetRowID(G4int row)                   { fRowID = row; };
+    void SetStripID(G4int strip)               { fStripID = strip; };
     void SetEdep(G4double de)                  { fEdep = de; };
     void SetGlobalPos(G4ThreeVector globalXYZ) { fGlobalPos = globalXYZ; };
     void SetLocalPos(G4ThreeVector localXYZ)   { fLocalPos = localXYZ; };
@@ -51,6 +55,8 @@ class FaserSensorHit : public G4VHit
     G4int GetPlaneID() const           { return fPlaneID; };
     G4int GetModuleID() const          { return fModuleID; };
     G4int GetSensorID() const          { return fSensorID; };
+    G4int GetRowID() const             { return fRowID; };
+    G4int GetStripID() const           { return fStripID; };
     G4double GetEdep() const           { return fEdep; };
     G4ThreeVector GetGlobalPos() const { return fGlobalPos; };
     G4ThreeVector GetLocalPos() const  { return fLocalPos; };
@@ -62,6 +68,8 @@ class FaserSensorHit : public G4VHit
     G4int fPlaneID;
     G4int fModuleID;
     G4int fSensorID;
+    G4int fRowID;
+    G4int fStripID;
     G4double fEdep;
     G4ThreeVector fGlobalPos;
     G4ThreeVector fLocalPos;

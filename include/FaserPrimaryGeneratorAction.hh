@@ -10,6 +10,7 @@
 class G4ParticleGun;
 class G4Event;
 class G4Box;
+class FaserDetectorConstruction;
 
 /// The primary generator action class with particle gun.
 ///
@@ -31,6 +32,7 @@ class FaserPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   private:
     G4ParticleGun*  fParticleGun; // pointer a to G4 gun class
     G4Box* fEnvelopeBox;
+    const FaserDetectorConstruction* fDetectorConstruction;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
