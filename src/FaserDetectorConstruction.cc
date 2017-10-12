@@ -2,6 +2,7 @@
 
 #include "FaserDetectorConstruction.hh"
 #include "FaserGeometryMessenger.hh"
+#include "FaserSensorSD.hh"
 
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
@@ -12,6 +13,8 @@
 #include "G4Trd.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
+#include "G4SDManager.hh"
+#include "G4Region.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -32,6 +35,16 @@ FaserDetectorConstruction::~FaserDetectorConstruction()
   if (fStereoPlus) delete fStereoPlus;
   if (fStereoMinus) delete fStereoMinus;
   if (fOverlapAngle) delete fOverlapAngle;
+}
+
+void FaserDetectorConstruction::ConstructSDandField()
+{
+  G4String sensorSDName = "Faser/SensorSD";
+  FaserSensorSD* aSensorSD = new FaserSensorSD(sensorSDName, 
+						  "FaserSensorHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(aSensorSD);
+  SetSensitiveDetector( "Sensor", aSensorSD, true );
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -217,6 +230,11 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 		    1,
  		    checkOverlaps);
 
+  // define a region encompassing the tracker plane(s)
+  //
+  G4Region* tracker = new G4Region("Tracker");
+  logicPlane->SetRegion(tracker);
+  tracker->AddRootLogicalVolume(logicPlane);
 
     /*
   // detector width
@@ -268,7 +286,7 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   G4double world_sizeZ = std::max(forward_distance, backward_distance) + 2.0*m;
   */
 
-  G4double world_sizeXY = 8 * sensor_sizeXY, world_sizeZ = 50.0*cm;
+  G4double world_sizeXY = 1.5 * std::max(plane_sizeX, plane_sizeY) + 10.0*cm, world_sizeZ = 50.0*cm;
   //     
   // World
   //
@@ -345,6 +363,15 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 		    logicEnv,
 		    false,
 		    0,
+		    checkOverlaps);
+
+  new G4PVPlacement(0,
+		    G4ThreeVector(0.0, 0.0, 2*plane_sizeZ),
+		    logicPlane,
+		    "Plane_PV",
+		    logicEnv,
+		    false,
+		    1,
 		    checkOverlaps);
 
   /*

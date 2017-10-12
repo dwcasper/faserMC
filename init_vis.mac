@@ -6,7 +6,7 @@
 /control/saveHistory
 /run/verbose 2
 #
-# Read FASER detector geometry
+# Read FASER detector geometry (must be done before initialization)
 #
 /control/execute faserGeo.mac
 #
@@ -15,6 +15,10 @@
 #
 # Initialize kernel
 /run/initialize
+#
+# Adjust physics parameters (must be done after initialization)
+#
+/control/execute faserPhys.mac
 #
 # Visualization setting
 /control/execute vis.mac

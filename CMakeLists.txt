@@ -49,6 +49,7 @@ set(FASER_SCRIPTS
   init_vis.mac
   vis.mac
   faserGeo.mac
+  faserPhys.mac
   )
 
 foreach(_script ${FASER_SCRIPTS})

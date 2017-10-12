@@ -22,6 +22,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual ~FaserDetectorConstruction();
 
   virtual G4VPhysicalVolume* Construct();
+  virtual void ConstructSDandField();
     
   virtual void setSensorSizeXY(G4double value) { sensor_sizeXY = value; }
   virtual G4double getSensorSizeXY() { return sensor_sizeXY; }

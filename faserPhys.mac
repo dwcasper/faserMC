@@ -1,0 +1,9 @@
+#
+# FASER physics setup
+#
+# This macro is executed AFTER the G4 run manager is initialized
+#
+# One use case is to adjust the production cut for a specific region
+# (the tracking planes)
+#
+/run/setCutForRegion Tracker 1.0 um

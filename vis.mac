@@ -48,7 +48,7 @@
 # (if too many tracks cause core dump => /tracking/storeTrajectory 0)
 #
 # Draw hits at end of event:
-#/vis/scene/add/hits
+/vis/scene/add/hits
 #
 # To draw only gammas:
 #/vis/filtering/trajectories/create/particleFilter
@@ -67,7 +67,7 @@
 #/vis/modeling/trajectories/drawByParticleID-0/set e+ yellow
 #
 # To superimpose all of the events from a given run:
-/vis/scene/endOfEventAction accumulate
+#/vis/scene/endOfEventAction accumulate
 #
 # Decorations
 # Name
