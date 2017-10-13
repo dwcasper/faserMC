@@ -5,6 +5,8 @@
 #include "G4SDManager.hh"
 #include "G4ios.hh"
 
+#include "RootIO.hh"
+
 FaserSensorSD::FaserSensorSD(const G4String& name,
 			     const G4String& hitsCollectionName)
   : G4VSensitiveDetector(name),
@@ -14,7 +16,9 @@ FaserSensorSD::FaserSensorSD(const G4String& name,
 }
 
 FaserSensorSD::~FaserSensorSD()
-{}
+{
+  RootIO::GetInstance()->Close();
+}
 
 G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
@@ -65,12 +69,20 @@ void FaserSensorSD::Initialize(G4HCofThisEvent* hce)
 
 void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
 {
+  G4int nofHits = fHitsCollection->entries();
   if (verboseLevel > 1)
-    {
-      G4int nofHits = fHitsCollection->entries();
+  {
       G4cout << G4endl <<
 	"-----> Hits Collection: " << nofHits <<
 	" hits in the silicon sensors:" << G4endl;
-      for (G4int i = 0; i < nofHits; i++) (*fHitsCollection)[i]->Print(); 
-    }
+      //for (G4int i = 0; i < nofHits; i++) (*fHitsCollection)[i]->Print(); 
+  }
+
+  std::vector<FaserSensorHit*> hitsVector;
+
+  for (G4int i = 0; i < nofHits; i++)
+  {
+    hitsVector.push_back((*fHitsCollection)[i]);
+  }
+  RootIO::GetInstance()->Write(&hitsVector);
 }

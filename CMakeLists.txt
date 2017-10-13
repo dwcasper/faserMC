@@ -21,24 +21,54 @@ endif()
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
-# Setup include directory for this project
 #
 include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/include)
 
+#---------------------------------------------------------------------------
+# Find ROOT
+#
+find_package(ROOT REQUIRED)
+
+# ROOT version 6 
+if(ROOT_FOUND)
+  STRING(REGEX MATCH "6.*" VERSION6MATCH ${ROOT_VERSION})
+  if(NOT VERSION6MATCH)
+    message(FATAL_ERROR "ROOT 6 is required")
+  endif()
+endif()
+
+#---------------------------------------------------------------------------
+# Shared libraries are required (why?)
+#
+if(NOT Geant4_shared_FOUND)
+  message(FATAL_ERROR "Geant must be built with shared libraries")
+endif()
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
+include_directories(${PROJECT_SOURCE_DIR}/include
+                    ${Geant4_INCLUDE_DIR}
+                    ${ROOT_INCLUDE_DIR})
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+
+#---------------------------------------------------------------------------
+# Generate dictionaries, add ROOT incantations
+#
+REFLEX_GENERATE_DICTIONARY(FaserRootClasses include/FaserRootClasses.hh SELECTION xml/selection.xml)
+add_library(FaserRootClassesDict SHARED ${sources} FaserRootClasses.cpp)
+set(libsuffix .so)
+set(ROOT_LIBRARY_PROPERTIES ${ROOT_LIBRARY_PROPERTIES} SUFFIX ${libsuffix})
+set_target_properties(FaserRootClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
+target_link_libraries(FaserRootClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(faser faser.cc ${sources} ${headers})
-target_link_libraries(faser ${Geant4_LIBRARIES})
+target_link_libraries(faser FaserRootClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
@@ -47,6 +77,7 @@ target_link_libraries(faser ${Geant4_LIBRARIES})
 #
 set(FASER_SCRIPTS
   init_vis.mac
+  init_novis.mac
   vis.mac
   faserGeo.mac
   faserPhys.mac
@@ -70,5 +101,7 @@ add_custom_target(FASER DEPENDS faser)
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS faser DESTINATION bin)
+install(TARGETS FaserRootClassesDict DESTINATION lib)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/FaserRootClasses_rdict.pcm DESTINATION lib)
 install(FILES ${FASER_SCRIPTS} DESTINATION .)
 

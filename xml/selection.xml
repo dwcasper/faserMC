@@ -1,0 +1,12 @@
+<lcgdict>
+<class name="std::basic_string<char>" />
+<class name="G4String"/>
+<class name="G4VHit"/>
+<class name="G4AttDef"/>
+<class name="G4AttValue"/>
+<class name="FaserSensorHit"/>
+<class name="std::vector<FaserSensorHit*>" />
+<class name="std::map<G4String,G4AttDef>" />
+<class name="std::vector<G4AttValue>" />
+<class name="CLHEP::Hep3Vector"/>
+</lcgdict>
