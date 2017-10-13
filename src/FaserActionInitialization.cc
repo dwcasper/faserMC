@@ -6,11 +6,16 @@
 #include "FaserEventAction.hh"
 #include "FaserSteppingAction.hh"
 
+#include "TROOT.h"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserActionInitialization::FaserActionInitialization()
  : G4VUserActionInitialization()
-{}
+{
+  // kludge to avoid Open-GL/ROOT collision
+  gROOT->GetInterpreter();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
