@@ -2,6 +2,7 @@ Geant4 must be installed, here assumed to be in /some/path/geant4/geant4-install
 
 To build and run, create build and run directories next to the checked out source directory:
 
+/path/to> source /some/path/geant4/geant4-install/bin/geant4.sh
 /path/to> mkdir build run
 /path/to> ls
 build faserMC run
