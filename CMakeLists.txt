@@ -28,7 +28,6 @@ include(${Geant4_USE_FILE})
 # Find ROOT
 #
 find_package(ROOT REQUIRED)
-
 # ROOT version 6 
 if(ROOT_FOUND)
   STRING(REGEX MATCH "6.*" VERSION6MATCH ${ROOT_VERSION})
@@ -36,6 +35,12 @@ if(ROOT_FOUND)
     message(FATAL_ERROR "ROOT 6 is required")
   endif()
 endif()
+
+#----------------------------------------------------------------------------
+# Setup ROOT include directories and compile definitions
+#
+include(${ROOT_USE_FILE})
+
 
 #---------------------------------------------------------------------------
 # Shared libraries are required (why?)
@@ -58,7 +63,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 # Generate dictionaries, add ROOT incantations
 #
 REFLEX_GENERATE_DICTIONARY(FaserRootClasses include/FaserRootClasses.hh SELECTION xml/selection.xml)
-add_library(FaserRootClassesDict SHARED ${sources} FaserRootClasses.cpp)
+add_library(FaserRootClassesDict SHARED ${sources} FaserRootClasses.cxx)
 set(libsuffix .so)
 set(ROOT_LIBRARY_PROPERTIES ${ROOT_LIBRARY_PROPERTIES} SUFFIX ${libsuffix})
 set_target_properties(FaserRootClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
