@@ -45,18 +45,9 @@ void FaserRunAction::EndOfRunAction(const G4Run* run)
   // Run conditions
   //  note: There is no primary generator action object for "master"
   //        run manager for multi-threaded mode.
-  const FaserPrimaryGeneratorAction* generatorAction
-   = static_cast<const FaserPrimaryGeneratorAction*>
-     (G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction());
-  G4String runCondition;
-  if (generatorAction)
-  {
-    const G4ParticleGun* particleGun = generatorAction->GetParticleGun();
-    runCondition += particleGun->GetParticleDefinition()->GetParticleName();
-    runCondition += " of ";
-    G4double particleEnergy = particleGun->GetParticleEnergy();
-    runCondition += G4BestUnit(particleEnergy,"Energy");
-  }
+  //const FaserPrimaryGeneratorAction* generatorAction
+  // = static_cast<const FaserPrimaryGeneratorAction*>
+  //   (G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction());
         
   // Print
   //  
@@ -73,7 +64,7 @@ void FaserRunAction::EndOfRunAction(const G4Run* run)
   
   G4cout
      << G4endl
-     << " The run consists of " << nofEvents << " "<< runCondition
+     << " The run consists of " << nofEvents << " events"
      << G4endl;
 }
 

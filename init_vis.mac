@@ -22,3 +22,7 @@
 #
 # Visualization setting
 /control/execute vis.mac
+#
+# Dump generator parameters after initialization
+#
+/faser/generator/dump

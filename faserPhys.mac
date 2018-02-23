@@ -3,6 +3,10 @@
 #
 # This macro is executed AFTER the G4 run manager is initialized
 #
+/faser/generator/minMomentum 200.0 GeV
+/faser/generator/maxMomentum 6.5 TeV
+/faser/generator/sourcePosition 0.0 0.0 -475.0 m
+#
 # One use case is to adjust the production cut for a specific region
 # (the tracking planes)
 #

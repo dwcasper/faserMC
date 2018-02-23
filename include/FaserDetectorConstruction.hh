@@ -26,7 +26,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual G4VPhysicalVolume* Construct();
   virtual void ConstructSDandField();
     
-  virtual void setReadoutStrips(G4double value) { sensor_readoutStrips = value; }
+  virtual void setReadoutStrips(G4int value) { sensor_readoutStrips = value; }
   virtual G4int getReadoutStrips() const { return sensor_readoutStrips; }
 
   virtual void setStripPitch(G4double value) { sensor_stripPitch = value; }
@@ -47,7 +47,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setSupportSizeZ(G4double value) { support_sizeZ = value; }
   virtual G4double getSupportSizeZ() const { return support_sizeZ; }
 
-  virtual void setSensorPlanes(G4double value) { detector_sensorPlanes = value; }
+  virtual void setSensorPlanes(G4int value) { detector_sensorPlanes = value; }
   virtual G4int getSensorPlanes() const { return detector_sensorPlanes; }
 
   virtual void setPlanePitch(G4double value) { detector_planePitch = value; }

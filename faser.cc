@@ -11,6 +11,7 @@
 
 #include "G4UImanager.hh"
 #include "FTFP_BERT.hh"
+#include "FaserPhysicsList.hh"
 
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
@@ -45,7 +46,7 @@ int main(int argc,char** argv)
   runManager->SetUserInitialization(new FaserDetectorConstruction());
 
   // Physics list
-  G4VModularPhysicsList* physicsList = new FTFP_BERT;
+  G4VModularPhysicsList* physicsList = new TFTFP_BERT<FaserPhysicsList>();
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
     
