@@ -7,9 +7,11 @@ To build and run, create build and run directories next to the checked out sourc
 /path/to> ls
 build faserMC run
 /path/to> cd build
-/path/to> cmake -DGeant4_DIR=/some/path/geant4/geant4-install/lib64/Geant4-10.3.2 -DCMAKE_INSTALL_PREFIX=/path/to/run ../faserMC
+/path/to> cmake -DGeant4_DIR=/some/path/geant4/geant4-install/lib64/Geant4-10.4.9 -DCMAKE_INSTALL_PREFIX=/path/to/run ../faserMC
 /path/to/build> make
 /path/to/build> make install
 /path/to/build> export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/run/lib
 /path/to/build> cd ../run
 /path/to/run> bin/faser
+
+(Changes between Geant versions 10.3 and 10.4 may break the build - this configuration works with 10.4 and ROOT 6.12.06)
