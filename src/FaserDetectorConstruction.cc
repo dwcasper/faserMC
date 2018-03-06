@@ -3,6 +3,7 @@
 #include "FaserDetectorConstruction.hh"
 #include "FaserGeometryMessenger.hh"
 #include "FaserSensorSD.hh"
+#include "FaserFieldSetup.hh"
 
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
@@ -16,17 +17,13 @@
 #include "G4PVReplica.hh"
 #include "G4SDManager.hh"
 #include "G4Region.hh"
-#include "G4GlobalMagFieldMessenger.hh"
 #include "G4AutoDelete.hh"
-
-
-G4ThreadLocal
-G4GlobalMagFieldMessenger* FaserDetectorConstruction::fMagFieldMessenger = 0;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserDetectorConstruction::FaserDetectorConstruction()
   : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
+    fLogicTracker(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
     sensor_stripPitch(default_sensor_stripPitch),
     sensor_stripLength(default_sensor_stripLength),
@@ -58,12 +55,16 @@ void FaserDetectorConstruction::ConstructSDandField()
   G4SDManager::GetSDMpointer()->AddNewDetector(aSensorSD);
   SetSensitiveDetector( "Strip", aSensorSD, true );
 
-  G4ThreeVector fieldValue = G4ThreeVector();
-  fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
-  fMagFieldMessenger->SetVerboseLevel(1);
-
-  G4AutoDelete::Register(fMagFieldMessenger);
-
+  // not clear why we need this concurrency stuff...
+  if (!fFieldSetup.Get())
+  {
+    FaserFieldSetup* emSetup = new FaserFieldSetup();
+    fFieldSetup.Put(emSetup);
+    G4AutoDelete::Register(emSetup);
+  }
+  G4bool allLocal = true;
+  fLogicTracker->SetFieldManager(fFieldSetup.Get()->GetLocalFieldManager(),
+				 allLocal);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -313,29 +314,29 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   logicPlane->SetRegion(tracker);
   tracker->AddRootLogicalVolume(logicPlane);
 
-  // air volume (envelope) size
+  // air volume (envelope) material transverse size
   //
+  G4Material* env_mat = nist->FindOrBuildMaterial("G4_AIR");
   G4double env_sizeX = plane_sizeX + 10.0*cm, env_sizeY = plane_sizeY + 10.0*cm;
 
-  // the z length of the lab includes a gap decayVolumeLength before the first
-  // sensor plane, and a gap of planePitch after the last one
+  // length of volume enclosing sensor planes (plus air gap behind)
   //
-  G4double decayVolumeLength = std::max(detector_decayVolumeLength, detector_planePitch);
-  G4double env_sizeZ = detector_sensorPlanes * detector_planePitch + 
-    plane_sizeZ + decayVolumeLength;
+  G4double allPlanes_sizeZ = detector_sensorPlanes * detector_planePitch + 
+    plane_sizeZ;
 
-  G4Box* solidEnv =    
-    new G4Box("Envelope",                    //its name
-        0.5*env_sizeX, 0.5*env_sizeY, 0.5*env_sizeZ); //its size
+  // solid to hold sensor planes (and tracker magnetic field)
+  //
+  G4Box* solidTracker =    
+    new G4Box("Tracker",                    //its name
+        0.5*env_sizeX, 0.5*env_sizeY, 0.5*allPlanes_sizeZ); //its size
       
-  G4Material* env_mat = nist->FindOrBuildMaterial("G4_AIR");
 
-  G4LogicalVolume* logicEnv =                         
-    new G4LogicalVolume(solidEnv,            //its solid
-                        env_mat,             //its material
-                        "Envelope");         //its name
+  fLogicTracker =                         
+    new G4LogicalVolume(solidTracker,            //its solid
+                        env_mat,                 //its material
+                        "Tracker");              //its name
 
-  G4double firstPlaneZ = -env_sizeZ/2 + decayVolumeLength + plane_sizeZ/2;
+  G4double firstPlaneZ = -allPlanes_sizeZ/2 + plane_sizeZ/2;
 
   for (G4int i = 0; i < detector_sensorPlanes; i++)
   {
@@ -343,23 +344,39 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 			G4ThreeVector(0, 0, firstPlaneZ + i*detector_planePitch),
 			logicPlane,
 			"Plane_PV",
-			logicEnv,
+			fLogicTracker,
 			false,
 			i,
 			checkOverlaps);
   }
 
+  // the z length of the lab includes a gap decayVolumeLength before the first
+  // sensor plane, and a gap of planePitch after the last one
+  //
+  G4double decayVolumeLength = std::max(detector_decayVolumeLength, detector_planePitch);
+  G4double env_sizeZ = decayVolumeLength;
+
+  G4Box* solidEnv =    
+    new G4Box("Envelope",                    //its name
+        0.5*env_sizeX, 0.5*env_sizeY, 0.5*env_sizeZ); //its size
+      
+  G4LogicalVolume* logicEnv =                         
+    new G4LogicalVolume(solidEnv,            //its solid
+                        env_mat,             //its material
+                        "Envelope");         //its name
+
   // world volume size
   // want front surface of first plane at z = 0 in world system
   //
   G4double world_sizeX = plane_sizeX + 2.0*m, world_sizeY = plane_sizeY + 2.0*m;
-  G4double world_sizeZ = 2 * std::max(decayVolumeLength, env_sizeZ - decayVolumeLength) + 2.0*m;
+  G4double world_sizeZ = 2 * std::max(decayVolumeLength, allPlanes_sizeZ) + 2.0*m;
 
   //     
   // World
   //
-  //G4Material* world_mat = nist->FindOrBuildMaterial("G4_CONCRETE");
   G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
+  // Concrete results in massive showers as tracks exit the air volume, very slow to display
+  //G4Material* world_mat = nist->FindOrBuildMaterial("G4_CONCRETE");
   
   G4Box* solidWorld =    
     new G4Box("World",                       //its name
@@ -370,10 +387,22 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                         world_mat,           //its material
                         "World");            //its name
 
-  // place lab (air) volume inside
-  //                                   
+
+  // place the tracker volume inside
+  //
   new G4PVPlacement(0,                       //no rotation
                     G4ThreeVector(0, 0, -(firstPlaneZ - plane_sizeZ/2) ),
+                    fLogicTracker,           //its logical volume
+                    "Tracker_PV",            //its name
+                    logicWorld,              //its mother  volume
+                    false,                   //no boolean operation
+                    0,                       //copy number
+                    checkOverlaps);          //overlaps checking
+
+  // place the decay volume inside
+  //                                   
+  new G4PVPlacement(0,                       //no rotation
+                    G4ThreeVector(0, 0, -decayVolumeLength/2 ),
                     logicEnv,                //its logical volume
                     "Envelope_PV",              //its name
                     logicWorld,              //its mother  volume

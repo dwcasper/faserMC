@@ -5,14 +5,15 @@
 
 #include "G4VUserDetectorConstruction.hh"
 #include "G4RotationMatrix.hh"
+#include "G4Cache.hh"
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
 
 class FaserGeometryMessenger;
+class FaserFieldSetup;
 class G4VPhysicalVolume;
 class G4LogicalVolume;
-class G4GlobalMagFieldMessenger;
 
 /// Detector construction class to define materials and geometry.
 
@@ -73,6 +74,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   protected:
 
   FaserGeometryMessenger* fGeometryMessenger;
+  G4LogicalVolume* fLogicTracker;
 
   // tunable (from macro) parameters 
   G4int    sensor_readoutStrips;
@@ -94,7 +96,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4RotationMatrix* fOverlapAngle;
 
   // mag field
-  static G4ThreadLocal G4GlobalMagFieldMessenger* fMagFieldMessenger;
+  G4Cache<FaserFieldSetup*> fFieldSetup;
 
 };
 

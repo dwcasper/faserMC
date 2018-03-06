@@ -37,10 +37,10 @@
 #
 # Spacing of detector planes
 #
-/faser/geo/planePitch 1.0 m
+/faser/geo/planePitch 0.2 m
 #
 # Length of empty air before first detector plane
 #
-/faser/geo/decayVolumeLength 5.0 m
+/faser/geo/decayVolumeLength 4.0 m
 
 

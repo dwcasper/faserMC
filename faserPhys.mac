@@ -14,4 +14,8 @@
 #
 # Magnetic field
 #
-/globalField/setValue 0.0 0.1 0.0 tesla
+# This sets the field outside the tracker
+/field/setGlobalField  0.0 tesla
+# This sets the field inside the tracker
+/field/setTrackerField 1.0 tesla
+/field/update
