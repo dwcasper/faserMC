@@ -50,7 +50,7 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 
   fHitsCollection->insert( newHit );
 
-  newHit->Print();
+  //newHit->Print();
 
   return true;
 }
