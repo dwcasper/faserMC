@@ -6,7 +6,7 @@
 #include "TSystem.h"
 #include "TTree.h"
 
-#include "FaserSensorHit.hh"
+#include "FaserDigi.hh"
 
 class RootIO
 {
@@ -15,7 +15,7 @@ public:
 
   static RootIO* GetInstance();
   static void SetFileName(G4String name);
-  void Write(std::vector<FaserSensorHit*>*);
+  void Write(std::vector<FaserDigi*>*);
   void Close();
 
 protected:
@@ -25,7 +25,7 @@ private:
   TFile* fFile;
   TTree* fTree;
   int fNevents;
-  std::vector<FaserSensorHit*>* fBranchAdx;
+  std::vector<FaserDigi*>* fBranchAdx;
 };
 
 #endif

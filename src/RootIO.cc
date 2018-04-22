@@ -50,7 +50,7 @@ void RootIO::SetFileName(G4String name)
   return;
 }
 
-void RootIO::Write(std::vector<FaserSensorHit*>* hcont)
+void RootIO::Write(std::vector<FaserDigi*>* hcont)
 {
   fNevents++;
 
@@ -65,7 +65,7 @@ void RootIO::Write(std::vector<FaserSensorHit*>* hcont)
   if (fBranchAdx == nullptr)
   {
     fBranchAdx = hcont;
-    fTree->Branch("Hits", "std::vector<FaserSensorHit*>", &fBranchAdx, 32000, 99);
+    fTree->Branch("Hits", "std::vector<FaserDigi*>", &fBranchAdx, 32000, 99);
   }
   else
   {
