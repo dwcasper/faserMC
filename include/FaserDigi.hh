@@ -24,37 +24,28 @@ class FaserDigi: public G4VDigi
 
   private:
 
-    G4int fTrackID;
     G4int fPlaneID;
     G4int fModuleID;
     G4int fSensorID;
     G4int fRowID;
     G4int fStripID;
     G4int fEdep;
-    G4ThreeVector fGlobalPos;
-    G4ThreeVector fLocalPos;
 
   public:
 
-    inline void SetTrackID(G4int track)		{ fTrackID = track; };
     inline void SetPlaneID(G4int plane)		{ fPlaneID = plane; };
     inline void SetModuleID(G4int module) 	{ fModuleID = module; };
     inline void SetSensorID(G4int sensor)	{ fSensorID = sensor; };
     inline void SetRowID(G4int row)		{ fRowID = row; };
     inline void SetStripID(G4int strip)		{ fStripID = strip; };
     inline void SetEdep(G4double edep)		{ fEdep = edep; };
-    inline void SetGlobalPos(G4ThreeVector gl)	{ fGlobalPos = gl; };
-    inline void SetLocalPos(G4ThreeVector loc)	{ fLocalPos = loc; };
 
-    inline G4int GetTrackID() 			{ return fTrackID; };
     inline G4int GetPlaneID() 			{ return fPlaneID; };
     inline G4int GetModuleID()			{ return fModuleID; };
     inline G4int GetSensorID()			{ return fSensorID; };
     inline G4int GetRowID()			{ return fRowID; };
     inline G4int GetStripID()			{ return fStripID; };
     inline G4double GetEdep()			{ return fEdep; };
-    inline G4ThreeVector GetGlobalPos()		{ return fGlobalPos; };
-    inline G4ThreeVector GetLocalPos()		{ return fLocalPos; };
 
 };
 
