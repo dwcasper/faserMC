@@ -6,14 +6,15 @@
 #include "G4RunManager.hh"
 #include "G4DigiManager.hh"
 
-#include "G4SystemOfUnits.hh"
-
 FaserDigitizer::FaserDigitizer(G4String name)
   : G4VDigitizerModule(name),
     fNModules(2),
     fNSensors(4),
     fNRows(2),
-    fThreshold(0.0)
+    fThreshold(0),
+    fElectronsPerADC(5.0),
+    fChargeSpreadSigma(0.0)
+
 {
   G4String colName = "FaserDigiCollection";
   collectionName.push_back(colName);
@@ -45,12 +46,6 @@ void FaserDigitizer::Digitize()
   if (FSHC) {
 
     G4int nHits = FSHC->entries();
-    G4cout << "nHits = " << nHits << G4endl;
-
-    G4int rowMult = fNStrips;
-    G4int sensorMult = rowMult * fNRows;
-    G4int moduleMult = sensorMult * fNSensors;
-    G4int planeMult = moduleMult * fNModules;
 
     // loop through hits and accumulate energies
     for (G4int i=0; i<nHits; i++) 
@@ -64,7 +59,13 @@ void FaserDigitizer::Digitize()
       G4int strip = hit->GetStripID();
       G4double edep = hit->GetEdep();
 
-      G4int index = plane*planeMult + module*moduleMult + sensor*sensorMult + row*rowMult + strip;
+      G4int index = (((plane*fNModules + module)
+	     * fNSensors + sensor)  
+	     * fNRows + row)
+	     * fNStrips + strip;
+
+      G4ThreeVector localPos = hit->GetLocalPos();
+
       *(fStripEnergies + index) += edep;
 
     }
@@ -74,21 +75,24 @@ void FaserDigitizer::Digitize()
     for (G4int index=0; index<nStripsTotal; index++)
     {
       G4double eTotal = *(fStripEnergies + index);
-      if (eTotal > fThreshold)
+      G4int ADC = eTotal/fBandGap/fElectronsPerADC;
+
+      if (ADC > fThreshold)
       {
         FaserDigi* digi = new FaserDigi();
                 
 	G4int remainder = index;
-	digi->SetPlaneID(remainder / planeMult);
-	remainder %= planeMult;
-	digi->SetModuleID(remainder / moduleMult);
-	remainder %= moduleMult;
-	digi->SetSensorID(remainder / sensorMult);
-	remainder %= sensorMult;
-	digi->SetRowID(remainder /= rowMult);
-	remainder %= rowMult;
-	digi->SetStripID(remainder);
-	digi->SetEdep(eTotal);
+	digi->SetStripID(remainder % fNStrips);
+	remainder /= fNStrips;
+	digi->SetRowID(remainder % fNRows);
+	remainder /= fNRows;
+	digi->SetSensorID(remainder % fNSensors);
+	remainder /= fNSensors;
+	digi->SetModuleID(remainder % fNModules);
+	remainder /= fNModules;
+	digi->SetPlaneID(remainder);
+	
+	digi->SetADC(ADC);
                 
 	fDigiCollection->insert(digi);
       }
@@ -96,7 +100,6 @@ void FaserDigitizer::Digitize()
       
     }
   }
-  G4cout << "nDigi = " << fDigiCollection->entries() << G4endl;
 
   StoreDigiCollection(fDigiCollection);
 

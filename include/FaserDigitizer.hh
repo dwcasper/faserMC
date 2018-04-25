@@ -3,6 +3,7 @@
 
 #include "G4VDigitizerModule.hh"
 #include "FaserDigi.hh"
+#include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
 class FaserDigitizer : public G4VDigitizerModule
@@ -21,7 +22,12 @@ class FaserDigitizer : public G4VDigitizerModule
     G4int fNSensors;
     G4int fNRows;
     G4int fNStrips;
-    G4double fThreshold;
+    
+    G4int fThreshold;
+    G4double fElectronsPerADC;
+    G4double fChargeSpreadSigma;
+    
+    const G4double fBandGap = 1.1*eV;
 
 };
 

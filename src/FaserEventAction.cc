@@ -48,16 +48,7 @@ void FaserEventAction::EndOfEventAction(const G4Event*)
   FaserDigiCollection* dc = (FaserDigiCollection*) digiMan->GetDigiCollection(digiID);
   if ( dc ) 
   {
- 
-    G4int nDigi = dc->entries();
-    std::vector<FaserDigi*> digiVector;
-  
-    for (G4int i=0; i<nDigi; i++)
-    {
-      digiVector.push_back((*dc)[i]);
-    }
-
-    RootIO::GetInstance()->Write(&digiVector);
+    RootIO::GetInstance()->Write(dc);
   }
 }
 

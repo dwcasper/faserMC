@@ -1,10 +1,7 @@
 #ifndef INCLUDE_ROOTIO_HH
 #define INCLUDE_ROOTIO_HH 1
 
-#include "TROOT.h"
-#include "TFile.h"
-#include "TSystem.h"
-#include "TTree.h"
+#include "g4root.hh"
 
 #include "FaserDigi.hh"
 
@@ -15,17 +12,21 @@ public:
 
   static RootIO* GetInstance();
   static void SetFileName(G4String name);
-  void Write(std::vector<FaserDigi*>*);
+  void Write(FaserDigiCollection* dc);
   void Close();
 
 protected:
   RootIO();
 
 private:
-  TFile* fFile;
-  TTree* fTree;
-  int fNevents;
-  std::vector<FaserDigi*>* fBranchAdx;
+  G4AnalysisManager* fAnalysisManager;
+
+  std::vector<G4int> fPlaneVector;
+  std::vector<G4int> fModuleVector;
+  std::vector<G4int> fSensorVector;
+  std::vector<G4int> fRowVector;
+  std::vector<G4int> fStripVector;
+  std::vector<G4int> fADCVector;
 };
 
 #endif

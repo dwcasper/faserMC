@@ -12,18 +12,26 @@ static G4String fileName = "FaserMC_Default.root";
 static RootIO* instance = nullptr;
 
 RootIO::RootIO()
-  : fNevents(0), fBranchAdx(nullptr)
 {
   // initialize ROOT
-  TSystem ts;
-  gSystem->Load("libFaserRootClassesDict");
+  fAnalysisManager = G4AnalysisManager::Instance();
+  fAnalysisManager->OpenFile(fileName);
+  fAnalysisManager->CreateNtuple("hits", "Faser tracker digits"); 
 
-  fFile = new TFile(fileName, "RECREATE");
-  fTree = new TTree("faser","an event tree");
+  fAnalysisManager->CreateNtupleIColumn("digi_plane", fPlaneVector);
+  fAnalysisManager->CreateNtupleIColumn("digi_module", fModuleVector);
+  fAnalysisManager->CreateNtupleIColumn("digi_sensor", fSensorVector);
+  fAnalysisManager->CreateNtupleIColumn("digi_row", fRowVector);
+  fAnalysisManager->CreateNtupleIColumn("digi_strip", fStripVector);
+  fAnalysisManager->CreateNtupleIColumn("digi_ADC", fADCVector);
+  
+  fAnalysisManager->FinishNtuple();
 }
 
 RootIO::~RootIO()
-{}
+{
+  delete fAnalysisManager;
+}
 
 RootIO* RootIO::GetInstance()
 {
@@ -50,33 +58,35 @@ void RootIO::SetFileName(G4String name)
   return;
 }
 
-void RootIO::Write(std::vector<FaserDigi*>* hcont)
+void RootIO::Write(FaserDigiCollection* dc)
 {
-  fNevents++;
 
-  std::ostringstream os;
-  os << fNevents;
-  std::string stevt = "Event_" + os.str();
-  //const char* chevt = stevt.c_str();
-  G4cout << "Writing " << stevt << G4endl;
+  G4int nDigi = dc->entries();
 
-  //fFile->WriteObject(hcont, chevt);
-
-  if (fBranchAdx == nullptr)
+  for(G4int i=0; i<nDigi; i++)
   {
-    fBranchAdx = hcont;
-    fTree->Branch("Hits", "std::vector<FaserDigi*>", &fBranchAdx, 32000, 99);
+    FaserDigi* digi = (*dc)[i];
+    
+    fPlaneVector.push_back(digi->GetPlaneID());
+    fModuleVector.push_back(digi->GetModuleID());
+    fSensorVector.push_back(digi->GetSensorID());
+    fRowVector.push_back(digi->GetRowID());
+    fStripVector.push_back(digi->GetStripID());
+    fADCVector.push_back(digi->GetADC());
   }
-  else
-  {
-    fBranchAdx = hcont;
-  }
-  fTree->Fill();
 
+  fAnalysisManager->AddNtupleRow();
+
+  fPlaneVector.clear();
+  fModuleVector.clear();
+  fSensorVector.clear();
+  fRowVector.clear();
+  fStripVector.clear();
+  fADCVector.clear();
 }
 
 void RootIO::Close()
 {
-  fTree->Write();
-  fFile->Close();
+  fAnalysisManager->Write();
+  fAnalysisManager->CloseFile();  
 }
