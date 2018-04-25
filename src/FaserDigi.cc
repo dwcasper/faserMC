@@ -9,7 +9,7 @@ FaserDigi::FaserDigi()
     fSensorID(-1),
     fRowID(-1),
     fStripID(-1),
-    fEdep(0.0)
+    fADC(0.0)
 { }
 
 FaserDigi::~FaserDigi()
@@ -23,7 +23,7 @@ FaserDigi::FaserDigi(const FaserDigi& right)
   fSensorID = right.fSensorID;
   fRowID = right.fRowID;
   fStripID = right.fStripID;
-  fEdep = right.fEdep;
+  fADC = right.fADC;
 }
 
 const FaserDigi& FaserDigi::operator=(const FaserDigi& right)
@@ -33,7 +33,7 @@ const FaserDigi& FaserDigi::operator=(const FaserDigi& right)
   fSensorID = right.fSensorID;
   fRowID = right.fRowID;
   fStripID = right.fStripID;
-  fEdep = right.fEdep;
+  fADC = right.fADC;
 
   return *this;
 }
