@@ -26,6 +26,7 @@ class FaserDigitizer : public G4VDigitizerModule
     G4int fThreshold;
     G4double fElectronsPerADC;
     G4double fChargeSpreadSigma;
+    G4double fStripPitch;
     
     const G4double fBandGap = 1.1*eV;
 
