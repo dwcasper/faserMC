@@ -3,6 +3,7 @@
 
 #include "G4VDigitizerModule.hh"
 #include "FaserDigi.hh"
+#include "FaserDigiMessenger.hh"
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
@@ -14,7 +15,18 @@ class FaserDigitizer : public G4VDigitizerModule
 
     void Digitize();
 
+    virtual void SetChargeSpreadSigma(G4double value)	{ fChargeSpreadSigma = value; }
+    virtual void SetThreshold(G4double value)		{ fThreshold = value; }
+
+    virtual G4double GetChargeSpreadSigma() const	{ return fChargeSpreadSigma; }
+    virtual G4int GetThreshold() const			{ return fThreshold; }
+
+    static constexpr G4double defaultChargeSpreadSigma = 100*um;
+    static constexpr G4double defaultThreshold = 0;
+
   private:
+    FaserDigiMessenger* fDigiMessenger;
+
     FaserDigiCollection* fDigiCollection;
     G4double* fStripEnergies;
     G4int fNPlanes;
@@ -23,8 +35,7 @@ class FaserDigitizer : public G4VDigitizerModule
     G4int fNRows;
     G4int fNStrips;
     
-    G4int fThreshold;
-    G4double fElectronsPerADC;
+    G4double fThreshold;
     G4double fChargeSpreadSigma;
     G4double fStripPitch;
     

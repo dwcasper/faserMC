@@ -29,7 +29,7 @@ class FaserDigi: public G4VDigi
     G4int fSensorID;
     G4int fRowID;
     G4int fStripID;
-    G4int fADC;
+    G4double fCharge;
 
   public:
 
@@ -38,14 +38,14 @@ class FaserDigi: public G4VDigi
     inline void SetSensorID(G4int sensor)	{ fSensorID = sensor; };
     inline void SetRowID(G4int row)		{ fRowID = row; };
     inline void SetStripID(G4int strip)		{ fStripID = strip; };
-    inline void SetADC(G4int ADC)		{ fADC = ADC; };
+    inline void SetCharge(G4int charge)		{ fCharge = charge; };
 
     inline G4int GetPlaneID() 			{ return fPlaneID; };
     inline G4int GetModuleID()			{ return fModuleID; };
     inline G4int GetSensorID()			{ return fSensorID; };
     inline G4int GetRowID()			{ return fRowID; };
     inline G4int GetStripID()			{ return fStripID; };
-    inline G4double GetADC()			{ return fADC; };
+    inline G4double GetCharge()			{ return fCharge; };
 
 };
 

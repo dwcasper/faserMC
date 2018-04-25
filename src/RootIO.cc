@@ -7,6 +7,7 @@
 #include "G4HCofThisEvent.hh"
 #include "G4EventManager.hh"
 #include "G4Event.hh"
+#include "G4SystemOfUnits.hh"
 
 static G4String fileName = "FaserMC_Default.root";
 static RootIO* instance = nullptr;
@@ -23,7 +24,7 @@ RootIO::RootIO()
   fAnalysisManager->CreateNtupleIColumn("digi_sensor", fSensorVector);
   fAnalysisManager->CreateNtupleIColumn("digi_row", fRowVector);
   fAnalysisManager->CreateNtupleIColumn("digi_strip", fStripVector);
-  fAnalysisManager->CreateNtupleIColumn("digi_ADC", fADCVector);
+  fAnalysisManager->CreateNtupleIColumn("digi_charge", fChargeVector);
   
   fAnalysisManager->FinishNtuple();
 }
@@ -72,7 +73,7 @@ void RootIO::Write(FaserDigiCollection* dc)
     fSensorVector.push_back(digi->GetSensorID());
     fRowVector.push_back(digi->GetRowID());
     fStripVector.push_back(digi->GetStripID());
-    fADCVector.push_back(digi->GetADC());
+    fChargeVector.push_back(digi->GetCharge()/coulomb*1e15);
   }
 
   fAnalysisManager->AddNtupleRow();
@@ -82,7 +83,7 @@ void RootIO::Write(FaserDigiCollection* dc)
   fSensorVector.clear();
   fRowVector.clear();
   fStripVector.clear();
-  fADCVector.clear();
+  fChargeVector.clear();
 }
 
 void RootIO::Close()

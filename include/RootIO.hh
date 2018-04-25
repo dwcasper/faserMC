@@ -26,7 +26,7 @@ private:
   std::vector<G4int> fSensorVector;
   std::vector<G4int> fRowVector;
   std::vector<G4int> fStripVector;
-  std::vector<G4int> fADCVector;
+  std::vector<G4int> fChargeVector;
 };
 
 #endif
