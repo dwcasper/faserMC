@@ -13,6 +13,7 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserRunAction::FaserRunAction()
@@ -39,6 +40,7 @@ void FaserRunAction::BeginOfRunAction(const G4Run*)
 
 void FaserRunAction::EndOfRunAction(const G4Run* run)
 {
+ 
   G4int nofEvents = run->GetNumberOfEvent();
   if (nofEvents == 0) return;
 

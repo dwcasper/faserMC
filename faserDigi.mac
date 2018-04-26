@@ -1,0 +1,11 @@
+#
+# FASER sensor parameters
+#
+#
+# Standard deviation of Gaussian charge sharing
+#
+/faser/digi/chargeSpreadSigma 50 um
+#
+# Charge threshold (events must be strictly greater)
+#
+/faser/digi/threshold 0 fC

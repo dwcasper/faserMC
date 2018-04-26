@@ -16,9 +16,10 @@
 # Initialize kernel
 /run/initialize
 #
-# Adjust physics parameters (must be done after initialization)
+# Adjust physics and digitization parameters (must be done after initialization)
 #
 /control/execute faserPhys.mac
+/control/execute faserDigi.mac
 #
 # Visualization setting
 /control/execute vis.mac

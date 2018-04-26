@@ -16,7 +16,7 @@ FaserSensorSD::FaserSensorSD(const G4String& name,
 }
 
 FaserSensorSD::~FaserSensorSD()
-{
+{ 
   RootIO::GetInstance()->Close();
 }
 
@@ -59,30 +59,23 @@ void FaserSensorSD::Initialize(G4HCofThisEvent* hce)
 {
   // Create hits collection
   fHitsCollection =
-    new FaserSensorHitsCollection(SensitiveDetectorName, collectionName[0]);
+    new FaserSensorHitsCollection(SensitiveDetectorName, collectionName[0]);  
 
-  // add hits collection to the collection of all hit collections for event
-  G4int hcID =
+    // add hits collection to the collection of all hit collections for event
+    G4int hcID =
     G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
-  hce->AddHitsCollection( hcID, fHitsCollection);
+    hce->AddHitsCollection( hcID, fHitsCollection);
 }
 
 void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
 {
-  G4int nofHits = fHitsCollection->entries();
   if (verboseLevel > 1)
   {
-      G4cout << G4endl <<
+    G4int nofHits = fHitsCollection->entries();
+
+    G4cout << G4endl <<
 	"-----> Hits Collection: " << nofHits <<
 	" hits in the silicon sensors:" << G4endl;
       //for (G4int i = 0; i < nofHits; i++) (*fHitsCollection)[i]->Print(); 
   }
-
-  std::vector<FaserSensorHit*> hitsVector;
-
-  for (G4int i = 0; i < nofHits; i++)
-  {
-    hitsVector.push_back((*fHitsCollection)[i]);
-  }
-  RootIO::GetInstance()->Write(&hitsVector);
 }
