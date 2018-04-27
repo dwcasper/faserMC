@@ -21,7 +21,7 @@ class FaserDigitizer : public G4VDigitizerModule
     virtual G4double GetChargeSpreadSigma() const	{ return fChargeSpreadSigma; }
     virtual G4int GetThreshold() const			{ return fThreshold; }
 
-    static constexpr G4double defaultChargeSpreadSigma = 100*um;
+    static constexpr G4double defaultChargeSpreadSigma = 50*um;
     static constexpr G4double defaultThreshold = 0;
 
   private:

@@ -24,7 +24,7 @@ RootIO::RootIO()
   fAnalysisManager->CreateNtupleIColumn("digi_sensor", fSensorVector);
   fAnalysisManager->CreateNtupleIColumn("digi_row", fRowVector);
   fAnalysisManager->CreateNtupleIColumn("digi_strip", fStripVector);
-  fAnalysisManager->CreateNtupleIColumn("digi_charge", fChargeVector);
+  fAnalysisManager->CreateNtupleDColumn("digi_charge", fChargeVector);
   
   fAnalysisManager->FinishNtuple();
 }
