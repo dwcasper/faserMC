@@ -6,6 +6,8 @@
 #include "G4Event.hh"
 #include "G4RunManager.hh"
 
+#include "FaserSensorHit.hh"
+
 #include "G4DigiManager.hh"
 #include "FaserDigitizer.hh"
 #include "FaserDigi.hh"
@@ -45,11 +47,28 @@ void FaserEventAction::EndOfEventAction(const G4Event*)
   digiModule->Digitize();  
   
   G4int digiID = digiMan->GetDigiCollectionID("FaserDigitizer/FaserDigiCollection");
-  FaserDigiCollection* dc = (FaserDigiCollection*) digiMan->GetDigiCollection(digiID);
+  FaserDigiCollection* dc = (FaserDigiCollection*) 
+	  digiMan->GetDigiCollection(digiID);
+  
+  G4int truthID = digiMan->GetHitsCollectionID("FaserSensorTruthCollection");
+  FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*) 
+	  digiMan->GetHitsCollection(truthID);
+
+
+  RootIO* root = RootIO::GetInstance();
+
   if ( dc ) 
   {
-    RootIO::GetInstance()->Write(dc);
+    root->AddDigits(dc);
   }
+
+  if ( hc )
+  {
+    root->AddTruth(hc);
+  }  
+  
+  root->WriteEvent();
+  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

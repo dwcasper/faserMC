@@ -11,7 +11,6 @@ G4ThreadLocal G4Allocator<FaserSensorHit>* FaserSensorHitAllocator = 0;
 
 FaserSensorHit::FaserSensorHit()
   : G4VHit(),
-    fTrackID(-1),
     fPlaneID(-1),
     fModuleID(-1),
     fSensorID(-1),
@@ -19,7 +18,12 @@ FaserSensorHit::FaserSensorHit()
     fStripID(-1),
     fEdep(0.0),
     fGlobalPos(G4ThreeVector()),
-    fLocalPos(G4ThreeVector())
+    fLocalPos(G4ThreeVector()),
+    fTrackID(-1),
+    fParticle(""),
+    fVertexPosition(G4ThreeVector()),
+    fVertexMomentumDirection(G4ThreeVector()),
+    fVertexKineticEnergy(0.0)
 {}
 
 FaserSensorHit::~FaserSensorHit() {}
@@ -27,7 +31,6 @@ FaserSensorHit::~FaserSensorHit() {}
 FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   : G4VHit()
 {
-  fTrackID = right.fTrackID;
   fPlaneID = right.fPlaneID;
   fModuleID = right.fModuleID;
   fSensorID = right.fSensorID;
@@ -36,6 +39,12 @@ FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   fEdep = right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
+  
+  fTrackID = right.fTrackID;
+  fParticle = right.fParticle;
+  fVertexPosition = right.fVertexPosition;
+  fVertexMomentumDirection = right.fVertexMomentumDirection;
+  fVertexKineticEnergy = right.fVertexKineticEnergy;
 }
 
 const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
@@ -49,6 +58,12 @@ const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
   fEdep =right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
+
+  fTrackID = right.fTrackID;
+  fParticle = right.fParticle;
+  fVertexPosition = right.fVertexPosition;
+  fVertexMomentumDirection = right.fVertexMomentumDirection;
+  fVertexKineticEnergy = right.fVertexKineticEnergy;
   
   return *this;
 }

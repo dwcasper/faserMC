@@ -3,6 +3,7 @@
 
 #include "G4VDigitizerModule.hh"
 #include "FaserDigi.hh"
+#include "FaserSensorHit.hh"
 #include "FaserDigiMessenger.hh"
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
@@ -26,7 +27,6 @@ class FaserDigitizer : public G4VDigitizerModule
 
   private:
     FaserDigiMessenger* fDigiMessenger;
-
     FaserDigiCollection* fDigiCollection;
     G4double* fStripEnergies;
     G4int fNPlanes;

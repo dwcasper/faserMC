@@ -1,12 +1,9 @@
 #include "FaserDigitizer.hh"
 #include "FaserDigi.hh"
-#include "FaserSensorHit.hh"
 #include "FaserDetectorConstruction.hh"
 
 #include "G4RunManager.hh"
 #include "G4DigiManager.hh"
-
-#include "G4SystemOfUnits.hh"
 
 #include <math.h>
 
@@ -69,7 +66,7 @@ void FaserDigitizer::Digitize()
 	     * fNSensors + sensor)  
 	     * fNRows + row)
 	     * fNStrips + strip;
-
+      
       if (fChargeSpreadSigma > 0)
       {
 
@@ -146,8 +143,6 @@ void FaserDigitizer::Digitize()
       
     }
   }
-
-  G4cout << "nHits = " << fDigiCollection->entries() << G4endl;
 
   StoreDigiCollection(fDigiCollection);
 
