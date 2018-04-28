@@ -1,4 +1,7 @@
 #include "FaserSensorSD.hh"
+#include "FaserDetectorConstruction.hh"
+
+#include "G4RunManager.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"
 #include "G4ThreeVector.hh"
@@ -10,9 +13,20 @@
 FaserSensorSD::FaserSensorSD(const G4String& name,
 			     const G4String& hitsCollectionName)
   : G4VSensitiveDetector(name),
-    fHitsCollection(NULL)
+    fHitsCollection(NULL),
+    fTruthCollection(NULL),
+    fNModules(2),
+    fNSensors(4),
+    fNRows(2)
 {
   collectionName.insert(hitsCollectionName);
+  collectionName.insert("FaserSensorTruthCollection");
+
+  G4RunManager* runMan = G4RunManager::GetRunManager();
+
+  FaserDetectorConstruction* dc = (FaserDetectorConstruction*)
+	  runMan->GetUserDetectorConstruction();
+  fNPlanes = dc->getSensorPlanes();
 }
 
 FaserSensorSD::~FaserSensorSD()
@@ -27,7 +41,6 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 
   FaserSensorHit* newHit = new FaserSensorHit();
 
-  newHit->SetTrackID ( aStep->GetTrack()->GetTrackID() );
   G4TouchableHandle h = aStep->GetPreStepPoint()->GetTouchableHandle();
   //
   // zero-based identifiers
@@ -48,7 +61,28 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   newHit->SetGlobalPos( worldPosition );
   newHit->SetLocalPos( h->GetHistory()->GetTopTransform().TransformPoint( worldPosition ) );
 
+  // truth information
+  G4Track* track = aStep->GetTrack();
+  newHit->SetTrackID( track->GetTrackID() );
+  newHit->SetParticle( track->GetParticleDefinition()->GetParticleName() );
+  newHit->SetVertexPosition( track->GetVertexPosition() );
+  newHit->SetVertexMomentumDirection( track->GetVertexMomentumDirection() );
+  newHit->SetVertexKineticEnergy( track->GetVertexKineticEnergy() );
+
   fHitsCollection->insert( newHit );
+
+  // get index up to row for truth values
+  G4int index = ((plane*fNModules + module) 
+		  * fNSensors + sensor) 
+	          * fNRows + row;
+  
+  // only need single representative hit per particle per row
+  if ( fTruthSet.insert(std::make_pair(index, track->GetTrackID())).second )
+  {
+    // make a copy
+    fTruthCollection->insert( new FaserSensorHit(*newHit) );
+  }
+
 
   //newHit->Print();
 
@@ -60,15 +94,24 @@ void FaserSensorSD::Initialize(G4HCofThisEvent* hce)
   // Create hits collection
   fHitsCollection =
     new FaserSensorHitsCollection(SensitiveDetectorName, collectionName[0]);  
+  fTruthCollection =
+    new FaserSensorHitsCollection(SensitiveDetectorName, collectionName[1]);
 
-    // add hits collection to the collection of all hit collections for event
-    G4int hcID =
-    G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
-    hce->AddHitsCollection( hcID, fHitsCollection);
+  // add hits collection to the collection of all hit collections for event
+  G4SDManager* sdMan = G4SDManager::GetSDMpointer();
+  
+  G4int hcID = sdMan->GetCollectionID(collectionName[0]);
+  hce->AddHitsCollection( hcID, fHitsCollection);
+  
+  G4int truthID = sdMan->GetCollectionID(collectionName[1]);
+  hce->AddHitsCollection( truthID, fTruthCollection);
 }
 
 void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
 {
+
+  fTruthSet.clear();
+
   if (verboseLevel > 1)
   {
     G4int nofHits = fHitsCollection->entries();
@@ -78,4 +121,5 @@ void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
 	" hits in the silicon sensors:" << G4endl;
       //for (G4int i = 0; i < nofHits; i++) (*fHitsCollection)[i]->Print(); 
   }
+
 }

@@ -40,31 +40,40 @@ class FaserSensorHit : public G4VHit
     virtual void Print();
 
     // setters
-    void SetTrackID(G4int track)               { fTrackID = track; };
-    void SetPlaneID(G4int plane)               { fPlaneID = plane; };
-    void SetModuleID(G4int module)             { fModuleID = module; };
-    void SetSensorID(G4int sensor)             { fSensorID = sensor; };
-    void SetRowID(G4int row)                   { fRowID = row; };
-    void SetStripID(G4int strip)               { fStripID = strip; };
-    void SetEdep(G4double de)                  { fEdep = de; };
-    void SetGlobalPos(G4ThreeVector globalXYZ) { fGlobalPos = globalXYZ; };
-    void SetLocalPos(G4ThreeVector localXYZ)   { fLocalPos = localXYZ; };
+    void SetPlaneID(G4int plane)               		{ fPlaneID = plane; };
+    void SetModuleID(G4int module) 	            	{ fModuleID = module; };
+    void SetSensorID(G4int sensor)      	       	{ fSensorID = sensor; };
+    void SetRowID(G4int row)                   		{ fRowID = row; };
+    void SetStripID(G4int strip)	               	{ fStripID = strip; };
+    void SetEdep(G4double de)           	       	{ fEdep = de; };
+    void SetGlobalPos(G4ThreeVector globalXYZ) 		{ fGlobalPos = globalXYZ; };
+    void SetLocalPos(G4ThreeVector localXYZ)   		{ fLocalPos = localXYZ; };
+    
+    void SetTrackID(G4int track)			{ fTrackID = track; };
+    void SetParticle(G4String particle)			{ fParticle = particle; };
+    void SetVertexPosition(G4ThreeVector xyz)		{ fVertexPosition = xyz; };
+    void SetVertexMomentumDirection(G4ThreeVector xyz)	{ fVertexMomentumDirection = xyz; };
+    void SetVertexKineticEnergy(G4double ke)		{ fVertexKineticEnergy = ke; };
 
     // getters
-    G4int GetTrackID() const           { return fTrackID; };
-    G4int GetPlaneID() const           { return fPlaneID; };
-    G4int GetModuleID() const          { return fModuleID; };
-    G4int GetSensorID() const          { return fSensorID; };
-    G4int GetRowID() const             { return fRowID; };
-    G4int GetStripID() const           { return fStripID; };
-    G4double GetEdep() const           { return fEdep; };
-    G4ThreeVector GetGlobalPos() const { return fGlobalPos; };
-    G4ThreeVector GetLocalPos() const  { return fLocalPos; };
+    G4int GetPlaneID() const    	       		{ return fPlaneID; };
+    G4int GetModuleID() const          			{ return fModuleID; };
+    G4int GetSensorID() const          			{ return fSensorID; };
+    G4int GetRowID() const	             		{ return fRowID; };
+    G4int GetStripID() const    	       		{ return fStripID; };
+    G4double GetEdep() const           			{ return fEdep; };
+    G4ThreeVector GetGlobalPos() const 			{ return fGlobalPos; };
+    G4ThreeVector GetLocalPos() const	  		{ return fLocalPos; };
+
+    G4int GetTrackID() const				{ return fTrackID; };
+    G4String GetParticle() const			{ return fParticle; };
+    G4ThreeVector GetVertexPosition() const		{ return fVertexPosition; };
+    G4ThreeVector GetVertexMomentumDirection() const	{ return fVertexMomentumDirection; };
+    G4double GetVertexKineticEnergy() const		{ return fVertexKineticEnergy; };
 
 
    private:
 
-    G4int fTrackID;
     G4int fPlaneID;
     G4int fModuleID;
     G4int fSensorID;
@@ -73,6 +82,12 @@ class FaserSensorHit : public G4VHit
     G4double fEdep;
     G4ThreeVector fGlobalPos;
     G4ThreeVector fLocalPos;
+
+    G4int fTrackID;
+    G4String fParticle;
+    G4ThreeVector fVertexPosition;
+    G4ThreeVector fVertexMomentumDirection;
+    G4double fVertexKineticEnergy;
 
 };
 
