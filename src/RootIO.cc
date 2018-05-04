@@ -19,12 +19,42 @@ RootIO::RootIO()
   fAnalysisManager->OpenFile(fileName);
   fAnalysisManager->CreateNtuple("hits", "Faser tracker digits"); 
 
+  // tracker readout
   fAnalysisManager->CreateNtupleIColumn("digi_plane", fPlaneVector);
   fAnalysisManager->CreateNtupleIColumn("digi_module", fModuleVector);
   fAnalysisManager->CreateNtupleIColumn("digi_sensor", fSensorVector);
   fAnalysisManager->CreateNtupleIColumn("digi_row", fRowVector);
   fAnalysisManager->CreateNtupleIColumn("digi_strip", fStripVector);
-  fAnalysisManager->CreateNtupleIColumn("digi_charge", fChargeVector);
+  // not included in trackers, but useful for post hoc thresholding
+  fAnalysisManager->CreateNtupleDColumn("digi_charge", fChargeVector);
+
+  // truth values
+  fAnalysisManager->CreateNtupleIColumn("truth_plane", fTruthPlaneVector);
+  fAnalysisManager->CreateNtupleIColumn("truth_module", fTruthModuleVector);
+  fAnalysisManager->CreateNtupleIColumn("truth_sensor", fTruthSensorVector);
+  fAnalysisManager->CreateNtupleIColumn("truth_row", fTruthRowVector);
+  fAnalysisManager->CreateNtupleIColumn("truth_strip", fTruthStripVector);
+
+  fAnalysisManager->CreateNtupleIColumn("truth_track", fTruthTrackVector);
+  //fAnalysisManager->CreateNtupleSColumn("truth_particle", fTruthParticleVector);
+
+  fAnalysisManager->CreateNtupleDColumn("truth_global_x", fTruthGlobalXVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_global_y", fTruthGlobalYVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_global_z", fTruthGlobalZVector);
+
+  fAnalysisManager->CreateNtupleDColumn("truth_local_x", fTruthLocalXVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_local_y", fTruthLocalYVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_local_z", fTruthLocalZVector);
+
+  fAnalysisManager->CreateNtupleDColumn("truth_vertex_x", fTruthVertexXVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_vertex_y", fTruthVertexYVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_vertex_z", fTruthVertexZVector);
+
+  fAnalysisManager->CreateNtupleDColumn("truth_vertex_px", fTruthVertexPXVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_vertex_py", fTruthVertexPYVector);
+  fAnalysisManager->CreateNtupleDColumn("truth_vertex_pz", fTruthVertexPZVector);
+
+  fAnalysisManager->CreateNtupleDColumn("truth_vertex_ke", fTruthVertexKineticEnergyVector);
   
   fAnalysisManager->FinishNtuple();
 }
@@ -59,12 +89,13 @@ void RootIO::SetFileName(G4String name)
   return;
 }
 
-void RootIO::Write(FaserDigiCollection* dc)
+void RootIO::AddDigits(FaserDigiCollection* dc)
 {
 
   G4int nDigi = dc->entries();
+  G4cout << "nDigi = " << nDigi << G4endl;
 
-  for(G4int i=0; i<nDigi; i++)
+  for (G4int i=0; i<nDigi; i++)
   {
     FaserDigi* digi = (*dc)[i];
     
@@ -75,7 +106,48 @@ void RootIO::Write(FaserDigiCollection* dc)
     fStripVector.push_back(digi->GetStripID());
     fChargeVector.push_back(digi->GetCharge()/coulomb*1e15);
   }
+}
 
+void RootIO::AddTruth(FaserSensorHitsCollection* hc)
+{
+  G4int nHits = hc->entries();
+  G4cout << "nHits = " << nHits << G4endl;
+
+  for (G4int i=0; i<nHits; i++)
+  {
+    FaserSensorHit* hit = (*hc)[i];
+
+    fTruthPlaneVector.push_back(hit->GetPlaneID());
+    fTruthModuleVector.push_back(hit->GetModuleID());
+    fTruthSensorVector.push_back(hit->GetSensorID());
+    fTruthRowVector.push_back(hit->GetRowID());
+    fTruthStripVector.push_back(hit->GetStripID());
+    fTruthTrackVector.push_back(hit->GetTrackID());
+
+    //fTruthParticleVector.push_back(hit->GetParticle());
+    
+    fTruthGlobalXVector.push_back(hit->GetGlobalPos().x()/cm);
+    fTruthGlobalYVector.push_back(hit->GetGlobalPos().y()/cm);
+    fTruthGlobalZVector.push_back(hit->GetGlobalPos().z()/cm);
+    
+    fTruthLocalXVector.push_back(hit->GetLocalPos().x()/mm);
+    fTruthLocalYVector.push_back(hit->GetLocalPos().y()/mm);
+    fTruthLocalZVector.push_back(hit->GetLocalPos().z()/mm);
+
+    fTruthVertexXVector.push_back(hit->GetVertexPosition().x()/cm);
+    fTruthVertexYVector.push_back(hit->GetVertexPosition().y()/cm);
+    fTruthVertexZVector.push_back(hit->GetVertexPosition().z()/cm);
+
+    fTruthVertexPXVector.push_back(hit->GetVertexMomentumDirection().x());
+    fTruthVertexPYVector.push_back(hit->GetVertexMomentumDirection().y());
+    fTruthVertexPZVector.push_back(hit->GetVertexMomentumDirection().z());
+
+    fTruthVertexKineticEnergyVector.push_back(hit->GetVertexKineticEnergy()/MeV);
+  }
+}
+
+void RootIO::WriteEvent()
+{
   fAnalysisManager->AddNtupleRow();
 
   fPlaneVector.clear();
@@ -84,6 +156,33 @@ void RootIO::Write(FaserDigiCollection* dc)
   fRowVector.clear();
   fStripVector.clear();
   fChargeVector.clear();
+
+  fTruthPlaneVector.clear();
+  fTruthModuleVector.clear();
+  fTruthSensorVector.clear();
+  fTruthRowVector.clear();
+  fTruthStripVector.clear();
+
+  fTruthTrackVector.clear();
+  //fTruthParticleVector.clear();
+
+  fTruthGlobalXVector.clear();
+  fTruthGlobalYVector.clear();
+  fTruthGlobalZVector.clear();
+
+  fTruthLocalXVector.clear();
+  fTruthLocalYVector.clear();
+  fTruthLocalZVector.clear();
+
+  fTruthVertexXVector.clear();
+  fTruthVertexYVector.clear();
+  fTruthVertexZVector.clear();
+
+  fTruthVertexPXVector.clear();
+  fTruthVertexPYVector.clear();
+  fTruthVertexPZVector.clear();
+
+  fTruthVertexKineticEnergyVector.clear(); 
 }
 
 void RootIO::Close()
