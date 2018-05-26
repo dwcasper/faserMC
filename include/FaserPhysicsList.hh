@@ -6,6 +6,7 @@
 #include "globals.hh"
 
 #include "FaserDarkPhoton.hh"
+class FaserPhysicsMessenger;
 
 class FaserPhysicsList : public G4VModularPhysicsList
 {
@@ -26,7 +27,7 @@ public:
 
 private:
   G4double fDarkPhotonMass;
-
+  FaserPhysicsMessenger* fPhysicsMessenger;
 
 };
 #endif

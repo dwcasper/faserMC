@@ -40,6 +40,9 @@ int main(int argc,char** argv)
   G4RunManager* runManager = new G4RunManager;
 #endif
 
+  // Get the pointer to the User Interface manager
+  G4UImanager* UImanager = G4UImanager::GetUIpointer();
+
   // Set mandatory initialization classes
   //
   // Detector construction
@@ -48,6 +51,7 @@ int main(int argc,char** argv)
   // Physics list
   G4VModularPhysicsList* physicsList = new TFTFP_BERT<FaserPhysicsList>();
   physicsList->SetVerboseLevel(1);
+  UImanager->ApplyCommand("/control/execute faserPhysicsList.mac");  
   runManager->SetUserInitialization(physicsList);
     
   // User action initialization
@@ -59,9 +63,6 @@ int main(int argc,char** argv)
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
   // G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
-
-  // Get the pointer to the User Interface manager
-  G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
   // Process macro or start UI session
   //

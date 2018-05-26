@@ -76,6 +76,13 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_detector_decayVolumeLength->SetUnitCandidates("mm micron cm m");
   cmd_detector_decayVolumeLength->AvailableForStates(G4State_PreInit);
 
+  cmd_detector_trackerLength = new G4UIcmdWithADoubleAndUnit("/faser/geo/trackerLength", this);
+  cmd_detector_trackerLength->SetGuidance("Length of the tracker region of the detector");
+  cmd_detector_trackerLength->SetParameterName("trackerLength", true, true);
+  cmd_detector_trackerLength->SetDefaultUnit("m");
+  cmd_detector_trackerLength->SetUnitCandidates("mm micron cm m");
+  cmd_detector_trackerLength->AvailableForStates(G4State_PreInit);
+
   fDetectorConstruction->setReadoutStrips( FaserDetectorConstruction::default_sensor_readoutStrips );
   fDetectorConstruction->setStripPitch( FaserDetectorConstruction::default_sensor_stripPitch );
   fDetectorConstruction->setStripLength( FaserDetectorConstruction::default_sensor_stripLength );
@@ -86,10 +93,12 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   fDetectorConstruction->setSensorPlanes( FaserDetectorConstruction::default_detector_sensorPlanes );
   fDetectorConstruction->setPlanePitch( FaserDetectorConstruction::default_detector_planePitch );
   fDetectorConstruction->setDecayVolumeLength( FaserDetectorConstruction::default_detector_decayVolumeLength );
+  fDetectorConstruction->setTrackerLength( FaserDetectorConstruction::default_detector_trackerLength );
 }
 
 FaserGeometryMessenger::~FaserGeometryMessenger()
 {
+  if (cmd_detector_trackerLength) delete cmd_detector_trackerLength;
   if (cmd_detector_decayVolumeLength) delete cmd_detector_decayVolumeLength;
   if (cmd_detector_planePitch) delete cmd_detector_planePitch;
   if (cmd_detector_sensorPlanes) delete cmd_detector_sensorPlanes;
@@ -145,6 +154,10 @@ void FaserGeometryMessenger::SetNewValue(G4UIcommand* command, G4String newValue
     {
       fDetectorConstruction->setDecayVolumeLength( cmd_detector_decayVolumeLength->GetNewDoubleValue(newValues) );
     }
+  else if (command == cmd_detector_trackerLength)
+    {
+      fDetectorConstruction->setTrackerLength( cmd_detector_trackerLength->GetNewDoubleValue(newValues) );
+    }
 }
 
 G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
@@ -190,6 +203,10 @@ G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
  else if (command == cmd_detector_decayVolumeLength)
     {
       cv = cmd_detector_decayVolumeLength->ConvertToString(fDetectorConstruction->getDecayVolumeLength(), "m");
+    }
+ else if (command == cmd_detector_trackerLength)
+    {
+      cv = cmd_detector_trackerLength->ConvertToString(fDetectorConstruction->getTrackerLength(), "m");
     }
   return cv;
 }

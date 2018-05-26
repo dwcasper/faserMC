@@ -35,12 +35,16 @@
 #
 /faser/geo/sensorPlanes 5
 #
-# Spacing of detector planes
+# Spacing of detector planes; this is now the minimum spacing between planes
 #
 /faser/geo/planePitch 0.2 m
 #
 # Length of empty air before first detector plane
 #
-/faser/geo/decayVolumeLength 4.0 m
+/faser/geo/decayVolumeLength 3.0 m
+#
+# Length of the volume instrumented for tracking
+#
+/faser/geo/trackerLength 2.0 m
 
 
