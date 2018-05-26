@@ -14,6 +14,8 @@ class FaserGeometryMessenger;
 class FaserFieldSetup;
 class G4VPhysicalVolume;
 class G4LogicalVolume;
+class G4NistManager;
+class G4Material;
 
 /// Detector construction class to define materials and geometry.
 
@@ -27,6 +29,11 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual G4VPhysicalVolume* Construct();
   virtual void ConstructSDandField();
     
+  virtual void ConstructTracker();
+  virtual void ConstructTrackerPlane();
+  virtual void ConstructTrackerModule();
+  virtual void ConstructTrackerSensor();
+
   virtual void setReadoutStrips(G4int value) { sensor_readoutStrips = value; }
   virtual G4int getReadoutStrips() const { return sensor_readoutStrips; }
 
@@ -57,6 +64,8 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setDecayVolumeLength(G4double value) { detector_decayVolumeLength = value; }
   virtual G4double getDecayVolumeLength() const { return detector_decayVolumeLength; }
 
+  virtual void setTrackerLength(G4double value) { detector_trackerLength = value; }
+  virtual G4double getTrackerLength() const { return detector_trackerLength; }
 
   static constexpr G4double default_sensor_activeSizeY = 96.669*mm;
 
@@ -69,12 +78,16 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_support_sizeZ = 3.3*mm;
   static constexpr G4int    default_detector_sensorPlanes = 5;
   static constexpr G4double default_detector_planePitch = 1.0*m;
-  static constexpr G4double default_detector_decayVolumeLength = 5.0*m;
+  static constexpr G4double default_detector_decayVolumeLength = 3.0*m;
+  static constexpr G4double default_detector_trackerLength = 2.0*m;
 
   protected:
 
   FaserGeometryMessenger* fGeometryMessenger;
   G4LogicalVolume* fLogicTracker;
+  G4LogicalVolume* fLogicTrackerPlane;
+  G4LogicalVolume* fLogicTrackerModule;
+  G4LogicalVolume* fLogicTrackerSensor;
 
   // tunable (from macro) parameters 
   G4int    sensor_readoutStrips;
@@ -87,6 +100,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4int    detector_sensorPlanes;
   G4double detector_planePitch;
   G4double detector_decayVolumeLength;
+  G4double detector_trackerLength;
 
   // these are not copied by the volumes that use them,
   // so they must not be changed
@@ -98,6 +112,15 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   // mag field
   G4Cache<FaserFieldSetup*> fFieldSetup;
 
+  // internal variables
+  G4bool checkOverlaps;
+  G4NistManager* nist;
+  G4Material* env_mat;
+  G4double env_sizeX, env_sizeY;
+  G4double plane_sizeX, plane_sizeY, plane_sizeZ;
+  G4double module_sizeX, module_sizeY, module_sizeZ;
+  G4double sensor_sizeX, sensor_sizeY;
+  G4double firstPlaneZ;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

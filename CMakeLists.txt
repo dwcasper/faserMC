@@ -77,6 +77,7 @@ set(FASER_SCRIPTS
   faserGeo.mac
   faserPhys.mac
   faserDigi.mac
+  faserPhysicsList.mac
   )
 
 foreach(_script ${FASER_SCRIPTS})
