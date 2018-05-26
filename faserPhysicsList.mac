@@ -1,0 +1,10 @@
+#
+# Stand-alone file that is read at the earliest possible moment
+# during start-up, to allow the dark photon to be created with a
+# a user-specified mass. 
+#
+# This macro file will not work if included in one of the other
+# run-time macro files, because the dark photon will already be
+# created by the time they are read.
+#
+/faser/physics/setDarkPhotonMass 125 MeV
