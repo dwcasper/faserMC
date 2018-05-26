@@ -5,6 +5,8 @@
 #include "FaserRunAction.hh"
 #include "FaserEventAction.hh"
 #include "FaserSteppingAction.hh"
+#include "FaserStackingAction.hh"
+#include "FaserTrackingAction.hh"
 
 #include "TROOT.h"
 
@@ -43,6 +45,10 @@ void FaserActionInitialization::Build() const
   SetUserAction(eventAction);
   
   SetUserAction(new FaserSteppingAction(eventAction));
+
+  SetUserAction(new FaserStackingAction);
+
+  SetUserAction(new FaserTrackingAction);
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
