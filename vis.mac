@@ -105,8 +105,8 @@
 #/vis/geometry/set/visibility Row 0 false
 # Make the individual strip volumes invisible to avoid graphical overload
 /vis/geometry/set/visibility Strip 0 false
-# "Envelope" is transparent blue to represent air
-/vis/geometry/set/colour Envelope 0 0 0 1 .3
+# "DecayVolume" is transparent blue to represent air
+/vis/geometry/set/colour DecayVolume 0 0 0 1 .3
 # "Tracker" is transparent blue to represent air
 /vis/geometry/set/colour Tracker 0 0 0 1 .3
 # "Sensor" is purple-ish
