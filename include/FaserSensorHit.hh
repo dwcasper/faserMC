@@ -50,10 +50,10 @@ class FaserSensorHit : public G4VHit
     void SetLocalPos(G4ThreeVector localXYZ)   		{ fLocalPos = localXYZ; };
     
     void SetTrackID(G4int track)			{ fTrackID = track; };
-    void SetParticle(G4String particle)			{ fParticle = particle; };
-    void SetVertexPosition(G4ThreeVector xyz)		{ fVertexPosition = xyz; };
-    void SetVertexMomentumDirection(G4ThreeVector xyz)	{ fVertexMomentumDirection = xyz; };
-    void SetVertexKineticEnergy(G4double ke)		{ fVertexKineticEnergy = ke; };
+    void SetParticle(G4int particle)			{ fParticle = particle; };
+    void SetVertex(G4ThreeVector xyz)		        { fOriginPosition = xyz; };
+    void SetMomentum(G4ThreeVector xyz)	                { fOriginMomentum = xyz; };
+    void SetTotalEnergy(G4double te)   		        { fOriginEnergy = te; };
 
     // getters
     G4int GetPlaneID() const    	       		{ return fPlaneID; };
@@ -66,10 +66,10 @@ class FaserSensorHit : public G4VHit
     G4ThreeVector GetLocalPos() const	  		{ return fLocalPos; };
 
     G4int GetTrackID() const				{ return fTrackID; };
-    G4String GetParticle() const			{ return fParticle; };
-    G4ThreeVector GetVertexPosition() const		{ return fVertexPosition; };
-    G4ThreeVector GetVertexMomentumDirection() const	{ return fVertexMomentumDirection; };
-    G4double GetVertexKineticEnergy() const		{ return fVertexKineticEnergy; };
+    G4int GetParticle() const			        { return fParticle; };
+    G4ThreeVector GetVertex() const	   	        { return fOriginPosition; };
+    G4ThreeVector GetMomentum() const	                { return fOriginMomentum; };
+    G4double GetTotalEnergy() const		        { return fOriginEnergy; };
 
 
    private:
@@ -84,10 +84,10 @@ class FaserSensorHit : public G4VHit
     G4ThreeVector fLocalPos;
 
     G4int fTrackID;
-    G4String fParticle;
-    G4ThreeVector fVertexPosition;
-    G4ThreeVector fVertexMomentumDirection;
-    G4double fVertexKineticEnergy;
+    G4int fParticle;
+    G4ThreeVector fOriginPosition;
+    G4ThreeVector fOriginMomentum;
+    G4double fOriginEnergy;
 
 };
 

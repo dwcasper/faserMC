@@ -20,10 +20,10 @@ FaserSensorHit::FaserSensorHit()
     fGlobalPos(G4ThreeVector()),
     fLocalPos(G4ThreeVector()),
     fTrackID(-1),
-    fParticle(""),
-    fVertexPosition(G4ThreeVector()),
-    fVertexMomentumDirection(G4ThreeVector()),
-    fVertexKineticEnergy(0.0)
+    fParticle(0),
+    fOriginPosition(G4ThreeVector()),
+    fOriginMomentum(G4ThreeVector()),
+    fOriginEnergy(0.0)
 {}
 
 FaserSensorHit::~FaserSensorHit() {}
@@ -42,14 +42,13 @@ FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   
   fTrackID = right.fTrackID;
   fParticle = right.fParticle;
-  fVertexPosition = right.fVertexPosition;
-  fVertexMomentumDirection = right.fVertexMomentumDirection;
-  fVertexKineticEnergy = right.fVertexKineticEnergy;
+  fOriginPosition = right.fOriginPosition;
+  fOriginMomentum = right.fOriginMomentum;
+  fOriginEnergy = right.fOriginEnergy;
 }
 
 const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
 {
-  fTrackID = right.fTrackID;
   fPlaneID = right.fPlaneID;
   fModuleID = right.fModuleID;
   fSensorID = right.fSensorID;
@@ -61,9 +60,9 @@ const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
 
   fTrackID = right.fTrackID;
   fParticle = right.fParticle;
-  fVertexPosition = right.fVertexPosition;
-  fVertexMomentumDirection = right.fVertexMomentumDirection;
-  fVertexKineticEnergy = right.fVertexKineticEnergy;
+  fOriginPosition = right.fOriginPosition;
+  fOriginMomentum = right.fOriginMomentum;
+  fOriginEnergy = right.fOriginEnergy;
   
   return *this;
 }

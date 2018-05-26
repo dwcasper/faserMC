@@ -1,5 +1,6 @@
 #include "FaserSensorSD.hh"
 #include "FaserDetectorConstruction.hh"
+#include "FaserTrackInformation.hh"
 
 #include "G4RunManager.hh"
 #include "G4HCofThisEvent.hh"
@@ -63,11 +64,28 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 
   // truth information
   G4Track* track = aStep->GetTrack();
-  newHit->SetTrackID( track->GetTrackID() );
-  newHit->SetParticle( track->GetParticleDefinition()->GetParticleName() );
-  newHit->SetVertexPosition( track->GetVertexPosition() );
-  newHit->SetVertexMomentumDirection( track->GetVertexMomentumDirection() );
-  newHit->SetVertexKineticEnergy( track->GetVertexKineticEnergy() );
+  //newHit->SetTrackID( track->GetTrackID() );
+  //newHit->SetParticle( track->GetParticleDefinition()->GetParticleName() );
+  //newHit->SetVertexPosition( track->GetVertexPosition() );
+  //newHit->SetVertexMomentumDirection( track->GetVertexMomentumDirection() );
+  //newHit->SetVertexKineticEnergy( track->GetVertexKineticEnergy() );
+
+
+  FaserTrackInformation* info = (FaserTrackInformation*) track->GetUserInformation();
+  if ( info != nullptr )
+  {
+    //G4cout << "Hit created from primary particle " << track->GetTrackID() << " ";
+    //info->Print();
+    newHit->SetTrackID( info->GetOriginalTrackID() );
+    newHit->SetParticle( info->GetParticleDefinition()->GetPDGEncoding() );
+    newHit->SetVertex( info->GetOriginalPosition() );
+    newHit->SetMomentum( info->GetOriginalMomentum() );
+    newHit->SetTotalEnergy( info->GetOriginalEnergy() );
+  }
+  else
+  {
+    G4cout << "Warning: no user information for track producing hit" << G4endl;
+  }
 
   fHitsCollection->insert( newHit );
 
