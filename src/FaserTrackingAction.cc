@@ -24,14 +24,14 @@ void FaserTrackingAction::PostUserTrackingAction(const G4Track*aTrack)
 	      if (aTrack->GetParentID() == 0)
 	      {
 		  infoNew = new FaserTrackInformation((*secondaries)[i]);
-		  G4cout << "Created new trackinfo for daughter of primary: " << G4endl;
-		  infoNew->Print();
+		  //G4cout << "Created new trackinfo for daughter of primary: " << G4endl;
+		  //infoNew->Print();
 	      }
 	      else
 	      {
 		  infoNew = new FaserTrackInformation(info);
-		  G4cout << "Copied trackinfo to daughter of secondary: " << G4endl;
-		  infoNew->Print();
+		  //G4cout << "Copied trackinfo to daughter of secondary: " << G4endl;
+		  //infoNew->Print();
 	      }
 	      (*secondaries)[i]->SetUserInformation(infoNew);
 	  }

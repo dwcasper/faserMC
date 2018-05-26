@@ -10,7 +10,7 @@
 #include "G4Event.hh"
 
 FaserPrimaryGenerator::FaserPrimaryGenerator() 
-  : G4VPrimaryGenerator(), fGeneratorMessenger(nullptr), fEnvelope(nullptr), fDetectorConstruction(nullptr)
+  : G4VPrimaryGenerator(), fGeneratorMessenger(nullptr), fDecayVolume(nullptr), fDetectorConstruction(nullptr)
 {
   fGeneratorMessenger = new FaserGeneratorMessenger(this);
 }
@@ -22,26 +22,26 @@ FaserPrimaryGenerator::~FaserPrimaryGenerator()
 
 void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
 { 
-  G4double envSizeX = 0;
-  G4double envSizeY = 0;
-  G4double envSizeZ = 0;
-  G4double envLength = 0;
+  G4double decaySizeX = 0;
+  G4double decaySizeY = 0;
+  G4double decaySizeZ = 0;
+  G4double decayLength = 0;
 
-  if (fEnvelope == nullptr)
+  if (fDecayVolume == nullptr)
   {
-    G4LogicalVolume* envLV = G4LogicalVolumeStore::GetInstance()->GetVolume("Envelope");
-    if ( envLV ) fEnvelope = dynamic_cast<const G4Box*>(envLV->GetSolid());
+    G4LogicalVolume* decayLV = G4LogicalVolumeStore::GetInstance()->GetVolume("DecayVolume");
+    if ( decayLV ) fDecayVolume = dynamic_cast<const G4Box*>(decayLV->GetSolid());
   }
 
-  if ( fEnvelope != nullptr ) {
-    envSizeX = fEnvelope->GetXHalfLength();
-    envSizeY = fEnvelope->GetYHalfLength();
-    envLength = fEnvelope->GetZHalfLength()*2;
+  if ( fDecayVolume != nullptr ) {
+    decaySizeX = fDecayVolume->GetXHalfLength();
+    decaySizeY = fDecayVolume->GetYHalfLength();
+    decayLength = fDecayVolume->GetZHalfLength()*2;
   }  
   else  
   {
     G4ExceptionDescription msg;
-    msg << "Envelope volume of box shape not found.\n"; 
+    msg << "Decay volume of box shape not found.\n"; 
     msg << "Perhaps you have changed geometry.\n";
     msg << "Primary particles will start at (x,y) = (0,0) and decay immediately.";
     G4Exception("FaserPrimaryGeneratorAction::GeneratePrimaries()",
@@ -56,7 +56,7 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
 
   if ( fDetectorConstruction != nullptr )
   {
-    envSizeZ = std::max(fDetectorConstruction->getDecayVolumeLength(), fDetectorConstruction->getPlanePitch());
+    decaySizeZ = std::max(fDetectorConstruction->getDecayVolumeLength(), fDetectorConstruction->getPlanePitch());
   }
   else 
   {
@@ -68,9 +68,9 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
 		"MyCode0003",JustWarning,msg);
   }
 
-  G4double x0 = 2 * envSizeX * (G4UniformRand() - 0.5);
-  G4double y0 = 2 * envSizeY * (G4UniformRand() - 0.5);
-  G4double z0 = -envSizeZ + 1.0*cm;
+  G4double x0 = 2 * decaySizeX * (G4UniformRand() - 0.5);
+  G4double y0 = 2 * decaySizeY * (G4UniformRand() - 0.5);
+  G4double z0 = -decaySizeZ + 1.0*cm;
 
   G4ThreeVector position(x0, y0, z0);
   G4double time = 0.0 * s;
@@ -82,8 +82,8 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
   G4ParticleDefinition* particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle("darkphoton");
   G4PrimaryParticle* primary = new G4PrimaryParticle(particleDefinition, momentum.x(), momentum.y(), momentum.z());
 
-  G4double decayProperTime = (1.0-G4UniformRand())*primary->GetMass()*envLength/(primary->GetTotalMomentum() * CLHEP::c_light);
-  G4cout << "Proper time set for decay: " << decayProperTime / s << G4endl;
+  G4double decayProperTime = (1.0-G4UniformRand())*primary->GetMass()*decayLength/(primary->GetTotalMomentum() * CLHEP::c_light);
+  //G4cout << "Proper time set for decay: " << decayProperTime / s << G4endl;
   primary->SetProperTime(decayProperTime);
 
   vertex->SetPrimary(primary);

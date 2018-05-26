@@ -35,10 +35,7 @@ FaserDetectorConstruction::FaserDetectorConstruction()
     detector_planePitch(default_detector_planePitch),
     detector_decayVolumeLength(default_detector_decayVolumeLength),
   fStereoPlus(nullptr), fStereoMinus(nullptr), fOverlapAngle(nullptr),
-  checkOverlaps(true), nist(nullptr), env_mat(nullptr), env_sizeX(0),
-  env_sizeY(0), plane_sizeX(0), plane_sizeY(0), plane_sizeZ(0), 
-  module_sizeX(0), module_sizeY(0), module_sizeZ(0), sensor_sizeX(0), sensor_sizeY(0),
-  firstPlaneZ(0)
+  checkOverlaps(true), nist(nullptr)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -79,11 +76,11 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   //
   // In x, there are field-shaping strips at each end, and we assume a border on each edge of sensor_gap/2
   //
-  sensor_sizeX = ( sensor_readoutStrips + 2 ) * sensor_stripPitch + sensor_gap;
+  G4double sensor_sizeX = ( sensor_readoutStrips + 2 ) * sensor_stripPitch + sensor_gap;
 
   // In y, there are two rows of strips, separated by a gap, and we assume border on each edge of sensor_gap/2
   //
-  sensor_sizeY = ( sensor_stripLength * 2) + (sensor_gap * 2);
+  G4double sensor_sizeY = ( sensor_stripLength * 2) + (sensor_gap * 2);
   
   G4cout << "Sensor dimensions: ( " << sensor_sizeX/mm << " mm, " << sensor_sizeY/mm << " mm, "
 	 << sensor_sizeZ/mm << " mm )" << G4endl; 
@@ -157,6 +154,11 @@ void FaserDetectorConstruction::ConstructTrackerModule()
   // Construct a single Si sensor region
   //
   ConstructTrackerSensor();
+
+  const G4Box* sSensor = dynamic_cast<const G4Box*>(fLogicTrackerSensor->GetSolid());
+  G4double sensor_sizeX = 2*sSensor->GetXHalfLength();
+  G4double sensor_sizeY = 2*sSensor->GetYHalfLength();
+
   // sensor stereo angle (+/-)
   //
   G4cout << "Stereo angle: " << sensor_stereoAngle/mrad << " mrad" << G4endl;
@@ -191,9 +193,9 @@ void FaserDetectorConstruction::ConstructTrackerModule()
 
   // module dimensions
   //
-  module_sizeX = support_sizeX;
-  module_sizeY = support_sizeY;
-  module_sizeZ = 2 * sensor_sizeZ + support_sizeZ;
+  G4double module_sizeX = support_sizeX;
+  G4double module_sizeY = support_sizeY;
+  G4double module_sizeZ = 2 * sensor_sizeZ + support_sizeZ;
 
   // module volume
   //
@@ -266,8 +268,15 @@ void FaserDetectorConstruction::ConstructTrackerPlane()
   // Construct a tracker module (two of them overlap to form a plane)
   ConstructTrackerModule();
 
+  const G4Box* sModule = dynamic_cast<const G4Box*>(fLogicTrackerModule->GetSolid());
+  G4double module_sizeX = 2*sModule->GetXHalfLength();
+  G4double module_sizeY = 2*sModule->GetYHalfLength();
+  G4double module_sizeZ = 2*sModule->GetZHalfLength();
+
   // effective half-width of the wafer due to stereo rotation
   //
+  const G4Box* sSensor = dynamic_cast<const G4Box*>(fLogicTrackerSensor->GetSolid());
+  G4double sensor_sizeX = 2*sSensor->GetXHalfLength();
   G4double wPrime = (sensor_sizeX/2) / cos(sensor_stereoAngle);
 
   // overlap angle that will allow maximum x-separation without any gap
@@ -285,9 +294,9 @@ void FaserDetectorConstruction::ConstructTrackerPlane()
 
   // work out the size of the plane box that will contain both modules
   //
-  plane_sizeX = 2 * xOffset + module_sizeX * cos(overlapAngle) + module_sizeZ * sin(overlapAngle);
-  plane_sizeY = module_sizeY;
-  plane_sizeZ = module_sizeX * sin(overlapAngle) + module_sizeZ * cos(overlapAngle);
+  G4double plane_sizeX = 2 * xOffset + module_sizeX * cos(overlapAngle) + module_sizeZ * sin(overlapAngle);
+  G4double plane_sizeY = module_sizeY;
+  G4double plane_sizeZ = module_sizeX * sin(overlapAngle) + module_sizeZ * cos(overlapAngle);
   G4cout << "Plane dimensions: " << plane_sizeX/mm << " mm (X), "
 	 << plane_sizeY/mm << " mm (Y), " << plane_sizeZ/mm << " mm (Z)" << G4endl;
 
@@ -338,9 +347,19 @@ void FaserDetectorConstruction::ConstructTracker()
   // construct a two-sided sensor plane
   ConstructTrackerPlane();
 
-  // air volume (envelope) material transverse size
+  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicTrackerPlane->GetSolid());
+  G4double plane_sizeX = 2*sPlane->GetXHalfLength();
+  G4double plane_sizeY = 2*sPlane->GetYHalfLength();
+  G4double plane_sizeZ = 2*sPlane->GetZHalfLength();
+
+  // tracker material
   //
-  env_sizeX = plane_sizeX + 10.0*cm, env_sizeY = plane_sizeY + 10.0*cm;
+  G4Material* tracker_mat = nist->FindOrBuildMaterial("G4_AIR");
+
+  // air volume transverse size
+  //
+  G4double tracker_sizeX = plane_sizeX + 10.0*cm;
+  G4double tracker_sizeY = plane_sizeY + 10.0*cm;
 
   // length of volume enclosing sensor planes (plus air gap behind)
   //
@@ -353,15 +372,15 @@ void FaserDetectorConstruction::ConstructTracker()
   //
   G4Box* solidTracker =    
     new G4Box("Tracker",                    //its name
-        0.5*env_sizeX, 0.5*env_sizeY, 0.5*detector_trackerLength); //its size
+        0.5*tracker_sizeX, 0.5*tracker_sizeY, 0.5*detector_trackerLength); //its size
       
 
   fLogicTracker =                         
     new G4LogicalVolume(solidTracker,            //its solid
-                        env_mat,                 //its material
+                        tracker_mat,             //its material
                         "Tracker");              //its name
 
-  firstPlaneZ = -detector_trackerLength/2 + plane_sizeZ/2;
+  G4double firstPlaneZ = -detector_trackerLength/2 + plane_sizeZ/2;
 
   for (G4int i = 0; i < detector_sensorPlanes; i++)
   {
@@ -378,6 +397,36 @@ void FaserDetectorConstruction::ConstructTracker()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+void FaserDetectorConstruction::ConstructDecayVolume()
+{
+  // material for air volume
+  G4Material* decay_mat = nist->FindOrBuildMaterial("G4_AIR");
+
+  // the z length of the lab includes a gap decayVolumeLength before the first
+  // sensor plane, and a gap of planePitch after the last one
+  //
+  G4double decayVolumeLength = std::max(detector_decayVolumeLength, detector_planePitch);
+  G4double decay_sizeZ = decayVolumeLength;
+
+  const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
+  G4double tracker_sizeX = 2*sTracker->GetXHalfLength();
+  G4double tracker_sizeY = 2*sTracker->GetYHalfLength();
+
+  G4double decay_sizeX = tracker_sizeX;
+  G4double decay_sizeY = tracker_sizeY;
+
+  G4Box* solidEnv =    
+    new G4Box("DecayVolume",                 //its name
+        0.5*decay_sizeX, 0.5*decay_sizeY, 0.5*decay_sizeZ); //its size
+      
+  fLogicDecayVolume =                         
+    new G4LogicalVolume(solidEnv,            //its solid
+                        decay_mat,           //its material
+                        "DecayVolume");      //its name
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 G4VPhysicalVolume* FaserDetectorConstruction::Construct()
 {  
 
@@ -385,32 +434,27 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   //
   nist = G4NistManager::Instance();
   
-  // material for air
-  env_mat = nist->FindOrBuildMaterial("G4_AIR");
-
   // construct the tracker (and everything inside)
   ConstructTracker();
 
-  // the z length of the lab includes a gap decayVolumeLength before the first
-  // sensor plane, and a gap of planePitch after the last one
-  //
-  G4double decayVolumeLength = std::max(detector_decayVolumeLength, detector_planePitch);
-  G4double env_sizeZ = decayVolumeLength;
+  const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
+  G4double tracker_sizeZ = 2*sTracker->GetZHalfLength();
 
-  G4Box* solidEnv =    
-    new G4Box("Envelope",                    //its name
-        0.5*env_sizeX, 0.5*env_sizeY, 0.5*env_sizeZ); //its size
-      
-  G4LogicalVolume* logicEnv =                         
-    new G4LogicalVolume(solidEnv,            //its solid
-                        env_mat,             //its material
-                        "Envelope");         //its name
+  // construct the decay volue
+  ConstructDecayVolume();
+
+  const G4Box* sDecay = dynamic_cast<const G4Box*>(fLogicDecayVolume->GetSolid());
+  G4double decay_sizeZ = 2*sDecay->GetZHalfLength();
 
   // world volume size
   // want front surface of first plane at z = 0 in world system
   //
+  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicTrackerPlane->GetSolid());
+  G4double plane_sizeX = 2*sPlane->GetXHalfLength();
+  G4double plane_sizeY = 2*sPlane->GetYHalfLength();
+
   G4double world_sizeX = plane_sizeX + 2.0*m, world_sizeY = plane_sizeY + 2.0*m;
-  G4double world_sizeZ = 2 * std::max(decayVolumeLength, detector_trackerLength) + 2.0*m;
+  G4double world_sizeZ = 2 * std::max(decay_sizeZ, tracker_sizeZ) + 2.0*m;
 
   //     
   // World
@@ -428,11 +472,10 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                         world_mat,           //its material
                         "World");            //its name
 
-
   // place the tracker volume inside
   //
   new G4PVPlacement(0,                       //no rotation
-                    G4ThreeVector(0, 0, -(firstPlaneZ - plane_sizeZ/2) ),
+                    G4ThreeVector(0, 0, +tracker_sizeZ/2 ),
                     fLogicTracker,           //its logical volume
                     "Tracker_PV",            //its name
                     logicWorld,              //its mother  volume
@@ -443,9 +486,9 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   // place the decay volume inside
   //                                   
   new G4PVPlacement(0,                       //no rotation
-                    G4ThreeVector(0, 0, -decayVolumeLength/2 ),
-                    logicEnv,                //its logical volume
-                    "Envelope_PV",              //its name
+                    G4ThreeVector(0, 0, -decay_sizeZ/2 ),
+                    fLogicDecayVolume,       //its logical volume
+                    "Decay_PV",              //its name
                     logicWorld,              //its mother  volume
                     false,                   //no boolean operation
                     0,                       //copy number

@@ -29,6 +29,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual G4VPhysicalVolume* Construct();
   virtual void ConstructSDandField();
     
+  virtual void ConstructDecayVolume();
   virtual void ConstructTracker();
   virtual void ConstructTrackerPlane();
   virtual void ConstructTrackerModule();
@@ -84,6 +85,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   protected:
 
   FaserGeometryMessenger* fGeometryMessenger;
+  G4LogicalVolume* fLogicDecayVolume;
   G4LogicalVolume* fLogicTracker;
   G4LogicalVolume* fLogicTrackerPlane;
   G4LogicalVolume* fLogicTrackerModule;
@@ -115,12 +117,6 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   // internal variables
   G4bool checkOverlaps;
   G4NistManager* nist;
-  G4Material* env_mat;
-  G4double env_sizeX, env_sizeY;
-  G4double plane_sizeX, plane_sizeY, plane_sizeZ;
-  G4double module_sizeX, module_sizeY, module_sizeZ;
-  G4double sensor_sizeX, sensor_sizeY;
-  G4double firstPlaneZ;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

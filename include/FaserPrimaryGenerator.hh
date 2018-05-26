@@ -34,7 +34,7 @@ public:
 
 private:
   FaserGeneratorMessenger* fGeneratorMessenger;
-  const G4Box* fEnvelope;
+  const G4Box* fDecayVolume;
   const FaserDetectorConstruction* fDetectorConstruction; 
 
   double minPrimaryMomentum;
