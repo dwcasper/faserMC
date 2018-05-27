@@ -23,7 +23,8 @@
 
 FaserDetectorConstruction::FaserDetectorConstruction()
   : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
-    fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), fLogicTrackerModule(nullptr), fLogicTrackerSensor(nullptr),
+    fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), fLogicTrackerModule(nullptr), 
+    fLogicTrackerSensor(nullptr), fLogicStrip(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
     sensor_stripPitch(default_sensor_stripPitch),
     sensor_stripLength(default_sensor_stripLength),
@@ -131,7 +132,7 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   G4Box* solidStrip =
     new G4Box("Strip",
 	      0.5*sensor_stripPitch, 0.5*sensor_stripLength, 0.5*sensor_sizeZ);
-  G4LogicalVolume* logicStrip = 
+  fLogicStrip = 
     new G4LogicalVolume(solidStrip,
 		       sensor_mat,
 		       "Strip");
@@ -139,7 +140,7 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   // place the requested number of strips inside the row
   //
   new G4PVReplica("Strip_PV",
-		  logicStrip,
+		  fLogicStrip,
 		  logicRow,
 		  kXAxis,
 		  sensor_readoutStrips,

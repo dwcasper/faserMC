@@ -51,6 +51,13 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int module = h->GetCopyNumber(3);    // 0 - 1
   G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
 
+  G4cout << "Hit on strip " << strip << "/" << row << "/" << sensor << "/" << module << "/" << plane << G4endl;
+  for (int i = 0; i < h->GetHistory()->GetDepth(); i++)
+  {
+    G4cout << " Level " << i << " affine transform: " << h->GetHistory()->GetTransform(i) << G4endl;
+  }
+  G4cout << "Top transform: " << h->GetHistory()->GetTopTransform() << G4endl;
+
   newHit->SetPlaneID( plane );
   newHit->SetModuleID( module );
   newHit->SetSensorID( sensor );
@@ -61,6 +68,7 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4ThreeVector worldPosition = aStep->GetPostStepPoint()->GetPosition();
   newHit->SetGlobalPos( worldPosition );
   newHit->SetLocalPos( h->GetHistory()->GetTopTransform().TransformPoint( worldPosition ) );
+  newHit->SetTransform( h->GetHistory()->GetTopTransform().Inverse() );
 
   // truth information
   G4Track* track = aStep->GetTrack();

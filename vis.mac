@@ -110,9 +110,9 @@
 # "Tracker" is transparent blue to represent air
 /vis/geometry/set/colour Tracker 0 0 0 1 .3
 # "Sensor" is purple-ish
-/vis/geometry/set/colour Sensor 0 1 0 1 1
+/vis/geometry/set/colour Sensor 0 1 0 1 0.3
 # "Row" is lighter purple
-/vis/geometry/set/colour Row 0 0.7 0 0.7 1
+/vis/geometry/set/colour Row 0 0.7 0 0.7 0.3
 # "Support" is green
 /vis/geometry/set/colour Support 0 0 1 0 1
 /vis/viewer/set/style surface
