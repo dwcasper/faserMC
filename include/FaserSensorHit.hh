@@ -5,6 +5,8 @@
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 #include "G4ThreeVector.hh"
+#include "G4AffineTransform.hh"
+#include "FaserDetectorConstruction.hh"
 #include "tls.hh"
 
 // Hit class for the Faser silicon sensor
@@ -48,7 +50,8 @@ class FaserSensorHit : public G4VHit
     void SetEdep(G4double de)           	       	{ fEdep = de; };
     void SetGlobalPos(G4ThreeVector globalXYZ) 		{ fGlobalPos = globalXYZ; };
     void SetLocalPos(G4ThreeVector localXYZ)   		{ fLocalPos = localXYZ; };
-    
+    void SetTransform(G4AffineTransform transform)      { fTransform = transform; };  
+  
     void SetTrackID(G4int track)			{ fTrackID = track; };
     void SetParticle(G4int particle)			{ fParticle = particle; };
     void SetVertex(G4ThreeVector xyz)		        { fOriginPosition = xyz; };
@@ -64,6 +67,7 @@ class FaserSensorHit : public G4VHit
     G4double GetEdep() const           			{ return fEdep; };
     G4ThreeVector GetGlobalPos() const 			{ return fGlobalPos; };
     G4ThreeVector GetLocalPos() const	  		{ return fLocalPos; };
+    G4AffineTransform GetTransform() const              { return fTransform; }
 
     G4int GetTrackID() const				{ return fTrackID; };
     G4int GetParticle() const			        { return fParticle; };
@@ -82,6 +86,7 @@ class FaserSensorHit : public G4VHit
     G4double fEdep;
     G4ThreeVector fGlobalPos;
     G4ThreeVector fLocalPos;
+    G4AffineTransform fTransform;
 
     G4int fTrackID;
     G4int fParticle;
@@ -89,6 +94,7 @@ class FaserSensorHit : public G4VHit
     G4ThreeVector fOriginMomentum;
     G4double fOriginEnergy;
 
+    static const FaserDetectorConstruction* fDetectorConstruction;
 };
 
 typedef G4THitsCollection<FaserSensorHit> FaserSensorHitsCollection;

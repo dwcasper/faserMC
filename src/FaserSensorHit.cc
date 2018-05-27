@@ -4,10 +4,13 @@
 #include "G4Circle.hh"
 #include "G4Colour.hh"
 #include "G4VisAttributes.hh"
+#include "G4RunManager.hh"
 
 #include <iomanip>
 
 G4ThreadLocal G4Allocator<FaserSensorHit>* FaserSensorHitAllocator = 0;
+
+const FaserDetectorConstruction* FaserSensorHit::fDetectorConstruction = nullptr;
 
 FaserSensorHit::FaserSensorHit()
   : G4VHit(),
@@ -19,6 +22,7 @@ FaserSensorHit::FaserSensorHit()
     fEdep(0.0),
     fGlobalPos(G4ThreeVector()),
     fLocalPos(G4ThreeVector()),
+    fTransform(G4AffineTransform()),
     fTrackID(-1),
     fParticle(0),
     fOriginPosition(G4ThreeVector()),
@@ -39,6 +43,7 @@ FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   fEdep = right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
+  fTransform = right.fTransform;
   
   fTrackID = right.fTrackID;
   fParticle = right.fParticle;
@@ -57,6 +62,7 @@ const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
   fEdep =right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
+  fTransform = right.fTransform;
 
   fTrackID = right.fTrackID;
   fParticle = right.fParticle;
@@ -74,16 +80,34 @@ G4int FaserSensorHit::operator==(const FaserSensorHit& right)
 
 void FaserSensorHit::Draw()
 {
+  if (fDetectorConstruction == nullptr)
+  {
+    fDetectorConstruction = static_cast<const FaserDetectorConstruction*>(
+					G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+  }
+
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
   {
-    G4Circle circle(fGlobalPos);
-    circle.SetScreenSize(4.);
-    circle.SetFillStyle(G4Circle::filled);
-    G4Colour colour(1.0, 0.0, 0.0);
-    G4VisAttributes attribs(colour);
-    circle.SetVisAttributes(attribs);
-    pVVisManager->Draw(circle);
+    G4Transform3D trans(fTransform.NetRotation(), fTransform.NetTranslation());
+    G4VisAttributes attribs;
+    const G4LogicalVolume* strip = fDetectorConstruction->GetLogicStrip();
+    const G4VisAttributes* pVA = strip->GetVisAttributes();
+    if(pVA) attribs = *pVA;
+    G4Colour colour(1.,0.3,0.);
+    attribs.SetColour(colour);
+    attribs.SetForceSolid(true);
+
+    pVVisManager->Draw(*strip,attribs,trans);
+
+    //G4Circle circle(fGlobalPos);
+    //circle.SetScreenSize(4.);
+    //circle.SetFillStyle(G4Circle::filled);
+    //G4Colour colour(1.0, 0.0, 0.0);
+    //G4VisAttributes attribs(colour);
+    //circle.SetVisAttributes(attribs);
+    //pVVisManager->Draw(circle);
+
   }
 }
 
