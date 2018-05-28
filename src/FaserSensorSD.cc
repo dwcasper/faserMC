@@ -51,12 +51,12 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int module = h->GetCopyNumber(3);    // 0 - 1
   G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
 
-  G4cout << "Hit on strip " << strip << "/" << row << "/" << sensor << "/" << module << "/" << plane << G4endl;
-  for (int i = 0; i < h->GetHistory()->GetDepth(); i++)
-  {
-    G4cout << " Level " << i << " affine transform: " << h->GetHistory()->GetTransform(i) << G4endl;
-  }
-  G4cout << "Top transform: " << h->GetHistory()->GetTopTransform() << G4endl;
+  //G4cout << "Hit on strip " << strip << "/" << row << "/" << sensor << "/" << module << "/" << plane << G4endl;
+  //for (int i = 0; i <= h->GetHistory()->GetDepth(); i++)
+  //{
+  //  G4cout << " Level " << i << " affine transform: " << h->GetHistory()->GetTransform(i) << G4endl;
+  //}
+  //G4cout << "Top transform: " << h->GetHistory()->GetTopTransform() << G4endl;
 
   newHit->SetPlaneID( plane );
   newHit->SetModuleID( module );
@@ -72,23 +72,18 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 
   // truth information
   G4Track* track = aStep->GetTrack();
-  //newHit->SetTrackID( track->GetTrackID() );
-  //newHit->SetParticle( track->GetParticleDefinition()->GetParticleName() );
-  //newHit->SetVertexPosition( track->GetVertexPosition() );
-  //newHit->SetVertexMomentumDirection( track->GetVertexMomentumDirection() );
-  //newHit->SetVertexKineticEnergy( track->GetVertexKineticEnergy() );
-
+  newHit->SetTrackID( track->GetTrackID() );
+  newHit->SetParticle( track->GetParticleDefinition()->GetPDGEncoding() );
+  newHit->SetEnergy( track->GetTotalEnergy() );
 
   FaserTrackInformation* info = (FaserTrackInformation*) track->GetUserInformation();
   if ( info != nullptr )
   {
-    //G4cout << "Hit created from primary particle " << track->GetTrackID() << " ";
-    //info->Print();
-    newHit->SetTrackID( info->GetOriginalTrackID() );
-    newHit->SetParticle( info->GetParticleDefinition()->GetPDGEncoding() );
-    newHit->SetVertex( info->GetOriginalPosition() );
-    newHit->SetMomentum( info->GetOriginalMomentum() );
-    newHit->SetTotalEnergy( info->GetOriginalEnergy() );
+    newHit->SetOriginTrackID( info->GetOriginalTrackID() );
+    newHit->SetOriginParticle( info->GetParticleDefinition()->GetPDGEncoding() );
+    newHit->SetOriginPosition( info->GetOriginalPosition() );
+    newHit->SetOriginMomentum( info->GetOriginalMomentum() );
+    newHit->SetOriginEnergy( info->GetOriginalEnergy() );
   }
   else
   {

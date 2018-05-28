@@ -39,6 +39,7 @@ private:
 
   std::vector<G4int> fTruthTrackVector;
   std::vector<G4int> fTruthParticleVector;
+  std::vector<G4double> fTruthEnergyVector;
   
   std::vector<G4double> fTruthGlobalXVector;
   std::vector<G4double> fTruthGlobalYVector;
@@ -48,15 +49,18 @@ private:
   std::vector<G4double> fTruthLocalYVector;
   std::vector<G4double> fTruthLocalZVector;
 
-  std::vector<G4double> fTruthVertexXVector;
-  std::vector<G4double> fTruthVertexYVector;
-  std::vector<G4double> fTruthVertexZVector;
+  std::vector<G4int> fTruthOriginTrackVector;
+  std::vector<G4int> fTruthOriginParticleVector;  
 
-  std::vector<G4double> fTruthPXVector;
-  std::vector<G4double> fTruthPYVector;
-  std::vector<G4double> fTruthPZVector;
+  std::vector<G4double> fTruthOriginXVector;
+  std::vector<G4double> fTruthOriginYVector;
+  std::vector<G4double> fTruthOriginZVector;
 
-  std::vector<G4double> fTruthEnergyVector;
+  std::vector<G4double> fTruthOriginPXVector;
+  std::vector<G4double> fTruthOriginPYVector;
+  std::vector<G4double> fTruthOriginPZVector;
+
+  std::vector<G4double> fTruthOriginEnergyVector;
 };
 
 #endif

@@ -19,23 +19,24 @@ FaserDigitizer::FaserDigitizer(G4String name)
 {
   G4String colName = "FaserDigiCollection";
   collectionName.push_back(colName);
+}
 
+FaserDigitizer::~FaserDigitizer()
+{ }
+
+void FaserDigitizer::Digitize()
+{
+  // Can't retrieve this in constructor - it returns defaults
   G4RunManager* runMan = G4RunManager::GetRunManager();
   FaserDetectorConstruction* dc = (FaserDetectorConstruction*)
 	  runMan->GetUserDetectorConstruction();
   fNPlanes = dc->getSensorPlanes();
   fNStrips = dc->getReadoutStrips();
-  fStripEnergies = new G4double[fNPlanes * fNModules * fNSensors * fNRows * fNStrips]();
   fStripPitch = dc->getStripPitch();
-}
 
-FaserDigitizer::~FaserDigitizer()
-{
-  delete [] fStripEnergies;
-}
+  std::map<int, G4AffineTransform> transforms;
+  std::map<int, G4double> charges;
 
-void FaserDigitizer::Digitize()
-{
   fDigiCollection = new FaserDigiCollection
 	  ("FaserDigitizer", "FaserDigiCollection");
   
@@ -61,6 +62,14 @@ void FaserDigitizer::Digitize()
       G4int row = hit->GetRowID();
       G4int strip = hit->GetStripID();
       G4double eDepTotal = hit->GetEdep();
+      G4AffineTransform transform = hit->GetTransform(); // local->global
+      G4AffineTransform invTransform = transform.Inverse(); // global->local
+      G4ThreeVector localTranslate = invTransform.NetTranslation();
+      G4ThreeVector stripOffset(((strip+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
+      G4ThreeVector newTranslate = localTranslate + stripOffset;
+      invTransform.SetNetTranslation(newTranslate);
+      G4int rowIndex = ((plane*fNModules + module)*fNSensors + sensor)*fNRows + row;
+      if (transforms.count(rowIndex) == 0) transforms[rowIndex] = invTransform;
 
       G4int index = (((plane*fNModules + module)
 	     * fNSensors + sensor)  
@@ -69,12 +78,11 @@ void FaserDigitizer::Digitize()
       
       if (fChargeSpreadSigma > 0)
       {
-
 	// find deposited energy in the strip of incidence      
         G4double hitXscaled = hit->GetLocalPos().x() / fStripPitch; // in interval [-0.5, 0.5]
         G4double erfLeft = erf((-0.5 - hitXscaled)/erfNormalization)/2;
 	G4double erfRight = erf((0.5 - hitXscaled)/erfNormalization)/2;
-	*(fStripEnergies + index) += eDepTotal * (erfRight - erfLeft);
+	charges[index] += eDepTotal * (erfRight - erfLeft);
 
 	G4int dx;
 	G4double edep;
@@ -90,7 +98,7 @@ void FaserDigitizer::Digitize()
 
 	  if (edep < fBandGap) break;
 
-	  *(fStripEnergies + iStrip + indexBase) += edep;
+	  charges[iStrip + indexBase] += edep;
 	  erfLeft = erfBound;
 	}
 
@@ -103,21 +111,21 @@ void FaserDigitizer::Digitize()
 	  
 	  if (edep < fBandGap) break;
 	  
-	  *(fStripEnergies + iStrip + indexBase) += edep;
+	  charges[iStrip + indexBase] += edep;
 	  erfRight = erfBound;
 	}
       }
       else 
       {
-        *(fStripEnergies + index) += eDepTotal;
+	charges[index] += eDepTotal;
       }
     }
 
     // convert energies to charge
-    G4int nStripsTotal = fNPlanes * fNModules * fNSensors * fNRows * fNStrips;
-    for (G4int index=0; index<nStripsTotal; index++)
+    for (auto& p : charges)
     {
-      G4double eTotal = *(fStripEnergies + index);
+      G4int index = p.first;
+      G4double eTotal = p.second;
       G4double q = eTotal/fBandGap*eplus;
 
       if (q > fThreshold)
@@ -136,10 +144,20 @@ void FaserDigitizer::Digitize()
 	digi->SetPlaneID(remainder);
 	
 	digi->SetCharge(q);
+
+	G4int rowIndex = ((digi->GetPlaneID()*fNModules + 
+			   digi->GetModuleID())*fNSensors + 
+			   digi->GetSensorID())*fNRows + digi->GetRowID();
+	G4AffineTransform rowInv = transforms[rowIndex];
+	G4ThreeVector localTranslate = rowInv.NetTranslation();
+	G4ThreeVector stripOffset(((digi->GetStripID()+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
+	G4ThreeVector rowTranslate = localTranslate - stripOffset;
+	rowInv.SetNetTranslation(rowTranslate);
+	G4AffineTransform stripTransform = rowInv.Inverse(); // local to global
+	digi->SetTransform(stripTransform);
                 
 	fDigiCollection->insert(digi);
       }
-      *(fStripEnergies + index) = 0;
       
     }
   }

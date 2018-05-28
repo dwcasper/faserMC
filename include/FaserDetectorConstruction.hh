@@ -82,7 +82,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_detector_decayVolumeLength = 3.0*m;
   static constexpr G4double default_detector_trackerLength = 2.0*m;
 
-  virtual const G4LogicalVolume* GetLogicStrip() const { return fLogicStrip; }
+  virtual const G4LogicalVolume* GetTrackerStrip() const { return fLogicTrackerStrip; }
 
   protected:
 
@@ -92,7 +92,8 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4LogicalVolume* fLogicTrackerPlane;
   G4LogicalVolume* fLogicTrackerModule;
   G4LogicalVolume* fLogicTrackerSensor;
-  G4LogicalVolume* fLogicStrip;
+  G4LogicalVolume* fLogicTrackerRow;
+  G4LogicalVolume* fLogicTrackerStrip;
 
   // tunable (from macro) parameters 
   G4int    sensor_readoutStrips;

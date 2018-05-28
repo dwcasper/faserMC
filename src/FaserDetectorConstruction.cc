@@ -24,7 +24,7 @@
 FaserDetectorConstruction::FaserDetectorConstruction()
   : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
     fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), fLogicTrackerModule(nullptr), 
-    fLogicTrackerSensor(nullptr), fLogicStrip(nullptr),
+    fLogicTrackerSensor(nullptr), fLogicTrackerRow(nullptr), fLogicTrackerStrip(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
     sensor_stripPitch(default_sensor_stripPitch),
     sensor_stripLength(default_sensor_stripLength),
@@ -103,7 +103,7 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   G4Box* solidRow = 
     new G4Box("Row",
 	      0.5*(sensor_readoutStrips * sensor_stripPitch), 0.5*sensor_stripLength, 0.5*sensor_sizeZ);
-  G4LogicalVolume* logicRow =
+  fLogicTrackerRow =
     new G4LogicalVolume(solidRow,
 			sensor_mat,
 			"Row");
@@ -111,7 +111,7 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   // place the two rows inside the sensor
   new G4PVPlacement(0,
 		    G4ThreeVector(0, -0.5*(sensor_stripLength + sensor_gap), 0),
-		    logicRow,
+		    fLogicTrackerRow,
 		    "Row_PV",
 		    fLogicTrackerSensor,
 		    false,
@@ -120,7 +120,7 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
 
   new G4PVPlacement(0,
 		    G4ThreeVector(0, +0.5*(sensor_stripLength + sensor_gap), 0),
-		    logicRow,
+		    fLogicTrackerRow,
 		    "Row_PV",
 		    fLogicTrackerSensor,
 		    false,
@@ -132,7 +132,7 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   G4Box* solidStrip =
     new G4Box("Strip",
 	      0.5*sensor_stripPitch, 0.5*sensor_stripLength, 0.5*sensor_sizeZ);
-  fLogicStrip = 
+  fLogicTrackerStrip = 
     new G4LogicalVolume(solidStrip,
 		       sensor_mat,
 		       "Strip");
@@ -140,8 +140,8 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   // place the requested number of strips inside the row
   //
   new G4PVReplica("Strip_PV",
-		  fLogicStrip,
-		  logicRow,
+		  fLogicTrackerStrip,
+		  fLogicTrackerRow,
 		  kXAxis,
 		  sensor_readoutStrips,
 		  sensor_stripPitch,
@@ -167,11 +167,18 @@ void FaserDetectorConstruction::ConstructTrackerModule()
   // create rotation matrices for both senses of rotation
   // we have to hold these pointers (and not change the objects)
   // until the end of the job
+
+  // this combination of rotations, rather than the more obvious single rotation
+  // is necessary for hit/digit drawing of strips to draw them in the right place
+  // I don't really understand it...
+
   fStereoPlus = new G4RotationMatrix;
-  fStereoPlus->rotateZ(sensor_stereoAngle);
+  fStereoPlus->rotateY(CLHEP::pi);
+  fStereoPlus->rotateZ(-sensor_stereoAngle);
 
   fStereoMinus = new G4RotationMatrix;
-  fStereoMinus->rotateZ(-sensor_stereoAngle);
+  fStereoMinus->rotateY(CLHEP::pi);
+  fStereoMinus->rotateZ(sensor_stereoAngle);
 
   // support dimensions - assume a 2:1 rectangular shape
   //

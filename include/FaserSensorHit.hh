@@ -11,17 +11,6 @@
 
 // Hit class for the Faser silicon sensor
 //
-// Stores:
-//
-// trackID
-// planeID
-// moduleID
-// sensorID
-// rowID
-// stripID
-// energy deposit
-// global position
-// local position
 
 class FaserSensorHit : public G4VHit
 {
@@ -54,9 +43,13 @@ class FaserSensorHit : public G4VHit
   
     void SetTrackID(G4int track)			{ fTrackID = track; };
     void SetParticle(G4int particle)			{ fParticle = particle; };
-    void SetVertex(G4ThreeVector xyz)		        { fOriginPosition = xyz; };
-    void SetMomentum(G4ThreeVector xyz)	                { fOriginMomentum = xyz; };
-    void SetTotalEnergy(G4double te)   		        { fOriginEnergy = te; };
+    void SetEnergy(G4double te)   		        { fEnergy = te; };
+
+    void SetOriginTrackID(G4int track)                  { fOriginTrackID = track; }
+    void SetOriginParticle(G4int particle)              { fOriginParticle = particle; }
+    void SetOriginPosition(G4ThreeVector xyz)	        { fOriginPosition = xyz; };
+    void SetOriginMomentum(G4ThreeVector xyz)	        { fOriginMomentum = xyz; };
+    void SetOriginEnergy(G4double te)                   { fOriginEnergy = te; }
 
     // getters
     G4int GetPlaneID() const    	       		{ return fPlaneID; };
@@ -71,10 +64,13 @@ class FaserSensorHit : public G4VHit
 
     G4int GetTrackID() const				{ return fTrackID; };
     G4int GetParticle() const			        { return fParticle; };
-    G4ThreeVector GetVertex() const	   	        { return fOriginPosition; };
-    G4ThreeVector GetMomentum() const	                { return fOriginMomentum; };
-    G4double GetTotalEnergy() const		        { return fOriginEnergy; };
-
+    G4double GetEnergy() const                          { return fEnergy; }
+  
+    G4int GetOriginTrackID() const			{ return fOriginTrackID; };
+    G4int GetOriginParticle() const			{ return fOriginParticle; };
+    G4ThreeVector GetOriginPosition() const	   	{ return fOriginPosition; };
+    G4ThreeVector GetOriginMomentum() const	        { return fOriginMomentum; };
+    G4double GetOriginEnergy() const		        { return fOriginEnergy; };
 
    private:
 
@@ -90,6 +86,10 @@ class FaserSensorHit : public G4VHit
 
     G4int fTrackID;
     G4int fParticle;
+    G4double fEnergy;
+
+    G4int fOriginTrackID;
+    G4int fOriginParticle;
     G4ThreeVector fOriginPosition;
     G4ThreeVector fOriginMomentum;
     G4double fOriginEnergy;

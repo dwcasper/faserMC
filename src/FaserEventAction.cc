@@ -54,6 +54,7 @@ void FaserEventAction::EndOfEventAction(const G4Event*)
   FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*) 
 	  digiMan->GetHitsCollection(truthID);
 
+  G4cout << "Nhits: " << hc->entries() << ", Ndigits: " << dc->entries() << G4endl;
 
   RootIO* root = RootIO::GetInstance();
 
@@ -66,7 +67,7 @@ void FaserEventAction::EndOfEventAction(const G4Event*)
   {
     root->AddTruth(hc);
   }  
-  
+
   root->WriteEvent();
   
 }

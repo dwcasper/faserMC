@@ -25,6 +25,9 @@ FaserSensorHit::FaserSensorHit()
     fTransform(G4AffineTransform()),
     fTrackID(-1),
     fParticle(0),
+    fEnergy(0),
+    fOriginTrackID(-1),
+    fOriginParticle(0),
     fOriginPosition(G4ThreeVector()),
     fOriginMomentum(G4ThreeVector()),
     fOriginEnergy(0.0)
@@ -47,6 +50,9 @@ FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   
   fTrackID = right.fTrackID;
   fParticle = right.fParticle;
+  fEnergy = right.fEnergy;
+  fOriginTrackID = right.fOriginTrackID;
+  fOriginParticle = right.fOriginParticle;
   fOriginPosition = right.fOriginPosition;
   fOriginMomentum = right.fOriginMomentum;
   fOriginEnergy = right.fOriginEnergy;
@@ -66,6 +72,9 @@ const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
 
   fTrackID = right.fTrackID;
   fParticle = right.fParticle;
+  fEnergy = right.fEnergy;
+  fOriginTrackID = right.fOriginTrackID;
+  fOriginParticle = right.fOriginParticle;
   fOriginPosition = right.fOriginPosition;
   fOriginMomentum = right.fOriginMomentum;
   fOriginEnergy = right.fOriginEnergy;
@@ -89,24 +98,25 @@ void FaserSensorHit::Draw()
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager)
   {
+    /*
     G4Transform3D trans(fTransform.NetRotation(), fTransform.NetTranslation());
     G4VisAttributes attribs;
-    const G4LogicalVolume* strip = fDetectorConstruction->GetLogicStrip();
+    const G4LogicalVolume* strip = fDetectorConstruction->GetTrackerStrip();
     const G4VisAttributes* pVA = strip->GetVisAttributes();
     if(pVA) attribs = *pVA;
     G4Colour colour(1.,0.3,0.);
     attribs.SetColour(colour);
     attribs.SetForceSolid(true);
-
     pVVisManager->Draw(*strip,attribs,trans);
+    */
 
-    //G4Circle circle(fGlobalPos);
-    //circle.SetScreenSize(4.);
-    //circle.SetFillStyle(G4Circle::filled);
-    //G4Colour colour(1.0, 0.0, 0.0);
-    //G4VisAttributes attribs(colour);
-    //circle.SetVisAttributes(attribs);
-    //pVVisManager->Draw(circle);
+    G4Circle circle(fGlobalPos);
+    circle.SetScreenSize(8.);
+    circle.SetFillStyle(G4Circle::filled);
+    G4Colour colour(1.0, 0.0, 0.0);
+    G4VisAttributes attribs(colour);
+    circle.SetVisAttributes(attribs);
+    pVVisManager->Draw(circle);
 
   }
 }
