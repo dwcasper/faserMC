@@ -28,7 +28,6 @@ class FaserDigitizer : public G4VDigitizerModule
   private:
     FaserDigiMessenger* fDigiMessenger;
     FaserDigiCollection* fDigiCollection;
-    G4double* fStripEnergies;
     G4int fNPlanes;
     G4int fNModules;
     G4int fNSensors;

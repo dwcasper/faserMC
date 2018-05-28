@@ -47,8 +47,9 @@
 /vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
 # (if too many tracks cause core dump => /tracking/storeTrajectory 0)
 #
-# Draw hits at end of event:
+# Draw hits and digits at end of event:
 /vis/scene/add/hits
+/vis/scene/add/digis
 #
 # To draw only gammas:
 #/vis/filtering/trajectories/create/particleFilter
@@ -97,12 +98,17 @@
 # To get nice view
 # Make the "World" box invisible
 /vis/geometry/set/visibility World 0 false
+# Make the Tracker and Decay Volume invisible
+/vis/geometry/set/visibility Tracker 0 false
+/vis/geometry/set/visibility DecayVolume 0 false
 # Make the "Module" wrapper box invisibile
 /vis/geometry/set/visibility Module 0 false
 # Make the "Plane" wrapper box invisible
 /vis/geometry/set/visibility Plane 0 false
 # Make the "Row" wrapper box invisible
 #/vis/geometry/set/visibility Row 0 false
+# Make the "Sensor" wrapper box invisible
+/vis/geometry/set/visibility Sensor 0 false
 # Make the individual strip volumes invisible to avoid graphical overload
 /vis/geometry/set/visibility Strip 0 false
 # "DecayVolume" is transparent blue to represent air
