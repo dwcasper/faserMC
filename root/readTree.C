@@ -70,6 +70,10 @@ void readTree(TString fileName)
   // Histograms
   TH1F* qClust = new TH1F("qClust", "Qclust", 100, 0., 500000.);
   TH1F* nClust = new TH1F("nClust", "Nclust", 21, -0.5, 20.5);
+  TH1F* nMaxima = new TH1F("nMaxima", "Nmaxima", 21, -0.5, 20.5);
+  TH1F* qClustFail = new TH1F("qClustFail", "QclustFail", 100, 0., 500000.);
+  TH1F* nClustFail = new TH1F("nClustFail", "NclustFail", 21, -0.5, 20.5);
+  TH1F* nMaximaFail = new TH1F("nMaximaFail", "NmaximaFail", 21, -0.5, 20.5);
 
   std::map<Int_t, Int_t> cutFlow;
   for (Int_t i = 0 ; i < n; i++)
@@ -117,8 +121,19 @@ void readTree(TString fileName)
       }
       cout << "Plane " << plane.first << " has " << clusterMap[plane.first].size() << " clusters" << endl;
     }
+
     // Require at least 4 clusters in first plane
-    if (clusterMap[0].size() < 4 ) continue;
+    if (clusterMap[0].size() < 4 ) 
+    {
+      for ( auto& c : clusterMap[0] )
+      {
+	qClustFail->Fill(c.Charge());
+	nClustFail->Fill(c.Digis().size());
+	nMaximaFail->Fill(c.LocalMaxima());
+      }
+      continue;
+    }
+    
     cutFlow[cut++]++;
 
     for ( auto& plane : clusterMap )
@@ -127,6 +142,7 @@ void readTree(TString fileName)
       {
 	qClust->Fill(c.Charge());
 	nClust->Fill(c.Digis().size());
+	nMaxima->Fill(c.LocalMaxima());
       }
     }
   }
