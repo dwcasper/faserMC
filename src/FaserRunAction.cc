@@ -4,6 +4,7 @@
 #include "FaserPrimaryGeneratorAction.hh"
 #include "FaserDetectorConstruction.hh"
 // #include "FaserRun.hh"
+#include "RootEventIO.hh"
 
 #include "G4RunManager.hh"
 #include "G4Run.hh"
@@ -25,7 +26,9 @@ FaserRunAction::FaserRunAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserRunAction::~FaserRunAction()
-{}
+{
+  RootEventIO::GetInstance()->Close();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

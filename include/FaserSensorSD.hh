@@ -29,13 +29,6 @@ class FaserSensorSD : public G4VSensitiveDetector
   private:
   
     FaserSensorHitsCollection* fHitsCollection;
-    FaserSensorHitsCollection* fTruthCollection;
-    std::set<std::pair<G4int, G4int>> fTruthSet;
-
-    G4int fNPlanes;
-    G4int fNModules;
-    G4int fNSensors;
-    G4int fNRows;
 };
 
 #endif

@@ -11,14 +11,16 @@
 #include "G4DigiManager.hh"
 #include "FaserDigitizer.hh"
 #include "FaserDigi.hh"
+#include "FaserEvent.hh"
 
 #include "RootIO.hh"
+#include "RootEventIO.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserEventAction::FaserEventAction(FaserRunAction* runAction)
 : G4UserEventAction(),
-  fRunAction(runAction)
+  fRunAction(runAction), fFaserEvent(nullptr)
 {
   FaserDigitizer* fd = new FaserDigitizer("FaserDigitizer");
   G4DigiManager::GetDMpointer()->AddNewModule(fd);
@@ -27,13 +29,17 @@ FaserEventAction::FaserEventAction(FaserRunAction* runAction)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserEventAction::~FaserEventAction()
-{}
+{
+  if (fFaserEvent != nullptr) delete fFaserEvent;
+  fFaserEvent = nullptr;
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void FaserEventAction::BeginOfEventAction(const G4Event*)
+void FaserEventAction::BeginOfEventAction(const G4Event* event)
 {    
-
+  if (fFaserEvent != nullptr) delete fFaserEvent;
+  fFaserEvent = new FaserEvent(event->GetEventID());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -50,7 +56,7 @@ void FaserEventAction::EndOfEventAction(const G4Event*)
   FaserDigiCollection* dc = (FaserDigiCollection*) 
 	  digiMan->GetDigiCollection(digiID);
   
-  G4int truthID = digiMan->GetHitsCollectionID("FaserSensorTruthCollection");
+  G4int truthID = digiMan->GetHitsCollectionID("FaserSensorHitsCollection");
   FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*) 
 	  digiMan->GetHitsCollection(truthID);
 
@@ -70,6 +76,12 @@ void FaserEventAction::EndOfEventAction(const G4Event*)
 
   root->WriteEvent();
   
+
+  fFaserEvent->SetHits(hc);
+  fFaserEvent->SetDigis(dc);
+  RootEventIO* rootEventIO = RootEventIO::GetInstance();
+  rootEventIO->Write(fFaserEvent);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

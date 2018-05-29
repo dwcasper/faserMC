@@ -33,7 +33,8 @@ FaserSensorHit::FaserSensorHit()
     fOriginEnergy(0.0)
 {}
 
-FaserSensorHit::~FaserSensorHit() {}
+FaserSensorHit::~FaserSensorHit() 
+{ }
 
 FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   : G4VHit()
