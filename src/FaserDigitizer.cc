@@ -56,13 +56,13 @@ void FaserDigitizer::Digitize()
     {
       FaserSensorHit* hit = (*FSHC)[i];
 
-      G4int plane = hit->GetPlaneID();
-      G4int module = hit->GetModuleID();
-      G4int sensor = hit->GetSensorID();
-      G4int row = hit->GetRowID();
-      G4int strip = hit->GetStripID();
-      G4double eDepTotal = hit->GetEdep();
-      G4AffineTransform transform = hit->GetTransform(); // local->global
+      G4int plane = hit->Plane();
+      G4int module = hit->Module();
+      G4int sensor = hit->Sensor();
+      G4int row = hit->Row();
+      G4int strip = hit->Strip();
+      G4double eDepTotal = hit->Edep();
+      G4AffineTransform transform = hit->Transform(); // local->global
       G4AffineTransform invTransform = transform.Inverse(); // global->local
       G4ThreeVector localTranslate = invTransform.NetTranslation();
       G4ThreeVector stripOffset(((strip+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
@@ -76,12 +76,12 @@ void FaserDigitizer::Digitize()
 	     * fNRows + row)
 	     * fNStrips + strip;
       
-      G4int track = hit->GetTrackID();
+      G4int track = hit->Track();
 
       if (fChargeSpreadSigma > 0)
       {
 	// find deposited energy in the strip of incidence      
-        G4double hitXscaled = hit->GetLocalPos().x() / fStripPitch; // in interval [-0.5, 0.5]
+        G4double hitXscaled = hit->LocalPos().x() / fStripPitch; // in interval [-0.5, 0.5]
         G4double erfLeft = erf((-0.5 - hitXscaled)/erfNormalization)/2;
 	G4double erfRight = erf((0.5 - hitXscaled)/erfNormalization)/2;
 	G4double delta = eDepTotal * (erfRight - erfLeft);
@@ -140,15 +140,15 @@ void FaserDigitizer::Digitize()
         FaserDigi* digi = new FaserDigi();
                 
 	G4int remainder = index;
-	digi->SetStripID(remainder % fNStrips);
+	digi->SetStrip(remainder % fNStrips);
 	remainder /= fNStrips;
-	digi->SetRowID(remainder % fNRows);
+	digi->SetRow(remainder % fNRows);
 	remainder /= fNRows;
-	digi->SetSensorID(remainder % fNSensors);
+	digi->SetSensor(remainder % fNSensors);
 	remainder /= fNSensors;
-	digi->SetModuleID(remainder % fNModules);
+	digi->SetModule(remainder % fNModules);
 	remainder /= fNModules;
-	digi->SetPlaneID(remainder);
+	digi->SetPlane(remainder);
 	
 	digi->SetCharge(q);
 	for (auto tq : contributions[index])
@@ -156,12 +156,12 @@ void FaserDigitizer::Digitize()
 	  digi->AddTrack(tq.first, tq.second);
 	}
 
-	G4int rowIndex = ((digi->GetPlaneID()*fNModules + 
-			   digi->GetModuleID())*fNSensors + 
-			   digi->GetSensorID())*fNRows + digi->GetRowID();
+	G4int rowIndex = ((digi->Plane()*fNModules + 
+			   digi->Module())*fNSensors + 
+			   digi->Sensor())*fNRows + digi->Row();
 	G4AffineTransform rowInv = transforms[rowIndex];
 	G4ThreeVector localTranslate = rowInv.NetTranslation();
-	G4ThreeVector stripOffset(((digi->GetStripID()+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
+	G4ThreeVector stripOffset(((digi->Strip()+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
 	G4ThreeVector rowTranslate = localTranslate - stripOffset;
 	rowInv.SetNetTranslation(rowTranslate);
 	G4AffineTransform stripTransform = rowInv.Inverse(); // local to global

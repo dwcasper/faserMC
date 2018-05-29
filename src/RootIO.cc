@@ -90,12 +90,12 @@ void RootIO::AddDigits(FaserDigiCollection* dc)
   {
     FaserDigi* digi = (*dc)[i];
     
-    fPlaneVector.push_back(digi->GetPlaneID());
-    fModuleVector.push_back(digi->GetModuleID());
-    fSensorVector.push_back(digi->GetSensorID());
-    fRowVector.push_back(digi->GetRowID());
-    fStripVector.push_back(digi->GetStripID());
-    fChargeVector.push_back(digi->GetCharge()/coulomb*1e15);
+    fPlaneVector.push_back(digi->Plane());
+    fModuleVector.push_back(digi->Module());
+    fSensorVector.push_back(digi->Sensor());
+    fRowVector.push_back(digi->Row());
+    fStripVector.push_back(digi->Strip());
+    fChargeVector.push_back(digi->Charge()/coulomb*1e15);
   }
 }
 
@@ -107,24 +107,24 @@ void RootIO::AddTruth(FaserSensorHitsCollection* hc)
   {
     FaserSensorHit* hit = (*hc)[i];
 
-    fTruthPlaneVector.push_back(hit->GetPlaneID());
-    fTruthModuleVector.push_back(hit->GetModuleID());
-    fTruthSensorVector.push_back(hit->GetSensorID());
-    fTruthRowVector.push_back(hit->GetRowID());
-    fTruthStripVector.push_back(hit->GetStripID());
+    fTruthPlaneVector.push_back(hit->Plane());
+    fTruthModuleVector.push_back(hit->Module());
+    fTruthSensorVector.push_back(hit->Sensor());
+    fTruthRowVector.push_back(hit->Row());
+    fTruthStripVector.push_back(hit->Strip());
 
-    fTruthTrackVector.push_back(hit->GetTrackID());
-    fTruthEnergyVector.push_back(hit->GetEnergy());
+    fTruthTrackVector.push_back(hit->Track());
+    fTruthEnergyVector.push_back(hit->Energy());
     
-    fTruthGlobalXVector.push_back(hit->GetGlobalPos().x()/cm);
-    fTruthGlobalYVector.push_back(hit->GetGlobalPos().y()/cm);
-    fTruthGlobalZVector.push_back(hit->GetGlobalPos().z()/cm);
+    fTruthGlobalXVector.push_back(hit->GlobalPos().x()/cm);
+    fTruthGlobalYVector.push_back(hit->GlobalPos().y()/cm);
+    fTruthGlobalZVector.push_back(hit->GlobalPos().z()/cm);
     
-    fTruthLocalXVector.push_back(hit->GetLocalPos().x()/mm);
-    fTruthLocalYVector.push_back(hit->GetLocalPos().y()/mm);
-    fTruthLocalZVector.push_back(hit->GetLocalPos().z()/mm);
+    fTruthLocalXVector.push_back(hit->LocalPos().x()/mm);
+    fTruthLocalYVector.push_back(hit->LocalPos().y()/mm);
+    fTruthLocalZVector.push_back(hit->LocalPos().z()/mm);
 
-    fTruthOriginTrackVector.push_back(hit->GetOriginTrackID());
+    fTruthOriginTrackVector.push_back(hit->OriginTrack());
   }
 }
 
