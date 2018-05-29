@@ -7,6 +7,7 @@
 #include "globals.hh"
 
 class FaserRunAction;
+class FaserEvent;
 
 /// Event action class
 ///
@@ -22,6 +23,7 @@ class FaserEventAction : public G4UserEventAction
 
   private:
     FaserRunAction* fRunAction;
+    FaserEvent*     fFaserEvent;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

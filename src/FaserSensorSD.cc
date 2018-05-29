@@ -1,8 +1,6 @@
 #include "FaserSensorSD.hh"
-#include "FaserDetectorConstruction.hh"
 #include "FaserTrackInformation.hh"
 
-#include "G4RunManager.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"
 #include "G4ThreeVector.hh"
@@ -14,20 +12,9 @@
 FaserSensorSD::FaserSensorSD(const G4String& name,
 			     const G4String& hitsCollectionName)
   : G4VSensitiveDetector(name),
-    fHitsCollection(NULL),
-    fTruthCollection(NULL),
-    fNModules(2),
-    fNSensors(4),
-    fNRows(2)
+    fHitsCollection(NULL)
 {
   collectionName.insert(hitsCollectionName);
-  collectionName.insert("FaserSensorTruthCollection");
-
-  G4RunManager* runMan = G4RunManager::GetRunManager();
-
-  FaserDetectorConstruction* dc = (FaserDetectorConstruction*)
-	  runMan->GetUserDetectorConstruction();
-  fNPlanes = dc->getSensorPlanes();
 }
 
 FaserSensorSD::~FaserSensorSD()
@@ -50,13 +37,6 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int sensor = h->GetCopyNumber(2);    // 0 - 3
   G4int module = h->GetCopyNumber(3);    // 0 - 1
   G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
-
-  //G4cout << "Hit on strip " << strip << "/" << row << "/" << sensor << "/" << module << "/" << plane << G4endl;
-  //for (int i = 0; i <= h->GetHistory()->GetDepth(); i++)
-  //{
-  //  G4cout << " Level " << i << " affine transform: " << h->GetHistory()->GetTransform(i) << G4endl;
-  //}
-  //G4cout << "Top transform: " << h->GetHistory()->GetTopTransform() << G4endl;
 
   newHit->SetPlaneID( plane );
   newHit->SetModuleID( module );
@@ -92,21 +72,6 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 
   fHitsCollection->insert( newHit );
 
-  // get index up to row for truth values
-  G4int index = ((plane*fNModules + module) 
-		  * fNSensors + sensor) 
-	          * fNRows + row;
-  
-  // only need single representative hit per particle per row
-  if ( fTruthSet.insert(std::make_pair(index, track->GetTrackID())).second )
-  {
-    // make a copy
-    fTruthCollection->insert( new FaserSensorHit(*newHit) );
-  }
-
-
-  //newHit->Print();
-
   return true;
 }
 
@@ -115,24 +80,16 @@ void FaserSensorSD::Initialize(G4HCofThisEvent* hce)
   // Create hits collection
   fHitsCollection =
     new FaserSensorHitsCollection(SensitiveDetectorName, collectionName[0]);  
-  fTruthCollection =
-    new FaserSensorHitsCollection(SensitiveDetectorName, collectionName[1]);
 
   // add hits collection to the collection of all hit collections for event
   G4SDManager* sdMan = G4SDManager::GetSDMpointer();
   
   G4int hcID = sdMan->GetCollectionID(collectionName[0]);
   hce->AddHitsCollection( hcID, fHitsCollection);
-  
-  G4int truthID = sdMan->GetCollectionID(collectionName[1]);
-  hce->AddHitsCollection( truthID, fTruthCollection);
 }
 
 void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
 {
-
-  fTruthSet.clear();
-
   if (verboseLevel > 1)
   {
     G4int nofHits = fHitsCollection->entries();
@@ -142,5 +99,4 @@ void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
 	" hits in the silicon sensors:" << G4endl;
       //for (G4int i = 0; i < nofHits; i++) (*fHitsCollection)[i]->Print(); 
   }
-
 }
