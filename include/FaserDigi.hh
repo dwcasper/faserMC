@@ -42,25 +42,25 @@ class FaserDigi: public G4VDigi
 
   public:
 
-    inline void SetPlaneID(G4int plane)		{ fPlaneID = plane; };
-    inline void SetModuleID(G4int module) 	{ fModuleID = module; };
-    inline void SetSensorID(G4int sensor)	{ fSensorID = sensor; };
-    inline void SetRowID(G4int row)		{ fRowID = row; };
-    inline void SetStripID(G4int strip)		{ fStripID = strip; };
+    inline void SetPlane(G4int plane)		{ fPlaneID = plane; };
+    inline void SetModule(G4int module) 	{ fModuleID = module; };
+    inline void SetSensor(G4int sensor)	        { fSensorID = sensor; };
+    inline void SetRow(G4int row)		{ fRowID = row; };
+    inline void SetStrip(G4int strip)		{ fStripID = strip; };
     inline void SetTransform(G4AffineTransform transform) 
                                                 { fTransform = transform; }
     inline void SetCharge(G4double charge)	{ fCharge = charge; };
     inline void AddTrack(G4int trackID, G4double charge)
                                                 { fTracks[trackID] += charge; } 
 
-    inline G4int GetPlaneID() const		{ return fPlaneID; };
-    inline G4int GetModuleID() const		{ return fModuleID; };
-    inline G4int GetSensorID() const		{ return fSensorID; };
-    inline G4int GetRowID() const		{ return fRowID; };
-    inline G4int GetStripID() const 		{ return fStripID; };
-    inline G4AffineTransform GetTransform() const     
+    inline G4int Plane() const		        { return fPlaneID; };
+    inline G4int Module() const	       	        { return fModuleID; };
+    inline G4int Sensor() const		        { return fSensorID; };
+    inline G4int Row() const		        { return fRowID; };
+    inline G4int Strip() const 		        { return fStripID; };
+    inline G4AffineTransform Transform() const     
                                                 { return fTransform; }
-    inline G4double GetCharge() const		{ return fCharge; };
+    inline G4double Charge() const		{ return fCharge; };
     inline std::map<G4int, G4double> Tracks() const     
                                                 { return fTracks; }
 };

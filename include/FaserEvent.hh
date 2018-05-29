@@ -17,13 +17,13 @@ public:
   G4int GetEventNumber() { return fEventNumber; }
   void  SetEventNumber(G4int eventNumber) { fEventNumber = eventNumber; }
 
-  std::vector<FaserTruthParticle*> Particles() { return fParticles; }
+  std::vector<FaserTruthParticle*>& Particles() { return fParticles; }
   void SetParticles(G4TrajectoryContainer* particles);
 
-  std::vector<FaserSensorHit*> Hits() { return fHits; }
+  std::vector<FaserSensorHit*>& Hits() { return fHits; }
   void SetHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fHits.push_back((*hits)[i]); }
 
-  std::vector<FaserDigi*> Digis() { return fDigis; }
+  std::vector<FaserDigi*> Digis()& { return fDigis; }
   void SetDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fDigis.push_back((*digis)[i]); }
 
 private:

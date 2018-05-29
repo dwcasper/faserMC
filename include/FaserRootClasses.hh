@@ -2,13 +2,13 @@
 // Declaration of classes that need dictionaries
 //
 
+#include <map>
 #include "FaserEvent.hh"
 #include "FaserDigi.hh"
 #include "FaserSensorHit.hh"
 #include "FaserTruthParticle.hh"
 #include "G4AttDef.hh"
 #include "G4AttValue.hh"
-#include <map>
 
 std::vector<FaserSensorHit*> aGarbage;
 std::vector<FaserDigi*> bGarbage;

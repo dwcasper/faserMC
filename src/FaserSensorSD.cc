@@ -38,11 +38,11 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int module = h->GetCopyNumber(3);    // 0 - 1
   G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
 
-  newHit->SetPlaneID( plane );
-  newHit->SetModuleID( module );
-  newHit->SetSensorID( sensor );
-  newHit->SetRowID( row );
-  newHit->SetStripID( strip );
+  newHit->SetPlane( plane );
+  newHit->SetModule( module );
+  newHit->SetSensor( sensor );
+  newHit->SetRow( row );
+  newHit->SetStrip( strip );
 
   newHit->SetEdep( edep );
   G4ThreeVector worldPosition = aStep->GetPostStepPoint()->GetPosition();
@@ -52,13 +52,13 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 
   // truth information
   G4Track* track = aStep->GetTrack();
-  newHit->SetTrackID( track->GetTrackID() );
+  newHit->SetTrack( track->GetTrackID() );
   newHit->SetEnergy( track->GetTotalEnergy() );
 
   FaserTrackInformation* info = (FaserTrackInformation*) track->GetUserInformation();
   if ( info != nullptr )
   {
-    newHit->SetOriginTrackID( info->GetOriginalTrackID() );
+    newHit->SetOriginTrack( info->GetOriginalTrackID() );
   }
   else
   {

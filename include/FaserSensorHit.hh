@@ -31,36 +31,36 @@ class FaserSensorHit : public G4VHit
     virtual void Print();
 
     // setters
-    void SetPlaneID(G4int plane)               		{ fPlaneID = plane; };
-    void SetModuleID(G4int module) 	            	{ fModuleID = module; };
-    void SetSensorID(G4int sensor)      	       	{ fSensorID = sensor; };
-    void SetRowID(G4int row)                   		{ fRowID = row; };
-    void SetStripID(G4int strip)	               	{ fStripID = strip; };
+    void SetPlane(G4int plane)               		{ fPlaneID = plane; };
+    void SetModule(G4int module) 	            	{ fModuleID = module; };
+    void SetSensor(G4int sensor)      	       	{ fSensorID = sensor; };
+    void SetRow(G4int row)                   		{ fRowID = row; };
+    void SetStrip(G4int strip)	               	{ fStripID = strip; };
     void SetEdep(G4double de)           	       	{ fEdep = de; };
     void SetGlobalPos(G4ThreeVector globalXYZ) 		{ fGlobalPos = globalXYZ; };
     void SetLocalPos(G4ThreeVector localXYZ)   		{ fLocalPos = localXYZ; };
     void SetTransform(G4AffineTransform transform)      { fTransform = transform; };  
   
-    void SetTrackID(G4int track)			{ fTrackID = track; };
+    void SetTrack(G4int track)			        { fTrackID = track; };
     void SetEnergy(G4double te)   		        { fEnergy = te; };
 
-    void SetOriginTrackID(G4int track)                  { fOriginTrackID = track; }
+    void SetOriginTrack(G4int track)                    { fOriginTrackID = track; }
 
     // getters
-    G4int GetPlaneID() const    	       		{ return fPlaneID; };
-    G4int GetModuleID() const          			{ return fModuleID; };
-    G4int GetSensorID() const          			{ return fSensorID; };
-    G4int GetRowID() const	             		{ return fRowID; };
-    G4int GetStripID() const    	       		{ return fStripID; };
-    G4double GetEdep() const           			{ return fEdep; };
-    G4ThreeVector GetGlobalPos() const 			{ return fGlobalPos; };
-    G4ThreeVector GetLocalPos() const	  		{ return fLocalPos; };
-    G4AffineTransform GetTransform() const              { return fTransform; }
+    G4int Plane() const    	       		        { return fPlaneID; };
+    G4int Module() const          			{ return fModuleID; };
+    G4int Sensor() const          			{ return fSensorID; };
+    G4int Row() const	             		        { return fRowID; };
+    G4int Strip() const    	       		        { return fStripID; };
+    G4double Edep() const           			{ return fEdep; };
+    G4ThreeVector GlobalPos() const 			{ return fGlobalPos; };
+    G4ThreeVector LocalPos() const	  		{ return fLocalPos; };
+    G4AffineTransform Transform() const                 { return fTransform; }
 
-    G4int GetTrackID() const				{ return fTrackID; };
-    G4double GetEnergy() const                          { return fEnergy; }
+    G4int Track() const				        { return fTrackID; };
+    G4double Energy() const                             { return fEnergy; }
   
-    G4int GetOriginTrackID() const			{ return fOriginTrackID; };
+    G4int OriginTrack() const			        { return fOriginTrackID; };
 
    private:
 

@@ -7,4 +7,4 @@
 # run-time macro files, because the dark photon will already be
 # created by the time they are read.
 #
-/faser/physics/setDarkPhotonMass 125 MeV
+/faser/physics/setDarkPhotonMass 100 MeV

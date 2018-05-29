@@ -98,6 +98,22 @@ foreach(_script ${FASER_SCRIPTS})
     )
 endforeach()
 
+#----------------------------------------
+# Install root macros into a root subdirectory
+#
+set(FASER_ROOT_MACROS
+    root/initFaser.C
+    root/readTree.C
+   )
+
+foreach(_macro ${FASER_ROOT_MACROS})
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/${_macro}
+    ${PROJECT_BINARY_DIR}/${_macro}
+    COPYONLY
+    )
+endforeach()
+
 #----------------------------------------------------------------------------
 # For internal Geant4 use - but has no effect if you build this
 # example standalone
@@ -111,4 +127,5 @@ install(TARGETS faser DESTINATION bin)
 install(TARGETS FaserRootClassesDict DESTINATION lib)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/FaserRootClasses_rdict.pcm DESTINATION lib)
 install(FILES ${FASER_SCRIPTS} DESTINATION .)
+install(FILES ${FASER_ROOT_MACROS} DESTINATION root)
 
