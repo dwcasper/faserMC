@@ -7,7 +7,7 @@
 #include "G4SDManager.hh"
 #include "G4ios.hh"
 
-#include "RootIO.hh"
+//#include "RootIO.hh"
 
 FaserSensorSD::FaserSensorSD(const G4String& name,
 			     const G4String& hitsCollectionName)
@@ -19,7 +19,7 @@ FaserSensorSD::FaserSensorSD(const G4String& name,
 
 FaserSensorSD::~FaserSensorSD()
 { 
-  RootIO::GetInstance()->Close();
+  //RootIO::GetInstance()->Close();
 }
 
 G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
@@ -53,17 +53,12 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   // truth information
   G4Track* track = aStep->GetTrack();
   newHit->SetTrackID( track->GetTrackID() );
-  newHit->SetParticle( track->GetParticleDefinition()->GetPDGEncoding() );
   newHit->SetEnergy( track->GetTotalEnergy() );
 
   FaserTrackInformation* info = (FaserTrackInformation*) track->GetUserInformation();
   if ( info != nullptr )
   {
     newHit->SetOriginTrackID( info->GetOriginalTrackID() );
-    newHit->SetOriginParticle( info->GetParticleDefinition()->GetPDGEncoding() );
-    newHit->SetOriginPosition( info->GetOriginalPosition() );
-    newHit->SetOriginMomentum( info->GetOriginalMomentum() );
-    newHit->SetOriginEnergy( info->GetOriginalEnergy() );
   }
   else
   {

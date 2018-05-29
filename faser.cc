@@ -17,6 +17,7 @@
 #include "G4UIExecutive.hh"
 
 #include "Randomize.hh"
+#include "RootEventIO.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -68,6 +69,7 @@ int main(int argc,char** argv)
   //
   if ( ! ui ) { 
     // batch mode
+    if (argc > 1) RootEventIO::SetFileName(argv[2]);
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
     UImanager->ApplyCommand(command+fileName);

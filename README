@@ -12,6 +12,18 @@ build faserMC run
 /path/to/build> make install
 /path/to/build> export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/run/lib
 /path/to/build> cd ../run
+
+Then, to run interactively use this command (running with no command line argument triggers interactive mode):
+
 /path/to/run> bin/faser
 
-(Changes between Geant versions 10.3 and 10.4 may break the build - this configuration works with 10.4 and ROOT 6.12.06)
+while to run in batch mode, use
+
+/path/to/run> bin/faser init_novis.mac outputFile.root
+
+"init_novis.mac" is a sample batch macro file.  The only thing you may want to change is the number of events (/run/beamOn command).
+
+"outputFile.root" is the name of whatever file you want the root Tree written to.
+
+In either case, the mass of the Aprime is set in the macro file faserPhysicsList.mac.  You can't change the name as it's hard-coded to read at job-startup time.
+

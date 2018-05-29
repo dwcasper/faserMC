@@ -15,7 +15,6 @@ FaserDigitizer::FaserDigitizer(G4String name)
     fNRows(2),
     fThreshold(defaultThreshold),
     fChargeSpreadSigma(defaultChargeSpreadSigma)
-
 {
   G4String colName = "FaserDigiCollection";
   collectionName.push_back(colName);
@@ -26,7 +25,7 @@ FaserDigitizer::~FaserDigitizer()
 
 void FaserDigitizer::Digitize()
 {
-  // Can't retrieve this in constructor - it returns defaults
+  // Can't retrieve this in constructor - it still has only default values then
   G4RunManager* runMan = G4RunManager::GetRunManager();
   FaserDetectorConstruction* dc = (FaserDetectorConstruction*)
 	  runMan->GetUserDetectorConstruction();
@@ -34,8 +33,9 @@ void FaserDigitizer::Digitize()
   fNStrips = dc->getReadoutStrips();
   fStripPitch = dc->getStripPitch();
 
-  std::map<int, G4AffineTransform> transforms;
-  std::map<int, G4double> charges;
+  std::map<G4int, G4AffineTransform> transforms;
+  std::map<G4int, G4double> charges;
+  std::map<G4int, std::map<G4int, G4double> > contributions;
 
   fDigiCollection = new FaserDigiCollection
 	  ("FaserDigitizer", "FaserDigiCollection");
@@ -76,13 +76,17 @@ void FaserDigitizer::Digitize()
 	     * fNRows + row)
 	     * fNStrips + strip;
       
+      G4int track = hit->GetTrackID();
+
       if (fChargeSpreadSigma > 0)
       {
 	// find deposited energy in the strip of incidence      
         G4double hitXscaled = hit->GetLocalPos().x() / fStripPitch; // in interval [-0.5, 0.5]
         G4double erfLeft = erf((-0.5 - hitXscaled)/erfNormalization)/2;
 	G4double erfRight = erf((0.5 - hitXscaled)/erfNormalization)/2;
-	charges[index] += eDepTotal * (erfRight - erfLeft);
+	G4double delta = eDepTotal * (erfRight - erfLeft);
+	charges[index] += delta;
+	contributions[index][track] += delta;
 
 	G4int dx;
 	G4double edep;
@@ -99,6 +103,7 @@ void FaserDigitizer::Digitize()
 	  if (edep < fBandGap) break;
 
 	  charges[iStrip + indexBase] += edep;
+	  contributions[iStrip + indexBase][track] += edep;
 	  erfLeft = erfBound;
 	}
 
@@ -112,12 +117,14 @@ void FaserDigitizer::Digitize()
 	  if (edep < fBandGap) break;
 	  
 	  charges[iStrip + indexBase] += edep;
+	  contributions[iStrip + indexBase][track] += edep;
 	  erfRight = erfBound;
 	}
       }
       else 
       {
 	charges[index] += eDepTotal;
+	contributions[index][track] += eDepTotal;
       }
     }
 
@@ -144,6 +151,10 @@ void FaserDigitizer::Digitize()
 	digi->SetPlaneID(remainder);
 	
 	digi->SetCharge(q);
+	for (auto tq : contributions[index])
+	{
+	  digi->AddTrack(tq.first, tq.second);
+	}
 
 	G4int rowIndex = ((digi->GetPlaneID()*fNModules + 
 			   digi->GetModuleID())*fNSensors + 

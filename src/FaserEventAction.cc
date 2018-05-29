@@ -13,7 +13,7 @@
 #include "FaserDigi.hh"
 #include "FaserEvent.hh"
 
-#include "RootIO.hh"
+//#include "RootIO.hh"
 #include "RootEventIO.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -44,7 +44,7 @@ void FaserEventAction::BeginOfEventAction(const G4Event* event)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void FaserEventAction::EndOfEventAction(const G4Event*)
+void FaserEventAction::EndOfEventAction(const G4Event* g4event)
 { 
 
   G4DigiManager* digiMan = G4DigiManager::GetDMpointer();
@@ -62,21 +62,21 @@ void FaserEventAction::EndOfEventAction(const G4Event*)
 
   G4cout << "Nhits: " << hc->entries() << ", Ndigits: " << dc->entries() << G4endl;
 
-  RootIO* root = RootIO::GetInstance();
+  //RootIO* root = RootIO::GetInstance();
 
-  if ( dc ) 
-  {
-    root->AddDigits(dc);
-  }
+  //if ( dc ) 
+  //{
+  //  root->AddDigits(dc);
+  //}
 
-  if ( hc )
-  {
-    root->AddTruth(hc);
-  }  
+  //if ( hc )
+  //{
+  //  root->AddTruth(hc);
+  //}  
 
-  root->WriteEvent();
+  //root->WriteEvent();
   
-
+  fFaserEvent->SetParticles(g4event->GetTrajectoryContainer());
   fFaserEvent->SetHits(hc);
   fFaserEvent->SetDigis(dc);
   RootEventIO* rootEventIO = RootEventIO::GetInstance();

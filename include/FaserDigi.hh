@@ -36,6 +36,7 @@ class FaserDigi: public G4VDigi
     G4int fStripID;
     G4AffineTransform fTransform;
     G4double fCharge;
+    std::map<G4int, G4double> fTracks;
 
     static const FaserDetectorConstruction* fDetectorConstruction;
 
@@ -46,17 +47,22 @@ class FaserDigi: public G4VDigi
     inline void SetSensorID(G4int sensor)	{ fSensorID = sensor; };
     inline void SetRowID(G4int row)		{ fRowID = row; };
     inline void SetStripID(G4int strip)		{ fStripID = strip; };
-    inline void SetTransform(G4AffineTransform transform) { fTransform = transform; }
+    inline void SetTransform(G4AffineTransform transform) 
+                                                { fTransform = transform; }
     inline void SetCharge(G4double charge)	{ fCharge = charge; };
+    inline void AddTrack(G4int trackID, G4double charge)
+                                                { fTracks[trackID] += charge; } 
 
-    inline G4int GetPlaneID() 			{ return fPlaneID; };
-    inline G4int GetModuleID()			{ return fModuleID; };
-    inline G4int GetSensorID()			{ return fSensorID; };
-    inline G4int GetRowID()			{ return fRowID; };
-    inline G4int GetStripID()			{ return fStripID; };
-    inline G4AffineTransform GetTransform()     { return fTransform; }
-    inline G4double GetCharge()			{ return fCharge; };
-
+    inline G4int GetPlaneID() const		{ return fPlaneID; };
+    inline G4int GetModuleID() const		{ return fModuleID; };
+    inline G4int GetSensorID() const		{ return fSensorID; };
+    inline G4int GetRowID() const		{ return fRowID; };
+    inline G4int GetStripID() const 		{ return fStripID; };
+    inline G4AffineTransform GetTransform() const     
+                                                { return fTransform; }
+    inline G4double GetCharge() const		{ return fCharge; };
+    inline std::map<G4int, G4double> Tracks() const     
+                                                { return fTracks; }
 };
 
 typedef G4TDigiCollection<FaserDigi> FaserDigiCollection;
