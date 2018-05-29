@@ -24,13 +24,8 @@ FaserSensorHit::FaserSensorHit()
     fLocalPos(G4ThreeVector()),
     fTransform(G4AffineTransform()),
     fTrackID(-1),
-    fParticle(0),
     fEnergy(0),
-    fOriginTrackID(-1),
-    fOriginParticle(0),
-    fOriginPosition(G4ThreeVector()),
-    fOriginMomentum(G4ThreeVector()),
-    fOriginEnergy(0.0)
+    fOriginTrackID(-1)
 {}
 
 FaserSensorHit::~FaserSensorHit() 
@@ -50,13 +45,8 @@ FaserSensorHit::FaserSensorHit(const FaserSensorHit& right)
   fTransform = right.fTransform;
   
   fTrackID = right.fTrackID;
-  fParticle = right.fParticle;
   fEnergy = right.fEnergy;
   fOriginTrackID = right.fOriginTrackID;
-  fOriginParticle = right.fOriginParticle;
-  fOriginPosition = right.fOriginPosition;
-  fOriginMomentum = right.fOriginMomentum;
-  fOriginEnergy = right.fOriginEnergy;
 }
 
 const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
@@ -72,14 +62,9 @@ const FaserSensorHit& FaserSensorHit::operator=(const FaserSensorHit& right)
   fTransform = right.fTransform;
 
   fTrackID = right.fTrackID;
-  fParticle = right.fParticle;
   fEnergy = right.fEnergy;
   fOriginTrackID = right.fOriginTrackID;
-  fOriginParticle = right.fOriginParticle;
-  fOriginPosition = right.fOriginPosition;
-  fOriginMomentum = right.fOriginMomentum;
-  fOriginEnergy = right.fOriginEnergy;
-  
+
   return *this;
 }
 

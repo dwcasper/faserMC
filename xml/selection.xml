@@ -1,0 +1,23 @@
+<lcgdict>
+  <selection>
+    <class name="std::basic_string<char>" />
+    <class name="std::map<G4int, G4double>" />
+    <class name="G4String" />
+    <class name="FaserEvent" />
+    <class name="G4VHit" />
+    <class name="G4VDigi" />
+    <class name="G4ThreeVector" />
+    <class name="FaserTruthParticle" />
+    <class name="FaserSensorHit" />
+    <class name="FaserDigi" />
+    <class name="G4AffineTransform" />
+  </selection>
+  <exclusion>
+    <class name="FaserSensorHit">
+      <method name="Draw"/>
+    </class>
+    <class name="FaserDigi">
+      <method name="Draw"/>
+    </class>
+  </exclusion>
+</lcgdict>

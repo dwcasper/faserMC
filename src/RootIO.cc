@@ -36,7 +36,6 @@ RootIO::RootIO()
   fAnalysisManager->CreateNtupleIColumn("truth_strip", fTruthStripVector);
 
   fAnalysisManager->CreateNtupleIColumn("truth_track", fTruthTrackVector);
-  fAnalysisManager->CreateNtupleIColumn("truth_particle", fTruthParticleVector);
   fAnalysisManager->CreateNtupleDColumn("truth_energy", fTruthEnergyVector);
 
   fAnalysisManager->CreateNtupleDColumn("truth_global_x", fTruthGlobalXVector);
@@ -48,18 +47,7 @@ RootIO::RootIO()
   fAnalysisManager->CreateNtupleDColumn("truth_local_z", fTruthLocalZVector);
 
   fAnalysisManager->CreateNtupleIColumn("truth_origin_track", fTruthOriginTrackVector);
-  fAnalysisManager->CreateNtupleIColumn("truth_origin_particle", fTruthOriginParticleVector);
 
-  fAnalysisManager->CreateNtupleDColumn("truth_origin_x", fTruthOriginXVector);
-  fAnalysisManager->CreateNtupleDColumn("truth_origin_y", fTruthOriginYVector);
-  fAnalysisManager->CreateNtupleDColumn("truth_origin_z", fTruthOriginZVector);
-
-  fAnalysisManager->CreateNtupleDColumn("truth_origin_px", fTruthOriginPXVector);
-  fAnalysisManager->CreateNtupleDColumn("truth_origin_py", fTruthOriginPYVector);
-  fAnalysisManager->CreateNtupleDColumn("truth_origin_pz", fTruthOriginPZVector);
-
-  fAnalysisManager->CreateNtupleDColumn("truth_origin_energy", fTruthOriginEnergyVector);
-  
   fAnalysisManager->FinishNtuple();
 }
 
@@ -126,7 +114,6 @@ void RootIO::AddTruth(FaserSensorHitsCollection* hc)
     fTruthStripVector.push_back(hit->GetStripID());
 
     fTruthTrackVector.push_back(hit->GetTrackID());
-    fTruthParticleVector.push_back(hit->GetParticle());
     fTruthEnergyVector.push_back(hit->GetEnergy());
     
     fTruthGlobalXVector.push_back(hit->GetGlobalPos().x()/cm);
@@ -138,17 +125,6 @@ void RootIO::AddTruth(FaserSensorHitsCollection* hc)
     fTruthLocalZVector.push_back(hit->GetLocalPos().z()/mm);
 
     fTruthOriginTrackVector.push_back(hit->GetOriginTrackID());
-    fTruthOriginParticleVector.push_back(hit->GetOriginParticle());
-
-    fTruthOriginXVector.push_back(hit->GetOriginPosition().x()/cm);
-    fTruthOriginYVector.push_back(hit->GetOriginPosition().y()/cm);
-    fTruthOriginZVector.push_back(hit->GetOriginPosition().z()/cm);
-
-    fTruthOriginPXVector.push_back(hit->GetOriginMomentum().x());
-    fTruthOriginPYVector.push_back(hit->GetOriginMomentum().y());
-    fTruthOriginPZVector.push_back(hit->GetOriginMomentum().z());
-
-    fTruthOriginEnergyVector.push_back(hit->GetOriginEnergy()/MeV);
   }
 }
 
@@ -170,7 +146,6 @@ void RootIO::WriteEvent()
   fTruthStripVector.clear();
 
   fTruthTrackVector.clear();
-  fTruthParticleVector.clear();
   fTruthEnergyVector.clear();
 
   fTruthGlobalXVector.clear();
@@ -182,17 +157,6 @@ void RootIO::WriteEvent()
   fTruthLocalZVector.clear();
 
   fTruthOriginTrackVector.clear();
-  fTruthOriginParticleVector.clear();
-
-  fTruthOriginXVector.clear();
-  fTruthOriginYVector.clear();
-  fTruthOriginZVector.clear();
-
-  fTruthOriginPXVector.clear();
-  fTruthOriginPYVector.clear();
-  fTruthOriginPZVector.clear();
-
-  fTruthOriginEnergyVector.clear(); 
 }
 
 void RootIO::Close()
