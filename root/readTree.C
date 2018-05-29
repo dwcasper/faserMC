@@ -1,11 +1,32 @@
-Int_t digiID(FaserDigi* d)
-{
-  return 0;
-}
+#include "FaserCluster.C"
 
 Int_t rowID(FaserDigi* d)
 {
     return d->Row() + 2 * ( d->Sensor() + 4 * ( d->Module() + 2 * d->Plane() ) );
+}
+
+std::vector<std::vector<FaserDigi*> > clusterOneRow(std::vector<FaserDigi*> digits)
+{
+  std::vector<std::vector<FaserDigi*> > clusters;
+  std::vector<FaserDigi*> cluster;
+  int previousStrip = 1 << 30;
+  for (auto d : digits)
+  {
+    if (cluster.size() > 0 && d->Strip() > previousStrip + 1)
+    {
+      clusters.push_back(cluster);
+      cluster.clear();
+    }
+    cluster.push_back(d);
+    previousStrip = d->Strip();
+  }
+  if (cluster.size() > 0) clusters.push_back(cluster);
+  return clusters;
+}
+
+void sortDigits(std::vector<FaserDigi*>& v)
+{
+  std::sort(v.begin(), v.end(), [](FaserDigi* const& l, FaserDigi* const& r) { return l->Strip() < r->Strip(); });
 }
 
 std::map<int, std::vector<FaserDigi*> > mapDigitsByPlane(FaserEvent* e)
@@ -26,6 +47,10 @@ std::map<int, std::vector<FaserDigi*> > mapDigitsByRow( std::vector<FaserDigi*> 
   {
     rowMap[rowID(d)].push_back( d );
   }
+  for (auto& row : rowMap)
+  {
+    sortDigits(row.second);
+  }
   return rowMap;
 }
 
@@ -42,6 +67,9 @@ void readTree(TString fileName)
   Int_t n = t->GetEntries();
   cout << "File contains " << n << " event records" << endl;
 
+  // Histograms
+  TH1F* qClust = new TH1F("qClust", "Qclust", 100, 0., 500000.);
+  TH1F* nClust = new TH1F("nClust", "Nclust", 21, -0.5, 20.5);
 
   std::map<Int_t, Int_t> cutFlow;
   for (Int_t i = 0 ; i < n; i++)
@@ -74,6 +102,33 @@ void readTree(TString fileName)
     }
     if (nGoodPlanes < 3) continue;
     cutFlow[cut++]++;
+
+    // cluster the digits in each row of a plane
+    std::map<int, std::vector<FaserCluster> > clusterMap;
+    for ( auto& plane : rowMap )
+    {
+      for ( auto& row : plane.second )
+      {
+	std::vector<std::vector<FaserDigi*> > clusters = clusterOneRow(row.second);
+	for ( auto& c : clusters )
+	{
+	  clusterMap[plane.first].push_back(FaserCluster(c));
+	}
+      }
+      cout << "Plane " << plane.first << " has " << clusterMap[plane.first].size() << " clusters" << endl;
+    }
+    // Require at least 4 clusters in first plane
+    if (clusterMap[0].size() < 4 ) continue;
+    cutFlow[cut++]++;
+
+    for ( auto& plane : clusterMap )
+    {
+      for ( auto& c : plane.second )
+      {
+	qClust->Fill(c.Charge());
+	nClust->Fill(c.Digis().size());
+      }
+    }
   }
 
   cout << "CutFlow summary: " << endl;
