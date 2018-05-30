@@ -8,6 +8,7 @@ class FaserDigitizer;
 class G4UIdirectory;
 class G4UIcommand;
 class G4UIcmdWithADoubleAndUnit;
+class G4UIcmdWithADouble;
 
 class FaserDigiMessenger : public G4UImessenger
 {
@@ -26,6 +27,8 @@ class FaserDigiMessenger : public G4UImessenger
     G4UIdirectory*		digiDirectory;
     G4UIcmdWithADoubleAndUnit*	cmd_digi_chargeSpreadSigma;
     G4UIcmdWithADoubleAndUnit*	cmd_digi_threshold;
+    G4UIcmdWithADouble*	        cmd_digi_chargeSmear;
+    G4UIcmdWithADouble*	        cmd_digi_chargeSmearNorm;
 };
 
 #endif

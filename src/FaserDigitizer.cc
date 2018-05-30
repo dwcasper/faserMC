@@ -4,6 +4,7 @@
 
 #include "G4RunManager.hh"
 #include "G4DigiManager.hh"
+#include "Randomize.hh"
 
 #include <math.h>
 
@@ -14,7 +15,9 @@ FaserDigitizer::FaserDigitizer(G4String name)
     fNSensors(4),
     fNRows(2),
     fThreshold(defaultThreshold),
-    fChargeSpreadSigma(defaultChargeSpreadSigma)
+    fChargeSpreadSigma(defaultChargeSpreadSigma),
+    fChargeSmear(defaultChargeSmear),
+    fChargeSmearNorm(defaultChargeSmearNorm)
 {
   G4String colName = "FaserDigiCollection";
   collectionName.push_back(colName);
@@ -49,7 +52,7 @@ void FaserDigitizer::Digitize()
   if (FSHC) {
 
     G4int nHits = FSHC->entries();
-    G4double erfNormalization = fChargeSpreadSigma/fStripPitch/sqrt(2);
+    G4double erfNormalization = (fChargeSpreadSigma/fStripPitch)*sqrt(2); // was divided by sqrt(2) = incorrect
 
     // loop through hits and accumulate energies
     for (G4int i=0; i<nHits; i++) 
@@ -134,7 +137,8 @@ void FaserDigitizer::Digitize()
       G4int index = p.first;
       G4double eTotal = p.second;
       G4double q = eTotal/fBandGap*eplus;
-
+      // smear the charge 
+      q = std::max(0.0,G4RandGauss::shoot(q, fChargeSmear*sqrt(q*fChargeSmearNorm)));
       if (q > fThreshold)
       {
         FaserDigi* digi = new FaserDigi();
