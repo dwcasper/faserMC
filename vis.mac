@@ -69,6 +69,11 @@
 #
 # To superimpose all of the events from a given run:
 #/vis/scene/endOfEventAction accumulate
+/vis/scene/endOfEventAction refresh 0
+#
+# Don't understand why this is necessary, but it always runs out of memory
+#
+/vis/ogl/set/displayListLimit 50000000
 #
 # Decorations
 # Name
@@ -98,9 +103,10 @@
 # To get nice view
 # Make the "World" box invisible
 /vis/geometry/set/visibility World 0 false
-# Make the Tracker and Decay Volume invisible
+# Make the Calorimeter, Tracker and Decay Volume invisible
 /vis/geometry/set/visibility Tracker 0 false
 /vis/geometry/set/visibility DecayVolume 0 false
+/vis/geometry/set/visibility Calorimeter 0 false
 # Make the "Module" wrapper box invisibile
 /vis/geometry/set/visibility Module 0 false
 # Make the "Plane" wrapper box invisible
@@ -111,6 +117,8 @@
 /vis/geometry/set/visibility Sensor 0 false
 # Make the individual strip volumes invisible to avoid graphical overload
 /vis/geometry/set/visibility Strip 0 false
+# "Calorimeter" is transparent blue to represent air
+/vis/geometry/set/colour Calorimeter 0 0 0 1 .3
 # "DecayVolume" is transparent blue to represent air
 /vis/geometry/set/colour DecayVolume 0 0 0 1 .3
 # "Tracker" is transparent blue to represent air

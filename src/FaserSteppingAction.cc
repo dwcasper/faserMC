@@ -23,9 +23,22 @@ FaserSteppingAction::~FaserSteppingAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void FaserSteppingAction::UserSteppingAction(const G4Step* step)
+void FaserSteppingAction::UserSteppingAction(const G4Step* theStep)
 {
-  if (nullptr == step) return;
+  if (nullptr == theStep) return;
+  G4Track* theTrack = theStep->GetTrack();
+  if (theTrack->GetTrackStatus() != fAlive) { return; }
+  
+  // Get the region
+  G4StepPoint* thePrePoint = theStep->GetPreStepPoint();
+  G4LogicalVolume* thePreLV = thePrePoint->GetPhysicalVolume()->GetLogicalVolume();
+  G4Region* thePreR = thePreLV->GetRegion();
+  G4StepPoint* thePostPoint = theStep->GetPostStepPoint();
+  G4LogicalVolume* thePostLV = thePostPoint->GetPhysicalVolume()->GetLogicalVolume();
+  G4Region* thePostR = thePostLV->GetRegion();
+  if (thePreR->GetName() != "DefaultRegionForTheWorld" &&
+      thePostR->GetName() == "DefaultRegionForTheWorld")
+    theTrack->SetTrackStatus(fStopAndKill);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

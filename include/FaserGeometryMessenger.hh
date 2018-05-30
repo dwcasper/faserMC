@@ -36,6 +36,7 @@ private:
   G4UIcmdWithADoubleAndUnit*     cmd_detector_planePitch;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_decayVolumeLength;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_trackerLength;
+  G4UIcmdWithADoubleAndUnit*     cmd_detector_calorimeterLength;
 };
 
 #endif

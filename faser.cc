@@ -69,7 +69,7 @@ int main(int argc,char** argv)
   //
   if ( ! ui ) { 
     // batch mode
-    if (argc > 1) RootEventIO::SetFileName(argv[2]);
+    if (argc > 2) RootEventIO::SetFileName(argv[2]);
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
     UImanager->ApplyCommand(command+fileName);

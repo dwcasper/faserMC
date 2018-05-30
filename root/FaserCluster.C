@@ -132,8 +132,20 @@ FaserCluster::~FaserCluster()
 
 std::vector<ClusterFit> FaserCluster::WeightedAverage()
 {
-  int iMin = max(0, fMaxima[0] - 1);
-  int iMax = min((int)fDigis.size() - 1, fMaxima[0] + 1);
+  // find highest local maximum
+  double maxQ = 0.0;
+  int iLoc = 0;
+  for (auto i : fMaxima)
+  {
+    if (fDigis[i]->Charge() > maxQ)
+    {
+      maxQ = fDigis[i]->Charge();
+      iLoc = i;
+    }
+  }
+
+  int iMin = max(0, iLoc - 1);
+  int iMax = min((int)fDigis.size() - 1, iLoc + 1);
   double sumX = 0.0;
   double sumQ = 0.0;
   double sumXQ = 0.0;
@@ -152,8 +164,8 @@ std::vector<ClusterFit> FaserCluster::WeightedAverage()
   double widX = sqrt(sumX2Q/sumQ - wtdX*wtdX);
   threeParGauss->FixParameter(1, wtdX);
   threeParGauss->FixParameter(2, widX);
-  threeParGauss->SetParameter(0, fDigis[fMaxima[0]]->Charge());
-  threeParGauss->SetParLimits(0, fDigis[fMaxima[0]]->Charge()/3.0, fDigis[fMaxima[0]]->Charge()*3.0 );
+  threeParGauss->SetParameter(0, maxQ);
+  threeParGauss->SetParLimits(0, maxQ/3.0, maxQ*3.0 );
   fFitName = "g3";
   fH.Fit(fFitName, "QIEMB");
   TF1* fit = fH.GetFunction(fFitName);
