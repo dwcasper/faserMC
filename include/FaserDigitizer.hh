@@ -18,12 +18,18 @@ class FaserDigitizer : public G4VDigitizerModule
 
     virtual void SetChargeSpreadSigma(G4double value)	{ fChargeSpreadSigma = value; }
     virtual void SetThreshold(G4double value)		{ fThreshold = value; }
-
+    virtual void SetChargeSmear(G4double value)         { fChargeSmear = value; }
+    virtual void SetChargeSmearNorm(G4double value)         { fChargeSmearNorm = value; }
+   
     virtual G4double GetChargeSpreadSigma() const	{ return fChargeSpreadSigma; }
     virtual G4int GetThreshold() const			{ return fThreshold; }
+    virtual G4double GetChargeSmear() const              { return fChargeSmear; }
+    virtual G4double GetChargeSmearNorm() const          { return fChargeSmearNorm; } 
 
     static constexpr G4double defaultChargeSpreadSigma = 50*um;
     static constexpr G4double defaultThreshold = 0;
+    static constexpr G4double defaultChargeSmear = 0.05;
+    static constexpr G4double defaultChargeSmearNorm = 50000.0;
 
   private:
     FaserDigiMessenger* fDigiMessenger;
@@ -37,6 +43,9 @@ class FaserDigitizer : public G4VDigitizerModule
     G4double fThreshold;
     G4double fChargeSpreadSigma;
     G4double fStripPitch;
+
+    G4double fChargeSmear;
+    G4double fChargeSmearNorm;
     
     const G4double fBandGap = 1.1*eV;
 

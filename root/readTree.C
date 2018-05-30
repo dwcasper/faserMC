@@ -54,6 +54,35 @@ std::map<int, std::vector<FaserDigi*> > mapDigitsByRow( std::vector<FaserDigi*> 
   return rowMap;
 }
 
+bool displayClusterFits(int clusterNumber, std::map<int, std::vector<FaserCluster> > clusterMap)
+{
+    TCanvas c1("cCluster", "Clusters", 1800, 1300);
+    c1.Divide(3, int((clusterNumber-1)/3)+1);
+    gStyle->SetOptFit(1);
+    gStyle->SetOptStat(0);
+    int pad = 1;
+    for ( auto& p : clusterMap )
+    {
+      for ( auto& c : p.second )
+      {
+	c1.cd(pad++);
+	c.Draw();
+      }
+    }
+    gPad->Update();
+    TString prompt;
+    cout << "Enter text to continue" << endl;
+    cin >> prompt;
+    if (prompt == "q") return false;
+
+    gSystem->ProcessEvents();
+    TImage* img = TImage::Create();
+    img->FromPad(&c1);
+    img->WriteImage(prompt+".png");
+    delete img;
+    return true;
+}
+
 void readTree(TString fileName)
 {
 
@@ -74,6 +103,11 @@ void readTree(TString fileName)
   TH1F* qClustFail = new TH1F("qClustFail", "QclustFail", 100, 0., 500000.);
   TH1F* nClustFail = new TH1F("nClustFail", "NclustFail", 21, -0.5, 20.5);
   TH1F* nMaximaFail = new TH1F("nMaximaFail", "NmaximaFail", 21, -0.5, 20.5);
+  TH1F* nClust2Max = new TH1F("nClust2Max", "Nclust2Max", 21, -0.5, 20.5);
+
+  TH1F* clustChi2 = new TH1F("clustChi2", "ClustChi2", 100, 0., 6.);
+  TH1F* clustWid = new TH1F("clustWid", "ClustWid", 100, 0., 1.5);
+  TH1F* clustErr = new TH1F("clustErr", "ClustErr", 100, 0., 0.2);
 
   std::map<Int_t, Int_t> cutFlow;
   for (Int_t i = 0 ; i < n; i++)
@@ -107,6 +141,7 @@ void readTree(TString fileName)
     if (nGoodPlanes < 3) continue;
     cutFlow[cut++]++;
 
+    int clusterNumber = 0;
     // cluster the digits in each row of a plane
     std::map<int, std::vector<FaserCluster> > clusterMap;
     for ( auto& plane : rowMap )
@@ -116,10 +151,31 @@ void readTree(TString fileName)
 	std::vector<std::vector<FaserDigi*> > clusters = clusterOneRow(row.second);
 	for ( auto& c : clusters )
 	{
-	  clusterMap[plane.first].push_back(FaserCluster(c));
+	  clusterMap[plane.first].push_back(FaserCluster(clusterNumber++, c));
+	  if (clusterMap[plane.first].back().LocalMaxima() == 2) nClust2Max->Fill(c.size());
 	}
       }
       cout << "Plane " << plane.first << " has " << clusterMap[plane.first].size() << " clusters" << endl;
+    }
+
+    // uncomment to show clusters from each event
+    //if (!displayClusterFits(clusterNumber, clusterMap)) break;
+
+    for ( auto& p : clusterMap )
+    {
+      for ( auto& c : p.second )
+      {
+	std::vector<ClusterFit> fits = c.Fit();
+	if (fits.size() > 0) 
+	{
+	  clustChi2->Fill(fits[0].chiSquared);
+	}
+	for (auto& f : fits)
+	{
+	  clustWid->Fill(f.width);
+	  clustErr->Fill(f.positionError);
+	}
+      }
     }
 
     // Require at least 4 clusters in first plane
