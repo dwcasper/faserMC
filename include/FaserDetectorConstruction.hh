@@ -16,6 +16,7 @@ class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4NistManager;
 class G4Material;
+class G4Region;
 
 /// Detector construction class to define materials and geometry.
 
@@ -31,6 +32,8 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
     
   virtual void ConstructDecayVolume();
   virtual void ConstructTracker();
+  virtual void ConstructCalorimeter();
+  virtual void ConstructTrackerOld();
   virtual void ConstructTrackerPlane();
   virtual void ConstructTrackerModule();
   virtual void ConstructTrackerSensor();
@@ -68,8 +71,10 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setTrackerLength(G4double value) { detector_trackerLength = value; }
   virtual G4double getTrackerLength() const { return detector_trackerLength; }
 
-  static constexpr G4double default_sensor_activeSizeY = 96.669*mm;
+  virtual void setCalorimeterLength(G4double value) { detector_calorimeterLength = value; }
+  virtual G4double getCalorimeterLength() const { return detector_calorimeterLength; }
 
+  static constexpr G4double default_sensor_activeSizeY = 96.669*mm;
   static constexpr G4int    default_sensor_readoutStrips = 1280;
   static constexpr G4double default_sensor_stripPitch = 75.5*um;
   static constexpr G4double default_sensor_stripLength = 48.20*mm;
@@ -77,16 +82,18 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_sensor_sizeZ = 0.32*mm;
   static constexpr G4double default_sensor_stereoAngle = 26.0*mrad;
   static constexpr G4double default_support_sizeZ = 3.3*mm;
-  static constexpr G4int    default_detector_sensorPlanes = 5;
-  static constexpr G4double default_detector_planePitch = 1.0*m;
+  static constexpr G4int    default_detector_sensorPlanes = 8;
+  static constexpr G4double default_detector_planePitch = 5.0*cm;
   static constexpr G4double default_detector_decayVolumeLength = 3.0*m;
   static constexpr G4double default_detector_trackerLength = 2.0*m;
+  static constexpr G4double default_detector_calorimeterLength = 0.25*m;
 
   virtual const G4LogicalVolume* GetTrackerStrip() const { return fLogicTrackerStrip; }
 
   protected:
 
   FaserGeometryMessenger* fGeometryMessenger;
+  G4LogicalVolume* fLogicCalorimeter;
   G4LogicalVolume* fLogicDecayVolume;
   G4LogicalVolume* fLogicTracker;
   G4LogicalVolume* fLogicTrackerPlane;
@@ -107,6 +114,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4double detector_planePitch;
   G4double detector_decayVolumeLength;
   G4double detector_trackerLength;
+  G4double detector_calorimeterLength;
 
   // these are not copied by the volumes that use them,
   // so they must not be changed
@@ -121,6 +129,8 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   // internal variables
   G4bool checkOverlaps;
   G4NistManager* nist;
+  G4Region* fRegTracker;
+  G4Region* fRegAir;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

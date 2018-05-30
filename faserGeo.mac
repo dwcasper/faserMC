@@ -33,11 +33,11 @@
 #
 # Number of detector planes
 #
-/faser/geo/sensorPlanes 5
+/faser/geo/sensorPlanes 12
 #
 # Spacing of detector planes; this is now the minimum spacing between planes
 #
-/faser/geo/planePitch 0.2 m
+/faser/geo/planePitch 5.0 cm
 #
 # Length of empty air before first detector plane
 #

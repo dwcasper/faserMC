@@ -83,6 +83,13 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_detector_trackerLength->SetUnitCandidates("mm micron cm m");
   cmd_detector_trackerLength->AvailableForStates(G4State_PreInit);
 
+  cmd_detector_calorimeterLength = new G4UIcmdWithADoubleAndUnit("/faser/geo/calorimeterLength", this);
+  cmd_detector_calorimeterLength->SetGuidance("Length of the calorimeter region of the detector");
+  cmd_detector_calorimeterLength->SetParameterName("calorimeterLength", true, true);
+  cmd_detector_calorimeterLength->SetDefaultUnit("m");
+  cmd_detector_calorimeterLength->SetUnitCandidates("mm micron cm m");
+  cmd_detector_calorimeterLength->AvailableForStates(G4State_PreInit);
+
   fDetectorConstruction->setReadoutStrips( FaserDetectorConstruction::default_sensor_readoutStrips );
   fDetectorConstruction->setStripPitch( FaserDetectorConstruction::default_sensor_stripPitch );
   fDetectorConstruction->setStripLength( FaserDetectorConstruction::default_sensor_stripLength );
@@ -94,10 +101,12 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   fDetectorConstruction->setPlanePitch( FaserDetectorConstruction::default_detector_planePitch );
   fDetectorConstruction->setDecayVolumeLength( FaserDetectorConstruction::default_detector_decayVolumeLength );
   fDetectorConstruction->setTrackerLength( FaserDetectorConstruction::default_detector_trackerLength );
+  fDetectorConstruction->setCalorimeterLength( FaserDetectorConstruction::default_detector_calorimeterLength );
 }
 
 FaserGeometryMessenger::~FaserGeometryMessenger()
 {
+  if (cmd_detector_calorimeterLength) delete cmd_detector_calorimeterLength;
   if (cmd_detector_trackerLength) delete cmd_detector_trackerLength;
   if (cmd_detector_decayVolumeLength) delete cmd_detector_decayVolumeLength;
   if (cmd_detector_planePitch) delete cmd_detector_planePitch;
@@ -158,6 +167,10 @@ void FaserGeometryMessenger::SetNewValue(G4UIcommand* command, G4String newValue
     {
       fDetectorConstruction->setTrackerLength( cmd_detector_trackerLength->GetNewDoubleValue(newValues) );
     }
+  else if (command == cmd_detector_calorimeterLength)
+    {
+      fDetectorConstruction->setCalorimeterLength( cmd_detector_calorimeterLength->GetNewDoubleValue(newValues) );
+    }
 }
 
 G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
@@ -207,6 +220,10 @@ G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
  else if (command == cmd_detector_trackerLength)
     {
       cv = cmd_detector_trackerLength->ConvertToString(fDetectorConstruction->getTrackerLength(), "m");
+    }
+ else if (command == cmd_detector_calorimeterLength)
+    {
+      cv = cmd_detector_calorimeterLength->ConvertToString(fDetectorConstruction->getCalorimeterLength(), "m");
     }
   return cv;
 }
