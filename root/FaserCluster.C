@@ -132,6 +132,14 @@ FaserCluster::~FaserCluster()
 
 std::vector<ClusterFit> FaserCluster::WeightedAverage()
 {
+  // bail out on 1 hit cluster
+  if (fDigis.size() == 1)
+  {
+    fFitResults.push_back(ClusterFit(0.0, fDigis[0]->Strip(), 
+				     0.5, 0.5,
+				     fDigis[0]->Charge(), 1));
+    return fFitResults;
+  }
   // find highest local maximum
   double maxQ = 0.0;
   int iLoc = 0;
