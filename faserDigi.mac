@@ -8,7 +8,7 @@
 #
 # Charge threshold (events must be strictly greater)
 #
-/faser/digi/threshold 0.6 fC
+/faser/digi/threshold 0.85 fC
 #
 # Noise level
 #
@@ -16,4 +16,4 @@
 #
 # Fudge factor for energy deposit -> digit charge
 #
-/faser/digi/chargeNorm 0.4
+/faser/digi/chargeNorm 0.24

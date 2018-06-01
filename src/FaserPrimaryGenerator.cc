@@ -27,18 +27,27 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
   G4double decaySizeX = 0;
   G4double decaySizeY = 0;
   G4double decaySizeZ = 0;
+  G4double planeSizeX = 0;
+  G4double planeSizeY = 0;
   G4double decayLength = 0;
 
-  if (fDecayVolume == nullptr)
+  G4bool firstCall = false;
+
+  if (fDecayVolume == nullptr || fPlane == nullptr)
   {
+    firstCall = true;
     G4LogicalVolume* decayLV = G4LogicalVolumeStore::GetInstance()->GetVolume("DecayVolume");
     if ( decayLV ) fDecayVolume = dynamic_cast<const G4Box*>(decayLV->GetSolid());
+    G4LogicalVolume* planeLV = G4LogicalVolumeStore::GetInstance()->GetVolume("Plane");
+    if ( planeLV )  fPlane = dynamic_cast<const G4Box*>(planeLV->GetSolid());    
   }
 
-  if ( fDecayVolume != nullptr ) {
+  if ( fDecayVolume != nullptr && fPlane != nullptr ) {
     decaySizeX = fDecayVolume->GetXHalfLength();
     decaySizeY = fDecayVolume->GetYHalfLength();
     decayLength = fDecayVolume->GetZHalfLength()*2;
+    planeSizeX = fPlane->GetXHalfLength();
+    planeSizeY = fPlane->GetYHalfLength();
   }  
   else  
   {
@@ -79,6 +88,15 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
   G4PrimaryVertex* vertex = new G4PrimaryVertex(position, time);
 
   G4ThreeVector momentum = position - sourcePosition;
+
+  if (firstCall) 
+  {
+    double solidAngleDecay = 4 * decaySizeX * decaySizeY * momentum.cosTheta() / momentum.mag2();
+    double solidAnglePlane = 4 * planeSizeX * planeSizeY * sourcePosition.cosTheta() / sourcePosition.mag2();
+    double geoWeight = solidAnglePlane / solidAngleDecay;
+    G4cout << "Generator solid-angle factor: " << geoWeight << G4endl;
+  }
+
   G4double logP = log(minPrimaryMomentum) + log(maxPrimaryMomentum/minPrimaryMomentum)*G4UniformRand();
   momentum.setMag(exp(logP));
   G4ParticleDefinition* particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle(fParticleName);
