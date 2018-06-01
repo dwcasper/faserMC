@@ -110,6 +110,9 @@ void readTree(TString fileName)
   TH1F* clustWid = new TH1F("clustWid", "ClustWid", 100, 0., 1.5);
   TH1F* clustErr = new TH1F("clustErr", "ClustErr", 100, 0., 0.2);
 
+  TH1F* pAprimeAll = new TH1F("pAprimeAll", "log(Paprime)", 5, log10(200.), log10(6500.));
+  TH1F* pAprimePass = new TH1F("pAprimePass", "log(Paprime)", 5, log10(200.), log10(6500.));
+
   std::map<Int_t, Int_t> cutFlow;
   for (Int_t i = 0 ; i < n; i++)
   {
@@ -117,6 +120,9 @@ void readTree(TString fileName)
     cutFlow[cut++]++;
 
     b->GetEntry(i);
+
+    pAprimeAll->Fill(log10(e->Particles()[0]->Momentum().z()/1000.));
+
     // if there are no digits, read next
     if (e->Digis().size() == 0) continue;
     cout << "Event has " << e->Digis().size() << " digits" << endl;
@@ -196,6 +202,8 @@ void readTree(TString fileName)
     }
     
     cutFlow[cut++]++;
+
+    pAprimePass->Fill(log10(e->Particles()[0]->Momentum().z()/1000.));
 
     for ( auto& plane : clusterMap )
     {
