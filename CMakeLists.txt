@@ -83,9 +83,11 @@ target_link_libraries(faser FaserRootClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBR
 set(FASER_SCRIPTS
   init_vis.mac
   init_novis.mac
+  init_minion.mac
   vis.mac
   faserGeo.mac
   faserPhys.mac
+  faserPhysMinIon.mac
   faserDigi.mac
   faserPhysicsList.mac
   )

@@ -28,15 +28,17 @@ FaserDigiMessenger::FaserDigiMessenger(FaserDigitizer* digitizer)
   cmd_digi_threshold->SetParameterName("threshold", true, true);
   cmd_digi_threshold->AvailableForStates(G4State_PreInit, G4State_Idle);
 
-  cmd_digi_chargeSmear = new G4UIcmdWithADouble("/faser/digi/chargeSmear", this);
-  cmd_digi_chargeSmear->SetGuidance("Relative charge measurement error at the specified normalization value");
+  cmd_digi_chargeSmear = new G4UIcmdWithADoubleAndUnit("/faser/digi/chargeSmear", this);
+  cmd_digi_chargeSmear->SetDefaultUnit("eplus");
+  cmd_digi_chargeSmear->SetUnitCandidates("eplus fC");
+  cmd_digi_chargeSmear->SetGuidance("Average value of noise per channel");
   cmd_digi_chargeSmear->SetParameterName("chargeSmear", true, true);
   cmd_digi_chargeSmear->AvailableForStates(G4State_PreInit, G4State_Idle);
 
-  cmd_digi_chargeSmearNorm = new G4UIcmdWithADouble("/faser/digi/chargeSmearNorm", this);
-  cmd_digi_chargeSmearNorm->SetGuidance("Charge value at which the measurement has the specified relative error");
-  cmd_digi_chargeSmearNorm->SetParameterName("chargeSmearNorm", true, true);
-  cmd_digi_chargeSmearNorm->AvailableForStates(G4State_PreInit, G4State_Idle);
+  cmd_digi_chargeNorm = new G4UIcmdWithADouble("/faser/digi/chargeNorm", this);
+  cmd_digi_chargeNorm->SetGuidance("Fudge factor to control over charge level");
+  cmd_digi_chargeNorm->SetParameterName("chargeNorm", true, true);
+  cmd_digi_chargeNorm->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 FaserDigiMessenger::~FaserDigiMessenger()
@@ -44,7 +46,7 @@ FaserDigiMessenger::~FaserDigiMessenger()
   if (cmd_digi_chargeSpreadSigma) delete cmd_digi_chargeSpreadSigma;
   if (cmd_digi_threshold) delete cmd_digi_threshold;
   if (cmd_digi_chargeSmear) delete cmd_digi_chargeSmear;
-  if (cmd_digi_chargeSmearNorm) delete cmd_digi_chargeSmearNorm;
+  if (cmd_digi_chargeNorm) delete cmd_digi_chargeNorm;
 }
 
 void FaserDigiMessenger::SetNewValue(G4UIcommand* command, G4String newValues)
@@ -61,9 +63,9 @@ void FaserDigiMessenger::SetNewValue(G4UIcommand* command, G4String newValues)
   {
     fDigitizer->SetChargeSmear(cmd_digi_chargeSmear->GetNewDoubleValue(newValues));
   }
-  else if (command == cmd_digi_chargeSmearNorm)
+  else if (command == cmd_digi_chargeNorm)
   {
-    fDigitizer->SetChargeSmearNorm(cmd_digi_chargeSmearNorm->GetNewDoubleValue(newValues));    
+    fDigitizer->SetChargeNorm(cmd_digi_chargeNorm->GetNewDoubleValue(newValues));    
   }
 }
 
@@ -81,11 +83,11 @@ G4String FaserDigiMessenger::GetCurrentValue(G4UIcommand* command)
   }
   else if (command == cmd_digi_chargeSmear)
   {
-    cv = cmd_digi_chargeSmear->ConvertToString(fDigitizer->GetChargeSmear());
+    cv = cmd_digi_chargeSmear->ConvertToString(fDigitizer->GetChargeSmear(), "eplus");
   }
-  else if (command == cmd_digi_chargeSmearNorm)
+  else if (command == cmd_digi_chargeNorm)
   {
-    cv = cmd_digi_chargeSmearNorm->ConvertToString(fDigitizer->GetChargeSmearNorm());
+    cv = cmd_digi_chargeNorm->ConvertToString(fDigitizer->GetChargeNorm());
   }
   return cv;
 }

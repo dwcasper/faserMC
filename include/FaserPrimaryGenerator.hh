@@ -23,14 +23,17 @@ public:
   void setMinPrimaryMomentum(G4double pMin) { minPrimaryMomentum = pMin; }
   void setMaxPrimaryMomentum(G4double pMax) { maxPrimaryMomentum = pMax; }
   void setSourcePosition(const G4ThreeVector& pos) { sourcePosition = pos; }
+  void setParticleName(G4String name) { fParticleName = name; }
 
   G4double getMinPrimaryMomentum() const { return minPrimaryMomentum; }
   G4double getMaxPrimaryMomentum() const { return maxPrimaryMomentum; }
   G4ThreeVector getSourcePosition() const { return sourcePosition; }
+  G4String getParticleName() const { return fParticleName; }
 
   static constexpr G4double default_minPrimaryMomentum = 100.0*GeV;
   static constexpr G4double default_maxPrimaryMomentum = 7.0*TeV;
   static constexpr G4double default_sourceDistance = 450.0*m;
+  static const G4String default_particleName;
 
 private:
   FaserGeneratorMessenger* fGeneratorMessenger;
@@ -40,5 +43,6 @@ private:
   double minPrimaryMomentum;
   double maxPrimaryMomentum;
   G4ThreeVector sourcePosition;
+  G4String fParticleName;
 };
 #endif

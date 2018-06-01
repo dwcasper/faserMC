@@ -27,8 +27,8 @@ class FaserDigiMessenger : public G4UImessenger
     G4UIdirectory*		digiDirectory;
     G4UIcmdWithADoubleAndUnit*	cmd_digi_chargeSpreadSigma;
     G4UIcmdWithADoubleAndUnit*	cmd_digi_threshold;
-    G4UIcmdWithADouble*	        cmd_digi_chargeSmear;
-    G4UIcmdWithADouble*	        cmd_digi_chargeSmearNorm;
+    G4UIcmdWithADoubleAndUnit*  cmd_digi_chargeSmear;
+    G4UIcmdWithADouble*	        cmd_digi_chargeNorm;
 };
 
 #endif

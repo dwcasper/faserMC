@@ -4,8 +4,16 @@
 #
 # Standard deviation of Gaussian charge sharing
 #
-/faser/digi/chargeSpreadSigma 50 um
+/faser/digi/chargeSpreadSigma 15 um
 #
 # Charge threshold (events must be strictly greater)
 #
-/faser/digi/threshold 0 fC
+/faser/digi/threshold 0.6 fC
+#
+# Noise level
+#
+/faser/digi/chargeSmear 600 eplus
+#
+# Fudge factor for energy deposit -> digit charge
+#
+/faser/digi/chargeNorm 0.4
