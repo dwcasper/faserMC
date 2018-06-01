@@ -17,7 +17,7 @@ FaserDigitizer::FaserDigitizer(G4String name)
     fThreshold(defaultThreshold),
     fChargeSpreadSigma(defaultChargeSpreadSigma),
     fChargeSmear(defaultChargeSmear),
-    fChargeSmearNorm(defaultChargeSmearNorm)
+    fChargeNorm(defaultChargeNorm)
 {
   G4String colName = "FaserDigiCollection";
   collectionName.push_back(colName);
@@ -136,9 +136,9 @@ void FaserDigitizer::Digitize()
     {
       G4int index = p.first;
       G4double eTotal = p.second;
-      G4double q = eTotal/fBandGap*eplus;
+      G4double q = fChargeNorm*eTotal/fBandGap*eplus;
       // smear the charge 
-      q = std::max(0.0,G4RandGauss::shoot(q, fChargeSmear*sqrt(q*fChargeSmearNorm)));
+      q = q + std::max(0.0, G4RandGauss::shoot(fChargeSmear/eplus, sqrt(fChargeSmear/eplus)));
       if (q > fThreshold)
       {
         FaserDigi* digi = new FaserDigi();

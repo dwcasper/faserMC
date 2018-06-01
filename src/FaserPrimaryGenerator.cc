@@ -9,6 +9,8 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "G4Event.hh"
 
+const G4String FaserPrimaryGenerator::default_particleName = "darkphoton";
+
 FaserPrimaryGenerator::FaserPrimaryGenerator() 
   : G4VPrimaryGenerator(), fGeneratorMessenger(nullptr), fDecayVolume(nullptr), fDetectorConstruction(nullptr)
 {
@@ -79,13 +81,16 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
   G4ThreeVector momentum = position - sourcePosition;
   G4double logP = log(minPrimaryMomentum) + log(maxPrimaryMomentum/minPrimaryMomentum)*G4UniformRand();
   momentum.setMag(exp(logP));
-  G4ParticleDefinition* particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle("darkphoton");
+  G4ParticleDefinition* particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle(fParticleName);
   G4PrimaryParticle* primary = new G4PrimaryParticle(particleDefinition, momentum.x(), momentum.y(), momentum.z());
 
-  G4double decayProperTime = (1.0-G4UniformRand())*primary->GetMass()*decayLength/(primary->GetTotalMomentum() * CLHEP::c_light);
-  //G4cout << "Proper time set for decay: " << decayProperTime / s << G4endl;
-  primary->SetProperTime(decayProperTime);
-
+  // special logic to make dark photon decay point uniform over decay volume length
+  if (fParticleName == "darkphoton")
+  {
+    G4double decayProperTime = (1.0-G4UniformRand())*primary->GetMass()*decayLength/(primary->GetTotalMomentum() * CLHEP::c_light);
+    //G4cout << "Proper time set for decay: " << decayProperTime / s << G4endl;
+    primary->SetProperTime(decayProperTime);
+  }
   vertex->SetPrimary(primary);
   event->AddPrimaryVertex(vertex);
 

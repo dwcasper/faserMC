@@ -23,7 +23,7 @@ public:
 
   std::vector<FaserDigi*>& Digis() { return fDigis; }
   double Charge() const { return fCharge; }
-  int LocalMaxima() const { return fNMaxima; }
+  std::vector<int> LocalMaxima() const { return fMaxima; }
   void Draw() { fH.Draw(); Fit(); }
   std::vector<ClusterFit> Fit();
   std::vector<ClusterFit> WeightedAverage();

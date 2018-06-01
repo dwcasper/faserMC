@@ -10,6 +10,7 @@ class G4UIcommand;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWith3VectorAndUnit;
 class G4UIcmdWithoutParameter;
+class G4UIcmdWithAString;
 
 class FaserGeneratorMessenger : public G4UImessenger
 {
@@ -30,6 +31,7 @@ private:
   G4UIcmdWithADoubleAndUnit*     cmd_gen_maxPrimaryMomentum;
   G4UIcmdWith3VectorAndUnit*     cmd_gen_sourcePosition;
   G4UIcmdWithoutParameter*       cmd_gen_dump;
+  G4UIcmdWithAString*            cmd_gen_particle;
 };
 
 #endif

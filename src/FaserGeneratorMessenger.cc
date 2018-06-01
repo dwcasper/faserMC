@@ -4,6 +4,7 @@
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithoutParameter.hh"
+#include "G4UIcmdWithAString.hh"
 
 FaserGeneratorMessenger::FaserGeneratorMessenger(FaserPrimaryGenerator* primaryGenerator)
   : fPrimaryGenerator(primaryGenerator)
@@ -32,15 +33,22 @@ FaserGeneratorMessenger::FaserGeneratorMessenger(FaserPrimaryGenerator* primaryG
   cmd_gen_sourcePosition->SetUnitCandidates("m cm km");
   cmd_gen_sourcePosition->AvailableForStates(G4State_PreInit, G4State_Idle);
 
+  cmd_gen_particle = new G4UIcmdWithAString("/faser/generator/particleName", this);
+  cmd_gen_particle->SetGuidance("Name of primary generator particle.");
+  cmd_gen_particle->SetParameterName("particleName", true, true);
+  cmd_gen_particle->AvailableForStates(G4State_PreInit, G4State_Idle);
+
   cmd_gen_dump = new G4UIcmdWithoutParameter("/faser/generator/dump", this);
  
   fPrimaryGenerator->setMinPrimaryMomentum( FaserPrimaryGenerator::default_minPrimaryMomentum );
   fPrimaryGenerator->setMaxPrimaryMomentum( FaserPrimaryGenerator::default_maxPrimaryMomentum );
   fPrimaryGenerator->setSourcePosition( G4ThreeVector(0.0, 0.0, -FaserPrimaryGenerator::default_sourceDistance) );
+  fPrimaryGenerator->setParticleName( FaserPrimaryGenerator::default_particleName );
 }
 
 FaserGeneratorMessenger::~FaserGeneratorMessenger()
 {
+  if (cmd_gen_particle) delete cmd_gen_particle;
   if (cmd_gen_minPrimaryMomentum) delete cmd_gen_minPrimaryMomentum;
   if (cmd_gen_maxPrimaryMomentum) delete cmd_gen_maxPrimaryMomentum;
   if (cmd_gen_sourcePosition) delete cmd_gen_sourcePosition;
@@ -61,9 +69,14 @@ void FaserGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValu
     {
       fPrimaryGenerator->setSourcePosition( cmd_gen_sourcePosition->GetNew3VectorValue(newValues) );
     }
+  else if (command == cmd_gen_particle)
+    {
+      fPrimaryGenerator->setParticleName( newValues );
+    }
   else if (command == cmd_gen_dump)
     {
       G4cout << "Generator Parameters:" << G4endl;
+      G4cout << "Primary particle: " << GetCurrentValue(cmd_gen_particle) << G4endl;
       G4cout << "Minimum Primary Momentum: " << GetCurrentValue(cmd_gen_minPrimaryMomentum) << G4endl;
       G4cout << "Maximum Primary Momentum: " << GetCurrentValue(cmd_gen_maxPrimaryMomentum) << G4endl;
       G4cout << "Source position (in FASER coordinate system): " << GetCurrentValue(cmd_gen_sourcePosition) << G4endl;
@@ -86,6 +99,9 @@ G4String FaserGeneratorMessenger::GetCurrentValue(G4UIcommand* command)
     {
       cv = cmd_gen_sourcePosition->ConvertToString(fPrimaryGenerator->getSourcePosition(), "m");
     }
-
+  else if (command == cmd_gen_particle)
+    {
+      cv = cmd_gen_particle->ConvertToString(fPrimaryGenerator->getParticleName());
+    }
   return cv;
 }

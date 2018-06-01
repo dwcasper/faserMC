@@ -105,6 +105,7 @@ void readTree(TString fileName)
   TH1F* nMaximaFail = new TH1F("nMaximaFail", "NmaximaFail", 21, -0.5, 20.5);
   TH1F* nClust2Max = new TH1F("nClust2Max", "Nclust2Max", 21, -0.5, 20.5);
 
+  TH1F* qMaxima = new TH1F("qMaxima", "Qmaxima", 100, 0.0, 100000.0);
   TH1F* clustChi2 = new TH1F("clustChi2", "ClustChi2", 100, 0., 6.);
   TH1F* clustWid = new TH1F("clustWid", "ClustWid", 100, 0., 1.5);
   TH1F* clustErr = new TH1F("clustErr", "ClustErr", 100, 0., 0.2);
@@ -152,7 +153,7 @@ void readTree(TString fileName)
 	for ( auto& c : clusters )
 	{
 	  clusterMap[plane.first].push_back(FaserCluster(clusterNumber++, c));
-	  if (clusterMap[plane.first].back().LocalMaxima() == 2) nClust2Max->Fill(c.size());
+	  if (clusterMap[plane.first].back().LocalMaxima().size() == 2) nClust2Max->Fill(c.size());
 	}
       }
       cout << "Plane " << plane.first << " has " << clusterMap[plane.first].size() << " clusters" << endl;
@@ -165,6 +166,10 @@ void readTree(TString fileName)
     {
       for ( auto& c : p.second )
       {
+	for ( int i : c.LocalMaxima() )
+	{
+	  qMaxima->Fill(c.Digis()[i]->Charge());
+	}
 	std::vector<ClusterFit> fits = c.Fit();
 	if (fits.size() > 0) 
 	{
@@ -185,7 +190,7 @@ void readTree(TString fileName)
       {
 	qClustFail->Fill(c.Charge());
 	nClustFail->Fill(c.Digis().size());
-	nMaximaFail->Fill(c.LocalMaxima());
+	nMaximaFail->Fill(c.LocalMaxima().size());
       }
       continue;
     }
@@ -198,7 +203,7 @@ void readTree(TString fileName)
       {
 	qClust->Fill(c.Charge());
 	nClust->Fill(c.Digis().size());
-	nMaxima->Fill(c.LocalMaxima());
+	nMaxima->Fill(c.LocalMaxima().size());
       }
     }
   }
