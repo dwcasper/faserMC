@@ -70,7 +70,6 @@ void RootEventIO::Write(FaserEvent* hcont)
   if (fBranchAdx == nullptr)
     {
       fBranchAdx = hcont;
-      //fTree->Branch("Hits", "std::vector<FaserSensorHit*>", &fBranchAdx, 32000, 99);
       fTree->Branch("event", "FaserEvent", &fBranchAdx, 3200, 99);
     }
   else
