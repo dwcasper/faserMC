@@ -8,6 +8,7 @@ class FaserDetectorConstruction;
 class G4UIdirectory;
 class G4UIcommand;
 class G4UIcmdWithADoubleAndUnit;
+class G4UIcmdWithADouble;
 class G4UIcmdWithAnInteger;
 
 class FaserGeometryMessenger : public G4UImessenger
@@ -33,6 +34,9 @@ private:
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_stereoAngle;
   G4UIcmdWithADoubleAndUnit*     cmd_support_sizeZ;
   G4UIcmdWithAnInteger*          cmd_detector_sensorPlanes;
+  G4UIcmdWithAnInteger*          cmd_detector_caloPlanes;
+  G4UIcmdWithADouble*            cmd_detector_absorberX0;
+  G4UIcmdWithADoubleAndUnit*     cmd_detector_samplerSizeZ;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_planePitch;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_decayVolumeLength;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_trackerLength;

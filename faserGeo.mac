@@ -33,11 +33,23 @@
 #
 # Number of detector planes
 #
-/faser/geo/sensorPlanes 12
+/faser/geo/trackerPlanes 8
 #
 # Spacing of detector planes; this is now the minimum spacing between planes
 #
 /faser/geo/planePitch 5.0 cm
+#
+# Number of calorimter planes;
+#
+/faser/geo/caloPlanes 0
+#
+# Thickness of calorimeter absorber layers (in radiation lengths)
+#
+/faser/geo/absorberX0 3.0
+#
+# Thickness of the calorimeter sampling layer (in dimensions of length)
+#
+/faser/geo/samplerSizeZ 0.32 mm
 #
 # Length of empty air before first detector plane
 #
@@ -46,5 +58,7 @@
 # Length of the volume instrumented for tracking
 #
 /faser/geo/trackerLength 2.0 m
-
-
+#
+# Length of the calorimeter
+#
+/faser/geo/calorimeterLength 0.5 m

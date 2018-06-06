@@ -7,6 +7,7 @@
 #include "G4RunManager.hh"
 
 #include "FaserSensorHit.hh"
+#include "FaserSamplerHit.hh"
 
 #include "G4DigiManager.hh"
 #include "FaserDigitizer.hh"
@@ -60,24 +61,16 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
   FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*) 
 	  digiMan->GetHitsCollection(truthID);
 
-  G4cout << "Nhits: " << hc->entries() << ", Ndigits: " << dc->entries() << G4endl;
+  G4int caloID = digiMan->GetHitsCollectionID("FaserSamplerHitsCollection");
+  FaserSamplerHitsCollection* sc = (FaserSamplerHitsCollection*)
+    digiMan->GetHitsCollection(caloID);
 
-  //RootIO* root = RootIO::GetInstance();
+  G4cout << "Nhits: " << hc->entries() << ", Ndigits: " << dc->entries() << ", Samples: " << sc->entries() << G4endl;
 
-  //if ( dc ) 
-  //{
-  //  root->AddDigits(dc);
-  //}
-
-  //if ( hc )
-  //{
-  //  root->AddTruth(hc);
-  //}  
-
-  //root->WriteEvent();
-  
+ 
   fFaserEvent->SetParticles(g4event->GetTrajectoryContainer());
   fFaserEvent->SetHits(hc);
+  fFaserEvent->SetSamples(sc);
   fFaserEvent->SetDigis(dc);
   RootEventIO* rootEventIO = RootEventIO::GetInstance();
   rootEventIO->Write(fFaserEvent);

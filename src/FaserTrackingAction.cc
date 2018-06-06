@@ -8,6 +8,12 @@ FaserTrackingAction::FaserTrackingAction()
   : G4UserTrackingAction()
 {;}
 
+void FaserTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
+{
+  FaserTrackInformation* info = dynamic_cast<FaserTrackInformation*>(aTrack->GetUserInformation());
+  if (info->GetSourceTrackID() != 0 && info->GetSourceTrackID() != aTrack->GetTrackID()) fpTrackingManager->SetStoreTrajectory(false);
+}
+
 void FaserTrackingAction::PostUserTrackingAction(const G4Track*aTrack)
 {
   G4TrackVector* secondaries = fpTrackingManager->GimmeSecondaries();

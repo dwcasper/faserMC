@@ -11,6 +11,7 @@ public:
   FaserTrackingAction();
   virtual ~FaserTrackingAction() {};
 
+  virtual void PreUserTrackingAction(const G4Track*);
   virtual void PostUserTrackingAction(const G4Track*);
 
 };

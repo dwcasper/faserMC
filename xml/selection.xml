@@ -9,11 +9,16 @@
     <class name="G4ThreeVector" />
     <class name="FaserTruthParticle" />
     <class name="FaserSensorHit" />
+    <class name="FaserSamplerHit" />
     <class name="FaserDigi" />
     <class name="G4AffineTransform" />
+    <class name="G4AttDef" />
   </selection>
   <exclusion>
     <class name="FaserSensorHit">
+      <method name="Draw"/>
+    </class>
+    <class name="FaserSamplerHit">
       <method name="Draw"/>
     </class>
     <class name="FaserDigi">

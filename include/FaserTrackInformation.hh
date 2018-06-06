@@ -31,6 +31,8 @@ public:
   G4ThreeVector GetOriginalMomentum() { return fOriginalMomentum; }
   G4double GetOriginalEnergy() { return fOriginalEnergy; }
   G4double GetOriginalTime() { return fOriginalTime; }
+  G4double GetSourceTrackID() { return fSourceTrackID; }
+  void SetSourceTrackID(G4int id) { fSourceTrackID = id; }
 
   virtual void Print() const;
 
@@ -41,7 +43,7 @@ private:
   G4ThreeVector         fOriginalMomentum;
   G4double              fOriginalEnergy;
   G4double              fOriginalTime;
-
+  G4int                 fSourceTrackID;
 };
 
 extern G4ThreadLocal

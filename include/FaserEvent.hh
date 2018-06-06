@@ -4,6 +4,7 @@
 #include "globals.hh"
 #include "FaserTruthParticle.hh"
 #include "FaserSensorHit.hh"
+#include "FaserSamplerHit.hh"
 #include "FaserDigi.hh"
 #include "G4TrajectoryContainer.hh"
 
@@ -23,6 +24,9 @@ public:
   std::vector<FaserSensorHit*>& Hits() { return fHits; }
   void SetHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fHits.push_back((*hits)[i]); }
 
+  std::vector<FaserSamplerHit*>& Samples() { return fSamples; }
+  void SetSamples(const FaserSamplerHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamples.push_back((*hits)[i]); }
+
   std::vector<FaserDigi*> Digis()& { return fDigis; }
   void SetDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fDigis.push_back((*digis)[i]); }
 
@@ -30,6 +34,7 @@ private:
   G4int fEventNumber;
   std::vector<FaserTruthParticle*> fParticles;
   std::vector<FaserSensorHit*> fHits;
+  std::vector<FaserSamplerHit*> fSamples;
   std::vector<FaserDigi*> fDigis;
 };
 
