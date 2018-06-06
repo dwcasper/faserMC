@@ -65,7 +65,7 @@ G4Colour FaserDigi::QtoC()
   G4double quotient = std::floor((h/60.0)/2.0);
   G4double r = quotient * 2.0;
   G4double hmod = (h/60.0) - r;
-  G4double x = 1.0 - abs(hmod-1.0);
+  G4double x = 1.0 - fabs(hmod-1.0);
   if (h < 60) return G4Colour(1.0,x,0);
   if (h < 120) return G4Colour(x,1.0,0);
   if (h < 180) return G4Colour(0,1.0,x);

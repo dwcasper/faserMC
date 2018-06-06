@@ -91,8 +91,8 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
 
   if (firstCall) 
   {
-    double solidAngleDecay = 4 * decaySizeX * decaySizeY * momentum.cosTheta() / momentum.mag2();
-    double solidAnglePlane = 4 * planeSizeX * planeSizeY * sourcePosition.cosTheta() / sourcePosition.mag2();
+    double solidAngleDecay = 4 * decaySizeX * decaySizeY * fabs(momentum.cosTheta()) / momentum.mag2();
+    double solidAnglePlane = 4 * planeSizeX * planeSizeY * fabs(sourcePosition.cosTheta()) / sourcePosition.mag2();
     double geoWeight = solidAnglePlane / solidAngleDecay;
     G4cout << "Generator solid-angle factor: " << geoWeight << G4endl;
   }

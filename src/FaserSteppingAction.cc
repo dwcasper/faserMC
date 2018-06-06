@@ -3,6 +3,7 @@
 #include "FaserSteppingAction.hh"
 #include "FaserEventAction.hh"
 #include "FaserDetectorConstruction.hh"
+#include "FaserTrackInformation.hh"
 
 #include "G4Step.hh"
 #include "G4Event.hh"
@@ -39,6 +40,12 @@ void FaserSteppingAction::UserSteppingAction(const G4Step* theStep)
   if (thePreR->GetName() != "DefaultRegionForTheWorld" &&
       thePostR->GetName() == "DefaultRegionForTheWorld")
     theTrack->SetTrackStatus(fStopAndKill);
+  if (thePreR->GetName() != "Calorimeter" &&
+      thePostR->GetName() == "Calorimeter")
+  {
+    auto info = dynamic_cast<FaserTrackInformation*>(theTrack->GetUserInformation());
+    if (info->GetSourceTrackID() == 0) info->SetSourceTrackID(theTrack->GetTrackID());
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

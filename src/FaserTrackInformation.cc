@@ -14,6 +14,7 @@ FaserTrackInformation::FaserTrackInformation()
   fOriginalMomentum = G4ThreeVector(0.,0.,0.);
   fOriginalEnergy = 0.;
   fOriginalTime = 0.;
+  fSourceTrackID = 0;
 }
 
 FaserTrackInformation::FaserTrackInformation(const G4Track* aTrack)
@@ -25,6 +26,7 @@ FaserTrackInformation::FaserTrackInformation(const G4Track* aTrack)
   fOriginalMomentum = aTrack->GetMomentum();
   fOriginalEnergy = aTrack->GetTotalEnergy();
   fOriginalTime = aTrack->GetGlobalTime();
+  fSourceTrackID = 0;
 }
 
 FaserTrackInformation::FaserTrackInformation(const FaserTrackInformation* aTrackInfo)
@@ -36,6 +38,7 @@ FaserTrackInformation::FaserTrackInformation(const FaserTrackInformation* aTrack
   fOriginalMomentum = aTrackInfo->fOriginalMomentum;
   fOriginalEnergy = aTrackInfo->fOriginalEnergy;
   fOriginalTime = aTrackInfo->fOriginalTime;
+  fSourceTrackID = aTrackInfo->fSourceTrackID;
 }
 
 FaserTrackInformation::~FaserTrackInformation()
@@ -50,7 +53,7 @@ FaserTrackInformation& FaserTrackInformation
   fOriginalMomentum = aTrackInfo.fOriginalMomentum;
   fOriginalEnergy = aTrackInfo.fOriginalEnergy;
   fOriginalTime = aTrackInfo.fOriginalTime;
-
+  fSourceTrackID = aTrackInfo.fSourceTrackID;
   return *this;
 }
 
