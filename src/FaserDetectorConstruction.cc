@@ -574,7 +574,7 @@ void FaserDetectorConstruction::ConstructCalorimeterPlane()
 
   G4Material* calo_mat = nist->FindOrBuildMaterial("G4_AIR");
 
-  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicTrackerPlane->GetSolid());
+  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
   G4double plane_sizeX = 2*sPlane->GetXHalfLength();
   G4double plane_sizeY = 2*sPlane->GetYHalfLength();
 

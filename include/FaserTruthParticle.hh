@@ -7,7 +7,8 @@ class FaserTruthParticle
 {
 public:
   FaserTruthParticle();
-  FaserTruthParticle(G4int trackID, G4int parentID, G4int pdgCode, G4ThreeVector vertex, G4ThreeVector momentum, G4double energy);
+  FaserTruthParticle(G4int trackID, G4int parentID, G4int pdgCode, G4ThreeVector vertex, 
+    G4ThreeVector momentum, G4double energy);
   virtual ~FaserTruthParticle();
 
   G4int TrackID() { return fTrackID; }
