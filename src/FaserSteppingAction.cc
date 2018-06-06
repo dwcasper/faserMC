@@ -44,7 +44,11 @@ void FaserSteppingAction::UserSteppingAction(const G4Step* theStep)
       thePostR->GetName() == "Calorimeter")
   {
     auto info = dynamic_cast<FaserTrackInformation*>(theTrack->GetUserInformation());
-    if (info->GetSourceTrackID() == 0) info->SetSourceTrackID(theTrack->GetTrackID());
+    if (info->GetSourceTrackID() == 0) 
+    {
+      info->SetSourceTrackID(theTrack->GetTrackID());
+      info->SetSourceEnergy(theTrack->GetTotalEnergy());
+    }
   }
 }
 

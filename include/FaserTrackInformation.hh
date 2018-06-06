@@ -33,6 +33,8 @@ public:
   G4double GetOriginalTime() { return fOriginalTime; }
   G4double GetSourceTrackID() { return fSourceTrackID; }
   void SetSourceTrackID(G4int id) { fSourceTrackID = id; }
+  G4double GetSourceEnergy() { return fSourceEnergy; }
+  void SetSourceEnergy(G4double energy) { fSourceEnergy = energy; }
 
   virtual void Print() const;
 
@@ -44,6 +46,7 @@ private:
   G4double              fOriginalEnergy;
   G4double              fOriginalTime;
   G4int                 fSourceTrackID;
+  G4double              fSourceEnergy;
 };
 
 extern G4ThreadLocal
