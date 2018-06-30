@@ -3,6 +3,7 @@
     <class name="std::basic_string<char>" />
     <class name="std::map<G4int, G4double>" />
     <class name="G4String" />
+    <class name="FaserGeometry" />
     <class name="FaserEvent" />
     <class name="G4VHit" />
     <class name="G4VDigi" />

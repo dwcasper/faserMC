@@ -6,6 +6,7 @@
 #include "TTree.h"
 
 #include "RootEventIO.hh"
+#include "FaserGeometry.hh"
 #include "FaserEvent.hh"
 
 #include "G4SDManager.hh"
@@ -14,6 +15,7 @@
 #include "G4Event.hh"
 
 static G4String fileName = "FaserMCEvent_Default.root";
+static G4String geoFileName = "faserGeo.mac";
 static RootEventIO* instance = nullptr;
 
 RootEventIO::RootEventIO()
@@ -82,6 +84,10 @@ void RootEventIO::Write(FaserEvent* hcont)
 
 void RootEventIO::Close()
 {
+  fFile->cd();
+  FaserGeometry geo {geoFileName};
+  geo.Tree()->Write();
+  G4cout << "Wrote geometry data to " << fileName << G4endl;
   fTree->Write();
   if (fNevents > 0) G4cout << "Wrote a total of " << fNevents << " events to " << fileName << G4endl;
   fFile->Close();
