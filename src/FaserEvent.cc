@@ -40,6 +40,9 @@ FaserEvent::~FaserEvent()
 
   for (auto c : fClusters) if (c) delete c;
   fClusters.clear();
+    delete p;
+  }
+  fParticles.clear();
 }
 
 void FaserEvent::SetParticles(G4TrajectoryContainer* particles)
@@ -172,7 +175,3 @@ map<int, vector<FaserDigi*>> mapDigitsByRow(vector<FaserDigi*> v)
   }
   return rowMap;
 }
-
-
-
-
