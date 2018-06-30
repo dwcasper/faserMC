@@ -72,6 +72,7 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
   fFaserEvent->SetHits(hc);
   fFaserEvent->SetSamples(sc);
   fFaserEvent->SetDigis(dc);
+  fFaserEvent->SetClusters();
   RootEventIO* rootEventIO = RootEventIO::GetInstance();
   rootEventIO->Write(fFaserEvent);
 

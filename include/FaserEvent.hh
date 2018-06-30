@@ -6,6 +6,7 @@
 #include "FaserSensorHit.hh"
 #include "FaserSamplerHit.hh"
 #include "FaserDigi.hh"
+#include "FaserCluster.hh"
 #include "G4TrajectoryContainer.hh"
 
 class FaserEvent
@@ -30,12 +31,17 @@ public:
   std::vector<FaserDigi*> Digis()& { return fDigis; }
   void SetDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fDigis.push_back((*digis)[i]); }
 
+  std::vector<FaserCluster*>& Clusters() { return fClusters; }
+  void SetClusters();
+
+
 private:
   G4int fEventNumber;
   std::vector<FaserTruthParticle*> fParticles;
   std::vector<FaserSensorHit*> fHits;
   std::vector<FaserSamplerHit*> fSamples;
   std::vector<FaserDigi*> fDigis;
+  std::vector<FaserCluster*> fClusters;
 };
 
 #endif

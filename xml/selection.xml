@@ -12,6 +12,7 @@
     <class name="FaserSensorHit" />
     <class name="FaserSamplerHit" />
     <class name="FaserDigi" />
+    <class name="FaserCluster" />
     <class name="G4AffineTransform" />
     <class name="G4AttDef" />
   </selection>
