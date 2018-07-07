@@ -3,6 +3,7 @@
 
 #include "G4String.hh"
 
+class FaserGeometry;
 class FaserEvent;
 class TFile;
 class TTree;

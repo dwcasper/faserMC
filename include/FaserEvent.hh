@@ -6,7 +6,14 @@
 #include "FaserSensorHit.hh"
 #include "FaserSamplerHit.hh"
 #include "FaserDigi.hh"
+#include "FaserCluster.hh"
 #include "G4TrajectoryContainer.hh"
+
+#include <map>
+#include <vector>
+
+using std::map;
+using std::vector;
 
 class FaserEvent
 {
@@ -30,12 +37,27 @@ public:
   std::vector<FaserDigi*> Digis()& { return fDigis; }
   void SetDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fDigis.push_back((*digis)[i]); }
 
+  std::vector<FaserCluster*>& Clusters() { return fClusters; }
+  void SetClusters();
+
+
 private:
   G4int fEventNumber;
   std::vector<FaserTruthParticle*> fParticles;
   std::vector<FaserSensorHit*> fHits;
   std::vector<FaserSamplerHit*> fSamples;
   std::vector<FaserDigi*> fDigis;
+  std::vector<FaserCluster*> fClusters;
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Utility methods for cluster finding                                        //
+
+  int rowID(FaserDigi* d);
+  vector<vector<FaserDigi*>> clusterOneRow(vector<FaserDigi*> digits);
+  void sortDigits(vector<FaserDigi*>& v);
+  map<int, vector<FaserDigi*>> mapDigitsByPlane(FaserEvent & evt);
+  map<int, vector<FaserDigi*>> mapDigitsByRow(vector<FaserDigi*> v);
+
 };
 
 #endif

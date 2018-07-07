@@ -10,14 +10,18 @@
 #include "FaserTruthParticle.hh"
 #include "G4AttDef.hh"
 #include "G4AttValue.hh"
+#include "FaserCluster.hh"
+#include "TF1.h"
+#include "FaserGeometry.hh"
 
 std::vector<FaserSensorHit*> aGarbage;
 std::vector<FaserDigi*> bGarbage;
 std::vector<FaserTruthParticle*> cGarbage;
+std::vector<FaserSamplerHit*> gGarbage;
+std::vector<FaserCluster*> hGarbage;
+
 std::pair<G4String, G4AttDef> ddGarbage;
 std::map<G4String, G4AttDef> dGarbage;
 std::vector<G4AttValue> eGarbage;
 std::map<G4int, G4double> fGarbage;
-std::vector<FaserSamplerHit*> gGarbage;
-
 #undef __G4String
