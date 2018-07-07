@@ -7,6 +7,7 @@
 #include "globals.hh"
 
 class G4Run;
+class FaserGeometry;
 
 /// Run action class
 ///
@@ -22,7 +23,7 @@ class FaserRunAction : public G4UserRunAction
     virtual void   EndOfRunAction(const G4Run*);
 
   private:
-
+  FaserGeometry* fGeometry;
 };
 
 #endif

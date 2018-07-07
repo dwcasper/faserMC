@@ -26,10 +26,12 @@ public:
   virtual ~FaserFieldSetup();
 
   void SetStepperType( G4int i ) { fStepperType = i; }
+  G4int GetStepperType() { return fStepperType; }
 
   void SetStepper();
 
   void SetMinStep(G4double newStep) { fMinStep = newStep; }
+  G4double GetMinStep() { return fMinStep; }
 
   void SetGlobalFieldValue(G4ThreeVector fieldVector);
   void SetGlobalFieldValue(G4double      fieldValue);

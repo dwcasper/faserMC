@@ -84,7 +84,7 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_detector_samplerSizeZ->SetGuidance("Thickness of calorimeter sampling layer.");
   cmd_detector_samplerSizeZ->SetParameterName("samplerSizeZ", true, true);
   cmd_detector_samplerSizeZ->SetDefaultUnit("um");
-  cmd_detector_samplerSizeZ->SetUnitCandidates("mm micron cm m");
+  cmd_detector_samplerSizeZ->SetUnitCandidates("mm micron um cm m");
   cmd_detector_samplerSizeZ->AvailableForStates(G4State_PreInit);
 
   cmd_detector_decayVolumeLength = new G4UIcmdWithADoubleAndUnit("/faser/geo/decayVolumeLength", this);

@@ -21,29 +21,29 @@ FaserFieldMessenger::FaserFieldMessenger(FaserFieldSetup* fieldSetup)
    fMinStepCmd(0),
    fUpdateCmd(0)
 {
-  fFieldDir = new G4UIdirectory("/field/");
+  fFieldDir = new G4UIdirectory("/faser/field/");
   fFieldDir->SetGuidance("Faser magnetic field control.");
 
-  fStepperCmd = new G4UIcmdWithAnInteger("/field/setStepperType",this);
+  fStepperCmd = new G4UIcmdWithAnInteger("/faser/field/setStepperType",this);
   fStepperCmd->SetGuidance("Select stepper type for magnetic field");
   fStepperCmd->SetParameterName("choice",true);
   fStepperCmd->SetDefaultValue(4);
   fStepperCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  fUpdateCmd = new G4UIcmdWithoutParameter("/field/update",this);
+  fUpdateCmd = new G4UIcmdWithoutParameter("/faser/field/update",this);
   fUpdateCmd->SetGuidance("Update field setup.");
   fUpdateCmd->SetGuidance("This command MUST be applied before \"beamOn\" ");
   fUpdateCmd->SetGuidance("if you changed field value(s).");
   fUpdateCmd->AvailableForStates(G4State_Idle);
  
-  fMagFieldCmd = new G4UIcmdWithADoubleAndUnit("/field/setGlobalField",this);
+  fMagFieldCmd = new G4UIcmdWithADoubleAndUnit("/faser/field/setGlobalField",this);
   fMagFieldCmd->SetGuidance("Define global magnetic field.");
   fMagFieldCmd->SetGuidance("Magnetic field will be in Y direction.");
   fMagFieldCmd->SetParameterName("GlobalBy",false,false);
   fMagFieldCmd->SetDefaultUnit("tesla");
   fMagFieldCmd->AvailableForStates(G4State_Idle);
  
-  fLocalMagFieldCmd = new G4UIcmdWithADoubleAndUnit("/field/setTrackerField",this);
+  fLocalMagFieldCmd = new G4UIcmdWithADoubleAndUnit("/faser/field/setTrackerField",this);
   fLocalMagFieldCmd->SetGuidance("Define tracker magnetic field.");
   fLocalMagFieldCmd->SetGuidance("Magnetic field will be in Y direction.");
   fLocalMagFieldCmd->SetGuidance("Overrides the global field in the tracker region only.");
@@ -51,7 +51,7 @@ FaserFieldMessenger::FaserFieldMessenger(FaserFieldSetup* fieldSetup)
   fLocalMagFieldCmd->SetDefaultUnit("tesla");
   fLocalMagFieldCmd->AvailableForStates(G4State_Idle);
  
-  fMinStepCmd = new G4UIcmdWithADoubleAndUnit("/field/setMinStep",this);
+  fMinStepCmd = new G4UIcmdWithADoubleAndUnit("/faser/field/setMinStep",this);
   fMinStepCmd->SetGuidance("Define minimal step");
   fMinStepCmd->SetParameterName("min step",false,false);
   fMinStepCmd->SetDefaultUnit("mm");
@@ -97,3 +97,29 @@ void FaserFieldMessenger::SetNewValue( G4UIcommand* command, G4String newValue)
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4String FaserFieldMessenger::GetCurrentValue(G4UIcommand* command)
+{
+  G4String cv;
+  if (command == fStepperCmd)
+  {
+    cv = fStepperCmd->ConvertToString(fEMfieldSetup->GetStepperType());
+  }
+  else if (command == fMinStepCmd)
+  {
+    cv = fMinStepCmd->ConvertToString(fEMfieldSetup->GetMinStep());
+  }
+  else if (command == fLocalMagFieldCmd)
+  {
+    cv = fLocalMagFieldCmd->ConvertToString(fEMfieldSetup->GetLocalFieldValue());
+  }
+  else if (command == fMagFieldCmd)
+  {
+    cv = fMagFieldCmd->ConvertToString(fEMfieldSetup->GetGlobalFieldValue());
+  }
+  else
+  {
+    cv = "";
+  }
+  return cv;
+}

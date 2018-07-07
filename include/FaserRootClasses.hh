@@ -24,4 +24,7 @@ std::pair<G4String, G4AttDef> ddGarbage;
 std::map<G4String, G4AttDef> dGarbage;
 std::vector<G4AttValue> eGarbage;
 std::map<G4int, G4double> fGarbage;
+std::map<G4String, G4String> jjGarbage;
+std::map<G4String, std::map<G4String, G4String>> jGarbage;
+
 #undef __G4String

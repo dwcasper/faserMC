@@ -27,6 +27,7 @@ RootEventIO::RootEventIO()
 
   fFile = new TFile(fileName, "RECREATE");
   fTree = new TTree("faser","an event tree");
+  fGeoTree = new TTree("faserGeo", "FASER simulation conditions");
 }
 
 RootEventIO::~RootEventIO()
@@ -66,27 +67,41 @@ void RootEventIO::Write(FaserEvent* hcont)
   std::ostringstream os;
   os << fNevents;
   std::string stevt = "Event_" + os.str();
-  //const char* chevt = stevt.c_str();
   G4cout << "Writing " << stevt << G4endl;
 
   if (fBranchAdx == nullptr)
-    {
-      fBranchAdx = hcont;
-      fTree->Branch("event", "FaserEvent", &fBranchAdx, 3200, 99);
-    }
+  {
+    fBranchAdx = hcont;
+    fTree->Branch("event", "FaserEvent", &fBranchAdx, 3200, 99);
+  }
   else
-    {
-      fBranchAdx = hcont;
-    }
+  {
+    fBranchAdx = hcont;
+  }
   fTree->Fill();
 
+}
+
+void RootEventIO::Write(FaserGeometry* hcont)
+{
+  G4cout << "Saving run conditions" << G4endl;
+
+  if (fGeoBranchAdx == nullptr)
+  {
+    fGeoBranchAdx = hcont;
+    fGeoTree->Branch("conditions", "FaserGeometry", &fGeoBranchAdx, 3200, 99);
+  }
+  else
+  {
+    fGeoBranchAdx = hcont;
+  }
+  fGeoTree->Fill();
 }
 
 void RootEventIO::Close()
 {
   fFile->cd();
-  FaserGeometry geo {geoFileName};
-  geo.Tree()->Write();
+  fGeoTree->Write();
   G4cout << "Wrote geometry data to " << fileName << G4endl;
   fTree->Write();
   if (fNevents > 0) G4cout << "Wrote a total of " << fNevents << " events to " << fileName << G4endl;

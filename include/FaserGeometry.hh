@@ -1,39 +1,29 @@
 #pragma once
 
 #include "TTree.h"
-#include <map>
-#include <memory>
-#include <string>
 
+#include <map>
+#include "G4String.hh"
+
+class G4UIcommandTree;
 
 //------------------------------------------------------------------------------
 
 class FaserGeometry {
 
-    std::map<std::string, int>    fIntProperties;
-    std::map<std::string, double> fDoubleProperties;
-
 public:
+    FaserGeometry();
 
-    // TODO: Read this also in from `faserGeo.mac` instead?
-    static constexpr int ALL_PLANE_INDICES     [] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    static constexpr int FRONT_PLANE_INDICES   [] = {0, 1, 2};
-    static constexpr int CENTRAL_PLANE_INDICES [] = {3, 4, 5, 6, 7, 8};
-    static constexpr int END_PLANE_INDICES     [] = {9, 10, 11};
-
-    FaserGeometry(const std::string & faserGeoFile);
+    // default constructor to retrieve data directly from memory...
+    FaserGeometry( G4String path );
 
     virtual ~FaserGeometry();
 
-    template<typename T> T Get(const std::string & propertyName);
-    template<typename T> T Get(const std::string & propertyName, T defaultValue);
-
-    void DumpProperties();
-    TTree * Tree();
+    std::map<G4String, std::map<G4String, G4String>> Properties() { return fProperties; }
 
 private:
+    std::map<G4String, std::map<G4String, G4String> > fProperties;
 
-    TTree * fTree;
-
+    void NavigateCommandTree(G4String path, G4UIcommandTree* cTree);
 };
 

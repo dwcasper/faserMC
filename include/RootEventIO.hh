@@ -16,6 +16,7 @@ public:
   static RootEventIO* GetInstance();
   static void SetFileName(G4String name);
   void Write(FaserEvent*);
+  void Write(FaserGeometry*);
   void Close();
 
 protected:
@@ -24,8 +25,10 @@ protected:
 private:
   TFile* fFile;
   TTree* fTree;
+  TTree* fGeoTree;
   int fNevents;
   FaserEvent* fBranchAdx;
+  FaserGeometry* fGeoBranchAdx;
 };
 
 #endif
