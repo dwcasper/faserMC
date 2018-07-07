@@ -101,7 +101,7 @@ G4String FaserGeneratorMessenger::GetCurrentValue(G4UIcommand* command)
     }
   else if (command == cmd_gen_particle)
     {
-      cv = cmd_gen_particle->ConvertToString(fPrimaryGenerator->getParticleName());
+      cv = fPrimaryGenerator->getParticleName();
     }
   return cv;
 }

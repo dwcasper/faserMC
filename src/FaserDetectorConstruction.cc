@@ -585,7 +585,7 @@ void FaserDetectorConstruction::ConstructCalorimeterPlane()
       absorber_mat, "Absorber");
 
   G4Box* solidSampler = new G4Box("Sampler",
-    0.5*plane_sizeX, 0.5*plane_sizeY, detector_samplerSizeZ);
+    0.5*plane_sizeX, 0.5*plane_sizeY, 0.5*detector_samplerSizeZ);
   fLogicSampler = new G4LogicalVolume(solidSampler, 
     sampler_mat, "Sampler");
   

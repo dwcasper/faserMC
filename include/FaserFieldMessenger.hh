@@ -20,6 +20,8 @@ class FaserFieldMessenger: public G4UImessenger
     virtual ~FaserFieldMessenger();
  
     virtual void SetNewValue(G4UIcommand*, G4String);
+
+    virtual G4String GetCurrentValue(G4UIcommand*);
  
   private:
 

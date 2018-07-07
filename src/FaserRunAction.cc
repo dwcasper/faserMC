@@ -3,6 +3,7 @@
 #include "FaserRunAction.hh"
 #include "FaserPrimaryGeneratorAction.hh"
 #include "FaserDetectorConstruction.hh"
+#include "FaserGeometry.hh"
 // #include "FaserRun.hh"
 #include "RootEventIO.hh"
 
@@ -19,6 +20,7 @@
 
 FaserRunAction::FaserRunAction()
 : G4UserRunAction()
+, fGeometry(nullptr)
 { 
 
 }
@@ -28,6 +30,7 @@ FaserRunAction::FaserRunAction()
 FaserRunAction::~FaserRunAction()
 {
   RootEventIO::GetInstance()->Close();
+  if (fGeometry) delete fGeometry;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -36,18 +39,22 @@ void FaserRunAction::BeginOfRunAction(const G4Run*)
 { 
   // inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
+  fGeometry = new FaserGeometry("/faser/");
 
+  // Run conditions
+  RootEventIO::GetInstance()->Write(fGeometry);
+  delete fGeometry;
+  fGeometry = nullptr;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void FaserRunAction::EndOfRunAction(const G4Run* run)
 {
- 
+  
   G4int nofEvents = run->GetNumberOfEvent();
   if (nofEvents == 0) return;
 
-  // Run conditions
   //  note: There is no primary generator action object for "master"
   //        run manager for multi-threaded mode.
   //const FaserPrimaryGeneratorAction* generatorAction
