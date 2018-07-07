@@ -3,22 +3,6 @@
 #include "G4ParticleTable.hh"
 #include "G4VTrajectoryPoint.hh"
 
-#include <map>
-#include <vector>
-
-using std::map;
-using std::vector;
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Utility methods for cluster finding                                        //
-
-int rowID(FaserDigi* d);
-vector<vector<FaserDigi*>> clusterOneRow(vector<FaserDigi*> digits);
-void sortDigits(vector<FaserDigi*>& v);
-map<int, vector<FaserDigi*>> mapDigitsByPlane(FaserEvent & evt);
-map<int, vector<FaserDigi*>> mapDigitsByRow(vector<FaserDigi*> v);
-
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -32,17 +16,11 @@ FaserEvent::FaserEvent()
 
 FaserEvent::~FaserEvent()
 { 
-  for (auto p : fParticles)
-  {
-    if (p) delete p;
-  }
+  for (auto p : fParticles) if (p) delete p;
   fParticles.clear();
 
   for (auto c : fClusters) if (c) delete c;
   fClusters.clear();
-    delete p;
-  }
-  fParticles.clear();
 }
 
 void FaserEvent::SetParticles(G4TrajectoryContainer* particles)
@@ -71,39 +49,28 @@ void FaserEvent::SetClusters()
   // Collect the digits by planes of the detector
   map<int, vector<FaserDigi*>> planeMap = mapDigitsByPlane(*this);
 
-  // Require activity in at least three planes
-  if (planeMap.size() < 3) return;
-
   // Process each plane in turn
   map<int, map<int, vector<FaserDigi*>>> rowMap;
-  int nGoodPlanes = 0;
-  for (auto & plane : planeMap) {
+  for (auto & plane : planeMap) 
+  {
     rowMap[plane.first] = mapDigitsByRow(plane.second);
-    if (rowMap[plane.first].size() < 2) continue;
-    nGoodPlanes++;
   }
-  if (nGoodPlanes < 3) return;
 
   int clusterNumber = 0;
   // cluster the digits in each row of a plane
-  map<int, vector<FaserCluster>> clusterMap;
+  map<int, vector<FaserCluster*>> clusterMap;
   for ( auto& plane : rowMap ) {
     for ( auto& row : plane.second ) {
       vector<vector<FaserDigi*>> clusters = clusterOneRow(row.second);
       for ( auto& c : clusters ) {
-        clusterMap[plane.first].push_back(FaserCluster(clusterNumber++, c));
+        clusterMap[plane.first].push_back(new FaserCluster(clusterNumber++, c));
       }
     }
   }
 
-  // Require at least 4 clusters in first plane
-  if ( clusterMap[0].size() < 4 ) {
-    return;
-  }
-
   for ( auto& plane : clusterMap ) {
-    for ( auto& c : plane.second ) {
-      fClusters.push_back(new FaserCluster {c});
+    for ( auto c : plane.second ) {
+      fClusters.push_back( c );
     }
   }
 
@@ -114,14 +81,14 @@ void FaserEvent::SetClusters()
 // Utility methods for cluster finding                                        //
 ////////////////////////////////////////////////////////////////////////////////
 
-int rowID(FaserDigi* d)
+int FaserEvent::rowID(FaserDigi* d)
 {
   return d->Row() + 2 * ( d->Sensor() + 4 * ( d->Module() + 2 * d->Plane() ) );
 }
 
 //------------------------------------------------------------------------------
 
-vector<vector<FaserDigi*>> clusterOneRow(vector<FaserDigi*> digits)
+vector<vector<FaserDigi*>> FaserEvent::clusterOneRow(vector<FaserDigi*> digits)
 {
   vector<vector<FaserDigi*>> clusters;
   vector<FaserDigi*> cluster;
@@ -142,14 +109,14 @@ vector<vector<FaserDigi*>> clusterOneRow(vector<FaserDigi*> digits)
 
 //------------------------------------------------------------------------------
 
-void sortDigits(vector<FaserDigi*>& v)
+void FaserEvent::sortDigits(vector<FaserDigi*>& v)
 {
     std::sort(v.begin(), v.end(), [](FaserDigi* const& l, FaserDigi* const& r) { return l->Strip() < r->Strip(); });
 }
 
 //------------------------------------------------------------------------------
 
-map<int, vector<FaserDigi*>> mapDigitsByPlane(FaserEvent & evt)
+map<int, vector<FaserDigi*>> FaserEvent::mapDigitsByPlane(FaserEvent & evt)
 {
   map<int, vector<FaserDigi*>> planeMap;
   for (FaserDigi* d : evt.Digis())
@@ -161,7 +128,7 @@ map<int, vector<FaserDigi*>> mapDigitsByPlane(FaserEvent & evt)
 
 //------------------------------------------------------------------------------
 
-map<int, vector<FaserDigi*>> mapDigitsByRow(vector<FaserDigi*> v)
+map<int, vector<FaserDigi*>> FaserEvent::mapDigitsByRow(vector<FaserDigi*> v)
 {
   map<int, vector<FaserDigi*>> rowMap;
 

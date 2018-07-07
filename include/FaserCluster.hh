@@ -7,63 +7,45 @@
 #include "TF1.h"
 #include "TH1F.h"
 
+#include "globals.hh"
+
 // Cluster class for grouped Faser digits
 //
 
 class FaserCluster {
 
-    struct ClusterFit {
-        double  chiSquared;
-        double  stripPosition;
-        double  positionError;
-        double  width;
-        double  amplitude;
-        int     nDoF;
-    };
-
-
-    int fIndex;
-
-    int fPlane;
-    int fModule;
-    int fSensor;
-    int fRow;
-
-    double fCharge;
-    std::vector<FaserDigi*> fDigis;
-    int fNMaxima;
-    std::vector<int> fMaxima;
-    TH1F fH;
-    TString fFitName;
-    std::vector<ClusterFit> fFitResults;
-
-
 public:
+
+    FaserCluster();
 
     FaserCluster(int index, std::vector<FaserDigi*> & digis);
 
-    virtual ~FaserCluster() {
-    }
+    FaserCluster(const FaserCluster& right);
+
+    FaserCluster& operator=(const FaserCluster& right);
+
+    virtual ~FaserCluster();
 
     std::vector<FaserDigi*>& Digis() { return fDigis; }
 
-    int  Plane()  const { return fPlane;  }
-    int  Module() const { return fModule; }
-    int  Sensor() const { return fSensor; }
-    int  Row()    const { return fRow;    }
-
-    double Charge() const { return fCharge; }
-    std::vector<int> LocalMaxima() const { return fMaxima; }
-    void Draw() { fH.Draw(); Fit(); }
-    std::vector<ClusterFit> Fit();
-    std::vector<ClusterFit> WeightedAverage();
-
+    G4int  Plane()  const { return (fDigis.size() > 0 ? fDigis[0]->Plane() : -1); }
+    G4int  Module() const { return (fDigis.size() > 0 ? fDigis[0]->Module() : -1); }
+    G4int  Sensor() const { return (fDigis.size() > 0 ? fDigis[0]->Sensor() : -1); }
+    G4int  Row()    const { return (fDigis.size() > 0 ? fDigis[0]->Row() : -1);  }
+    std::vector<G4int> LocalMaxima() const { return fMaxima; }
+    G4double Charge() const { return fCharge; }
+    G4double Position() const { return fPosition; }
 
 private:
+    G4int fIndex;
+    std::vector<FaserDigi*> fDigis;
 
-    std::shared_ptr<TF1> threeParGauss;
-    std::shared_ptr<TF1> fivePar2Gauss;
-    std::shared_ptr<TF1> sixPar2Gauss;
+    std::vector<G4int> fMaxima;
+
+    G4double fCharge;
+    G4double fPosition;
+
+    void WeightedAverage();
 
 };
 

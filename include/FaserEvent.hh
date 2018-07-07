@@ -9,6 +9,12 @@
 #include "FaserCluster.hh"
 #include "G4TrajectoryContainer.hh"
 
+#include <map>
+#include <vector>
+
+using std::map;
+using std::vector;
+
 class FaserEvent
 {
 public:
@@ -42,6 +48,16 @@ private:
   std::vector<FaserSamplerHit*> fSamples;
   std::vector<FaserDigi*> fDigis;
   std::vector<FaserCluster*> fClusters;
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Utility methods for cluster finding                                        //
+
+  int rowID(FaserDigi* d);
+  vector<vector<FaserDigi*>> clusterOneRow(vector<FaserDigi*> digits);
+  void sortDigits(vector<FaserDigi*>& v);
+  map<int, vector<FaserDigi*>> mapDigitsByPlane(FaserEvent & evt);
+  map<int, vector<FaserDigi*>> mapDigitsByRow(vector<FaserDigi*> v);
+
 };
 
 #endif
