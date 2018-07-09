@@ -136,6 +136,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   // G4RotationMatrix* fStereoPlus;
   // G4RotationMatrix* fStereoMinus;
   // G4RotationMatrix* fOverlapAngle;
+  G4RotationMatrix* fSamplerRotation;
 
   // mag field
   G4Cache<FaserFieldSetup*> fFieldSetup;

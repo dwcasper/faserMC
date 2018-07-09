@@ -31,26 +31,26 @@ public:
   std::vector<FaserSensorHit*>& TrackerHits() { return fTrackerHits; }
   void SetTrackerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fTrackerHits.push_back((*hits)[i]); }
 
-  // std::vector<FaserSensorHit*>& SamplerHits() { return fSamplerHits; }
-  // void SetSamplerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamplerHits.push_back((*hits)[i]); }
+  std::vector<FaserSensorHit*>& SamplerHits() { return fSamplerHits; }
+  void SetSamplerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamplerHits.push_back((*hits)[i]); }
 
   std::vector<FaserDigi*> TrackerDigis()& { return fTrackerDigis; }
   void SetTrackerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fTrackerDigis.push_back((*digis)[i]); }
 
-  // std::vector<FaserDigi*> SamplerDigis()& { return fTrackerDigis; }
-  // void SetSamplerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fSamplerDigis.push_back((*digis)[i]); }
+  std::vector<FaserDigi*> SamplerDigis()& { return fSamplerDigis; }
+  void SetSamplerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fSamplerDigis.push_back((*digis)[i]); }
 
   std::vector<FaserCluster*>& Clusters() { return fClusters; }
   void SetClusters();
 
 
 private:
-  G4int fEventNumber;
+  G4int fEventNumber; 
   std::vector<FaserTruthParticle*> fParticles;
   std::vector<FaserSensorHit*> fTrackerHits;
-  // std::vector<FaserSensorHit*> fSamplerHits;
+  std::vector<FaserSensorHit*> fSamplerHits;
   std::vector<FaserDigi*> fTrackerDigis;
-  // std::vector<FaserDigi*> fSamplerDigis;
+  std::vector<FaserDigi*> fSamplerDigis;
   std::vector<FaserCluster*> fClusters;
 
   ////////////////////////////////////////////////////////////////////////////////

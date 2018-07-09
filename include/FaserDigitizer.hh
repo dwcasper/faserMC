@@ -11,7 +11,7 @@
 class FaserDigitizer : public G4VDigitizerModule
 {
   public:
-    FaserDigitizer(G4String name);
+    FaserDigitizer(G4String name, G4String hitCollectionName, G4String digiCollectionName);
     virtual ~FaserDigitizer();
 
     void Digitize();
@@ -32,9 +32,12 @@ class FaserDigitizer : public G4VDigitizerModule
     static constexpr G4double defaultChargeNorm = 0.4;
 
   private:
+    G4String fModuleName;
+    G4String fInputName;
+    G4String fOutputName;
     FaserDigiMessenger* fDigiMessenger;
     FaserDigiCollection* fDigiCollection;
-    G4int fNPlanes;
+    // G4int fNPlanes;
     G4int fNModules;
     G4int fNSensors;
     G4int fNRows;

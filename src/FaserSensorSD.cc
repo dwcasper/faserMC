@@ -36,8 +36,7 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int row = h->GetCopyNumber(1);       // 0 - 1
   G4int sensor = h->GetCopyNumber(2);    // 0 - 3
   G4int module = h->GetCopyNumber(3);    // 0 - 1
-  // the sampler planes are embedded in an additional mother volume
-  G4int plane = ( h->GetCopyNumber(5) > 0 ? h->GetCopyNumber(5) : h->GetCopyNumber(4) );     // 0 - (nPlanes - 1)
+  G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
 
   newHit->SetPlane( plane );
   newHit->SetModule( module );

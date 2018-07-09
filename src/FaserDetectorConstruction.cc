@@ -38,6 +38,7 @@ FaserDetectorConstruction::FaserDetectorConstruction()
     detector_samplerLength(default_detector_samplerLength),
     detector_planePitch(default_detector_planePitch),
     detector_decayVolumeLength(default_detector_decayVolumeLength),
+    fSamplerRotation(nullptr),
     checkOverlaps(true), nist(nullptr), fRegTracker(nullptr), fRegCalorimeter(nullptr),
     fTrackerFactory { new FaserSensorPlaneConstruction(this, "tracker") }, 
     fSamplerFactory { new FaserSensorPlaneConstruction(this, "sampler") }
@@ -50,6 +51,7 @@ FaserDetectorConstruction::~FaserDetectorConstruction()
   if (fGeometryMessenger != nullptr) delete fGeometryMessenger;
   if (fTrackerFactory != nullptr) delete fTrackerFactory;
   if (fSamplerFactory != nullptr) delete fSamplerFactory;
+  if (fSamplerRotation != nullptr) delete fSamplerRotation;
 }
 
 const G4LogicalVolume* FaserDetectorConstruction::GetTrackerStrip() const
@@ -59,19 +61,18 @@ const G4LogicalVolume* FaserDetectorConstruction::GetTrackerStrip() const
 
 void FaserDetectorConstruction::ConstructSDandField()
 {
-  G4String sensorSDName = "Faser/SensorSD";
-  FaserSensorSD* aSensorSD = new FaserSensorSD(sensorSDName, 
-						  "FaserSensorHitsCollection");
-  G4SDManager::GetSDMpointer()->AddNewDetector(aSensorSD);
-  SetSensitiveDetector( "trackerStrip", aSensorSD, true );
+  G4String trackerSDName = "Tracker";
+  FaserSensorSD* trackerSD = new FaserSensorSD(trackerSDName, 
+						  "FaserTrackerHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(trackerSD);
+  SetSensitiveDetector( "trackerStrip", trackerSD, true );
 
-/*   G4String samplerSDName = "Faser/SamplerSD";
-  FaserSensorSD* aSamplerSD = new FaserSensorSD(samplerSDName,
-              "FaserSamplerHitsCollection",
-              "Calorimeter");
-  G4SDManager::GetSDMpointer()->AddNewDetector(aSamplerSD);
-  SetSensitiveDetector( "Strip", aSamplerSD, true);
- */
+  G4String samplerSDName = "Sampler";
+  FaserSensorSD* samplerSD = new FaserSensorSD(samplerSDName, 
+						  "FaserSamplerHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(samplerSD);
+  SetSensitiveDetector( "samplerStrip", samplerSD, true );
+
   // not clear why we need this concurrency stuff...
   if (!fFieldSetup.Get())
   {
@@ -335,11 +336,18 @@ void FaserDetectorConstruction::ConstructSampler()
                         sampler_mat,     //its material
                         "Sampler");      //its name
 
+  //fSamplerRotation = new G4RotationMatrix();
+  //fSamplerRotation->rotateY(CLHEP::pi);
+  //fSamplerRotation->rotateZ(CLHEP::pi/6);
+
   G4double firstAbsorberZ = -0.5 * (sampler_sizeZ - absorber_sizeZ) + plane_sizeZ + (sampler_sensorPlanes - 1) * (plane_sizeZ + absorber_sizeZ);
   G4double firstPlaneZ = firstAbsorberZ + 0.5 * (absorber_sizeZ + plane_sizeZ);
   for (int i = 0; i < sampler_sensorPlanes; i++)
   {
-      new G4PVPlacement(0,
+      //G4RotationMatrix* theRotation = ( i%2 > 0 ? fSamplerRotation : nullptr);
+      G4RotationMatrix* theRotation = nullptr;
+
+      new G4PVPlacement(theRotation,
       G4ThreeVector(0, 0, firstAbsorberZ + i * (plane_sizeZ + absorber_sizeZ)),
       fLogicAbsorber,
       "SamplerAbsorber_PV",
@@ -348,7 +356,7 @@ void FaserDetectorConstruction::ConstructSampler()
       i,
       checkOverlaps);
 
-      new G4PVPlacement(0,
+      new G4PVPlacement(theRotation,
 			G4ThreeVector(0, 0, firstPlaneZ + i * (plane_sizeZ + absorber_sizeZ)) ,
 			fLogicSamplerPlane,
 			"SamplerPlane_PV",

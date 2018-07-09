@@ -8,8 +8,8 @@
 
 #include <math.h>
 
-FaserDigitizer::FaserDigitizer(G4String name)
-  : G4VDigitizerModule(name),
+FaserDigitizer::FaserDigitizer(G4String name, G4String input, G4String output)
+  : G4VDigitizerModule(name), fModuleName(name), fInputName(input), fOutputName(output),
     fDigiMessenger(new FaserDigiMessenger(this)),
     fNModules(2),
     fNSensors(4),
@@ -19,8 +19,9 @@ FaserDigitizer::FaserDigitizer(G4String name)
     fChargeSmear(defaultChargeSmear),
     fChargeNorm(defaultChargeNorm)
 {
-  G4String colName = "FaserDigiCollection";
-  collectionName.push_back(colName);
+  // G4String colName = "FaserDigiCollection";
+  // collectionName.push_back(colName);
+  collectionName.push_back(fOutputName);
 }
 
 FaserDigitizer::~FaserDigitizer()
@@ -32,7 +33,7 @@ void FaserDigitizer::Digitize()
   G4RunManager* runMan = G4RunManager::GetRunManager();
   FaserDetectorConstruction* dc = (FaserDetectorConstruction*)
 	  runMan->GetUserDetectorConstruction();
-  fNPlanes = dc->getSensorPlanes();
+  // fNPlanes = dc->getSensorPlanes();
   fNStrips = dc->getReadoutStrips();
   fStripPitch = dc->getStripPitch();
 
@@ -41,11 +42,11 @@ void FaserDigitizer::Digitize()
   std::map<G4int, std::map<G4int, G4double> > contributions;
 
   fDigiCollection = new FaserDigiCollection
-	  ("FaserDigitizer", "FaserDigiCollection");
+	  (fModuleName, fOutputName);
   
   // get tracker hits
   G4DigiManager* digiMan = G4DigiManager::GetDMpointer();
-  G4int sensorID = digiMan->GetHitsCollectionID("FaserSensorHitsCollection");
+  G4int sensorID = digiMan->GetHitsCollectionID( fInputName );
   FaserSensorHitsCollection* FSHC = (FaserSensorHitsCollection*)
 	  (digiMan->GetHitsCollection(sensorID));
 
