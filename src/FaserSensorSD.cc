@@ -58,15 +58,14 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   FaserTrackInformation* info = (FaserTrackInformation*) track->GetUserInformation();
   if ( info != nullptr )
   {
-    if (info->GetSourceTrackID() > 0)
+    // G4cout << "At z = " << worldPosition.z() << " TrackID = " << track->GetTrackID() << " OriginID = " << info->GetOriginalTrackID() << " SourceID = " << info->GetSourceTrackID() << G4endl;
+    if (info->GetSourceTrackID() > -1)
     {
-      newHit->SetTrack( info->GetSourceTrackID() );
-      if (plane <= 5) G4cout << "Source Track ID: " << info->GetSourceTrackID() << " at z = " << worldPosition.z() << G4endl;
+      newHit->SetTrack(info->GetSourceTrackID());
     }
     else
     {
-      newHit->SetTrack( track->GetTrackID() );
-      if (plane <= 5) G4cout << "Track ID: " << track->GetTrackID() << " at z = " << worldPosition.z() << G4endl;
+      newHit->SetTrack(track->GetTrackID());
     }
     newHit->SetOriginTrack( info->GetOriginalTrackID() );
   }

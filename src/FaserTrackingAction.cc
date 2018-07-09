@@ -11,14 +11,22 @@ FaserTrackingAction::FaserTrackingAction()
 void FaserTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 {
   FaserTrackInformation* info = dynamic_cast<FaserTrackInformation*>(aTrack->GetUserInformation());
-  if (info->GetSourceTrackID() != 0 && info->GetSourceTrackID() != aTrack->GetTrackID()) 
-	{
-		fpTrackingManager->SetStoreTrajectory(false);
-	}
-	else
+	if (info->GetTrackingStatus() > 0)
 	{
 		fpTrackingManager->SetStoreTrajectory(true);
 	}
+	else 
+	{
+		fpTrackingManager->SetStoreTrajectory(false);
+	}
+  // if (info->GetSourceTrackID() != 0 && info->GetSourceTrackID() != aTrack->GetTrackID()) 
+	// {
+	// 	fpTrackingManager->SetStoreTrajectory(false);
+	// }
+	// else
+	// {
+	// 	fpTrackingManager->SetStoreTrajectory(true);
+	// }
 }
 
 void FaserTrackingAction::PostUserTrackingAction(const G4Track*aTrack)
@@ -37,14 +45,14 @@ void FaserTrackingAction::PostUserTrackingAction(const G4Track*aTrack)
 						if (aTrack->GetParentID() == 0)
 						{
 							infoNew = new FaserTrackInformation((*secondaries)[i]);
-							G4cout << "Created new trackinfo for daughter of primary at z = " << aTrack->GetPosition().z() << G4endl;
-							infoNew->Print();
+							// G4cout << "Created new trackinfo for daughter of primary at z = " << aTrack->GetPosition().z() << G4endl;
+							// infoNew->Print();
 						}
 						else
 						{
 							infoNew = new FaserTrackInformation(info);
-							G4cout << "Copied trackinfo to daughter of secondary at z= " << aTrack->GetPosition().z() << G4endl;
-							infoNew->Print();
+							// G4cout << "Copied trackinfo to daughter of secondary at z= " << aTrack->GetPosition().z() << G4endl;
+							// infoNew->Print();
 						}
 						(*secondaries)[i]->SetUserInformation(infoNew);
 				}

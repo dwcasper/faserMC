@@ -16,8 +16,11 @@ public:
 
 public:
   virtual G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack);
-  //virtual void NewStage();
-  //virtual void PrepareNewEvent();
+  virtual void NewStage();
+  virtual void PrepareNewEvent();
+
+private:
+  G4int fStage;
 
 };
 
