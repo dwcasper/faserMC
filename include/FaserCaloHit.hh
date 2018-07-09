@@ -1,5 +1,5 @@
-#ifndef FaserSamplerHit_h
-#define FaserSamplerHit_h 1
+#ifndef FaserCaloHit_h
+#define FaserCaloHit_h 1
 
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
@@ -12,16 +12,16 @@
 // Hit class for the Faser silicon sensor
 //
 
-class FaserSamplerHit : public G4VHit
+class FaserCaloHit : public G4VHit
 {
    public:
 
-    FaserSamplerHit();
-    FaserSamplerHit(const FaserSamplerHit&);
-    virtual ~FaserSamplerHit();
+    FaserCaloHit();
+    FaserCaloHit(const FaserCaloHit&);
+    virtual ~FaserCaloHit();
 
-    const FaserSamplerHit& operator=(const FaserSamplerHit&);
-    G4int operator==(const FaserSamplerHit&);
+    const FaserCaloHit& operator=(const FaserCaloHit&);
+    G4int operator==(const FaserCaloHit&);
 
     inline void* operator new(size_t);
     inline void  operator delete(void*);
@@ -32,15 +32,19 @@ class FaserSamplerHit : public G4VHit
 
     // setters
     void SetPlane(G4int plane)               		{ fPlaneID = plane; };
+    void SetTower(G4int tower)                  { fTowerID = tower; }
+    void SetModule(G4int module)                { fModuleID = module; }
     void SetEdep(G4double de)           	       	{ fEdep = de; };
     void SetGlobalPos(G4ThreeVector globalXYZ) 		{ fGlobalPos = globalXYZ; };
     void SetLocalPos(G4ThreeVector localXYZ)   		{ fLocalPos = localXYZ; };
   
-    void SetOriginTrack(G4int track)                    { fOriginTrackID = track; }
+    void SetOriginTrack(G4int track)            { fOriginTrackID = track; }
     void SetSourceTrack(G4int track)            { fSourceTrackID = track; }
 
     // getters
-    G4int Plane() const    	       		        { return fPlaneID; };
+    G4int Plane() const    	       	      { return fPlaneID; };
+    G4int Tower() const                   { return fTowerID; }
+    G4int Module() const                  { return fModuleID; }
     G4double Edep() const           			{ return fEdep; };
     G4ThreeVector GlobalPos() const 			{ return fGlobalPos; };
     G4ThreeVector LocalPos() const	  		{ return fLocalPos; };
@@ -52,6 +56,8 @@ class FaserSamplerHit : public G4VHit
    private:
 
     G4int fPlaneID;
+    G4int fTowerID;
+    G4int fModuleID;
     G4double fEdep;
     G4ThreeVector fGlobalPos;
     G4ThreeVector fLocalPos;

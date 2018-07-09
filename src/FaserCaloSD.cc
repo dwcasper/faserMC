@@ -1,4 +1,4 @@
-#include "FaserSamplerSD.hh"
+#include "FaserCaloSD.hh"
 #include "FaserTrackInformation.hh"
 
 #include "G4HCofThisEvent.hh"
@@ -7,9 +7,7 @@
 #include "G4SDManager.hh"
 #include "G4ios.hh"
 
-//#include "RootIO.hh"
-
-FaserSamplerSD::FaserSamplerSD(const G4String& name,
+FaserCaloSD::FaserCaloSD(const G4String& name,
 			     const G4String& hitsCollectionName)
   : G4VSensitiveDetector(name),
     fHitsCollection(NULL)
@@ -17,24 +15,28 @@ FaserSamplerSD::FaserSamplerSD(const G4String& name,
   collectionName.insert(hitsCollectionName);
 }
 
-FaserSamplerSD::~FaserSamplerSD()
+FaserCaloSD::~FaserCaloSD()
 { 
-  //RootIO::GetInstance()->Close();
+
 }
 
-G4bool FaserSamplerSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
+G4bool FaserCaloSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
   G4double edep = aStep->GetTotalEnergyDeposit();
   if (edep == 0.0) return false;
 
-  FaserSamplerHit* newHit = new FaserSamplerHit();
+  FaserCaloHit* newHit = new FaserCaloHit();
 
   G4TouchableHandle h = aStep->GetPreStepPoint()->GetTouchableHandle();
   //
   // zero-based identifiers
-  G4int plane = h->GetCopyNumber(1);     // 0 - (nPlanes - 1)
+  G4int plane = h->GetCopyNumber(0);     // 0 - (nPlanes - 1)
+  G4int tower = h->GetCopyNumber(1);     // 0, 0-3 or 0-8, depending on granularity
+  G4int module = h->GetCopyNumber(2);  
 
   newHit->SetPlane( plane );
+  newHit->SetTower( tower);
+  newHit->SetModule( module );
 
   newHit->SetEdep( edep );
   G4ThreeVector worldPosition = aStep->GetPostStepPoint()->GetPosition();
@@ -60,11 +62,11 @@ G4bool FaserSamplerSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   return true;
 }
 
-void FaserSamplerSD::Initialize(G4HCofThisEvent* hce)
+void FaserCaloSD::Initialize(G4HCofThisEvent* hce)
 {
   // Create hits collection
   fHitsCollection =
-    new FaserSamplerHitsCollection(SensitiveDetectorName, collectionName[0]);  
+    new FaserCaloHitsCollection(SensitiveDetectorName, collectionName[0]);  
 
   // add hits collection to the collection of all hit collections for event
   G4SDManager* sdMan = G4SDManager::GetSDMpointer();
@@ -73,7 +75,7 @@ void FaserSamplerSD::Initialize(G4HCofThisEvent* hce)
   hce->AddHitsCollection( hcID, fHitsCollection);
 }
 
-void FaserSamplerSD::EndOfEvent(G4HCofThisEvent*)
+void FaserCaloSD::EndOfEvent(G4HCofThisEvent*)
 {
   if (verboseLevel > 1)
   {

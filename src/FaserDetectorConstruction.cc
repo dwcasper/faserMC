@@ -87,9 +87,6 @@ void FaserDetectorConstruction::ConstructSDandField()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 void FaserDetectorConstruction::ConstructTracker()
 {
   //fTrackerFactory = new FaserSensorPlaneConstruction(this, G4String("tracker"));

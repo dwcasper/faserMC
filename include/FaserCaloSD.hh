@@ -1,9 +1,9 @@
-#ifndef FaserSamplerSD_h
-#define FaserSamplerSD_h 1
+#ifndef FaserCaloSD_h
+#define FaserCaloSD_h 1
 
 #include "G4VSensitiveDetector.hh"
 
-#include "FaserSamplerHit.hh"
+#include "FaserCaloHit.hh"
 
 #include <vector>
 #include <set>
@@ -13,13 +13,13 @@ class G4HCofThisEvent;
 
 // sensitive detector class, which is notified of energy deposits in the sensor and creates hits
 
-class FaserSamplerSD : public G4VSensitiveDetector
+class FaserCaloSD : public G4VSensitiveDetector
 {
   public:
   
-    FaserSamplerSD(const G4String& name,
+    FaserCaloSD(const G4String& name,
  		  const G4String& hitsCollectionName);
-    virtual ~FaserSamplerSD();
+    virtual ~FaserCaloSD();
 
     // methods from base class
     virtual void    Initialize(G4HCofThisEvent* hitCollection);
@@ -28,7 +28,7 @@ class FaserSamplerSD : public G4VSensitiveDetector
 
   private:
   
-    FaserSamplerHitsCollection* fHitsCollection;
+    FaserCaloHitsCollection* fHitsCollection;
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "FaserSamplerHit.hh"
+#include "FaserCaloHit.hh"
 #include "G4UnitsTable.hh"
 #include "G4VVisManager.hh"
 #include "G4Circle.hh"
@@ -8,13 +8,15 @@
 
 #include <iomanip>
 
-G4ThreadLocal G4Allocator<FaserSamplerHit>* FaserSamplerHitAllocator = 0;
+G4ThreadLocal G4Allocator<FaserCaloHit>* FaserCaloHitAllocator = 0;
 
-const FaserDetectorConstruction* FaserSamplerHit::fDetectorConstruction = nullptr;
+const FaserDetectorConstruction* FaserCaloHit::fDetectorConstruction = nullptr;
 
-FaserSamplerHit::FaserSamplerHit()
+FaserCaloHit::FaserCaloHit()
   : G4VHit(),
     fPlaneID(-1),
+    fTowerID(-1),
+    fModuleID(-1),
     fEdep(0.0),
     fGlobalPos(G4ThreeVector()),
     fLocalPos(G4ThreeVector()),
@@ -22,13 +24,15 @@ FaserSamplerHit::FaserSamplerHit()
     fSourceTrackID(-1)
 {}
 
-FaserSamplerHit::~FaserSamplerHit() 
+FaserCaloHit::~FaserCaloHit() 
 { }
 
-FaserSamplerHit::FaserSamplerHit(const FaserSamplerHit& right)
+FaserCaloHit::FaserCaloHit(const FaserCaloHit& right)
   : G4VHit()
 {
   fPlaneID = right.fPlaneID;
+  fTowerID = right.fTowerID;
+  fModuleID = right.fModuleID;
   fEdep = right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
@@ -37,9 +41,11 @@ FaserSamplerHit::FaserSamplerHit(const FaserSamplerHit& right)
   fSourceTrackID = right.fSourceTrackID;
 }
 
-const FaserSamplerHit& FaserSamplerHit::operator=(const FaserSamplerHit& right)
+const FaserCaloHit& FaserCaloHit::operator=(const FaserCaloHit& right)
 {
   fPlaneID = right.fPlaneID;
+  fTowerID = right.fTowerID;
+  fModuleID = right.fModuleID;
   fEdep =right.fEdep;
   fGlobalPos = right.fGlobalPos;
   fLocalPos = right.fLocalPos;
@@ -50,12 +56,12 @@ const FaserSamplerHit& FaserSamplerHit::operator=(const FaserSamplerHit& right)
   return *this;
 }
 
-G4int FaserSamplerHit::operator==(const FaserSamplerHit& right)
+G4int FaserCaloHit::operator==(const FaserCaloHit& right)
 {
   return ( this == &right) ? 1 : 0;
 }
 
-void FaserSamplerHit::Draw()
+void FaserCaloHit::Draw()
 {
   if (fDetectorConstruction == nullptr)
   {
@@ -89,7 +95,7 @@ void FaserSamplerHit::Draw()
   }
 }
 
-void FaserSamplerHit::Print()
+void FaserCaloHit::Print()
 {
   G4cout 
     << "  trackID: " << fSourceTrackID << " planeID: " 

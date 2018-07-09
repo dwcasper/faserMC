@@ -37,6 +37,13 @@ private:
   G4UIcmdWithADoubleAndUnit*     cmd_tracker_planePitch;
   G4UIcmdWithAnInteger*          cmd_sampler_sensorPlanes;
   G4UIcmdWithADouble*            cmd_sampler_absorberX0;
+  G4UIcmdWithAnInteger*          cmd_calo_planes;
+  G4UIcmdWithAnInteger*          cmd_calo_towers;
+  G4UIcmdWithAnInteger*          cmd_calo_modules;
+  G4UIcmdWithADoubleAndUnit*     cmd_calo_scintThickness;
+  G4UIcmdWithADoubleAndUnit*     cmd_calo_absorbThickness;
+  G4UIcmdWithADoubleAndUnit*     cmd_calo_sideThickess;
+  G4UIcmdWithADoubleAndUnit*     cmd_calo_sizeXY;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_samplerLength;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_decayVolumeLength;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_trackerLength;
