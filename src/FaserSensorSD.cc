@@ -36,7 +36,8 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int row = h->GetCopyNumber(1);       // 0 - 1
   G4int sensor = h->GetCopyNumber(2);    // 0 - 3
   G4int module = h->GetCopyNumber(3);    // 0 - 1
-  G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
+  // the sampler planes are embedded in an additional mother volume
+  G4int plane = ( h->GetCopyNumber(5) > 0 ? h->GetCopyNumber(5) : h->GetCopyNumber(4) );     // 0 - (nPlanes - 1)
 
   newHit->SetPlane( plane );
   newHit->SetModule( module );
@@ -45,19 +46,28 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   newHit->SetStrip( strip );
 
   newHit->SetEdep( edep );
-  G4ThreeVector worldPosition = aStep->GetPostStepPoint()->GetPosition();
+  G4ThreeVector worldPosition = aStep->GetPreStepPoint()->GetPosition();
   newHit->SetGlobalPos( worldPosition );
   newHit->SetLocalPos( h->GetHistory()->GetTopTransform().TransformPoint( worldPosition ) );
   newHit->SetTransform( h->GetHistory()->GetTopTransform().Inverse() );
 
   // truth information
   G4Track* track = aStep->GetTrack();
-  newHit->SetTrack( track->GetTrackID() );
   newHit->SetEnergy( track->GetTotalEnergy() );
 
   FaserTrackInformation* info = (FaserTrackInformation*) track->GetUserInformation();
   if ( info != nullptr )
   {
+    if (info->GetSourceTrackID() > 0)
+    {
+      newHit->SetTrack( info->GetSourceTrackID() );
+      if (plane <= 5) G4cout << "Source Track ID: " << info->GetSourceTrackID() << " at z = " << worldPosition.z() << G4endl;
+    }
+    else
+    {
+      newHit->SetTrack( track->GetTrackID() );
+      if (plane <= 5) G4cout << "Track ID: " << track->GetTrackID() << " at z = " << worldPosition.z() << G4endl;
+    }
     newHit->SetOriginTrack( info->GetOriginalTrackID() );
   }
   else
@@ -85,6 +95,7 @@ void FaserSensorSD::Initialize(G4HCofThisEvent* hce)
 
 void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
 {
+  G4cout << "FaserSensorSD::EndOfEvent" << G4endl;
   if (verboseLevel > 1)
   {
     G4int nofHits = fHitsCollection->entries();

@@ -4,7 +4,7 @@
 #include "globals.hh"
 #include "FaserTruthParticle.hh"
 #include "FaserSensorHit.hh"
-#include "FaserSamplerHit.hh"
+//#include "FaserSamplerHit.hh"
 #include "FaserDigi.hh"
 #include "FaserCluster.hh"
 #include "G4TrajectoryContainer.hh"
@@ -28,14 +28,17 @@ public:
   std::vector<FaserTruthParticle*>& Particles() { return fParticles; }
   void SetParticles(G4TrajectoryContainer* particles);
 
-  std::vector<FaserSensorHit*>& Hits() { return fHits; }
-  void SetHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fHits.push_back((*hits)[i]); }
+  std::vector<FaserSensorHit*>& TrackerHits() { return fTrackerHits; }
+  void SetTrackerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fTrackerHits.push_back((*hits)[i]); }
 
-  std::vector<FaserSamplerHit*>& Samples() { return fSamples; }
-  void SetSamples(const FaserSamplerHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamples.push_back((*hits)[i]); }
+  // std::vector<FaserSensorHit*>& SamplerHits() { return fSamplerHits; }
+  // void SetSamplerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamplerHits.push_back((*hits)[i]); }
 
-  std::vector<FaserDigi*> Digis()& { return fDigis; }
-  void SetDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fDigis.push_back((*digis)[i]); }
+  std::vector<FaserDigi*> TrackerDigis()& { return fTrackerDigis; }
+  void SetTrackerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fTrackerDigis.push_back((*digis)[i]); }
+
+  // std::vector<FaserDigi*> SamplerDigis()& { return fTrackerDigis; }
+  // void SetSamplerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fSamplerDigis.push_back((*digis)[i]); }
 
   std::vector<FaserCluster*>& Clusters() { return fClusters; }
   void SetClusters();
@@ -44,9 +47,10 @@ public:
 private:
   G4int fEventNumber;
   std::vector<FaserTruthParticle*> fParticles;
-  std::vector<FaserSensorHit*> fHits;
-  std::vector<FaserSamplerHit*> fSamples;
-  std::vector<FaserDigi*> fDigis;
+  std::vector<FaserSensorHit*> fTrackerHits;
+  // std::vector<FaserSensorHit*> fSamplerHits;
+  std::vector<FaserDigi*> fTrackerDigis;
+  // std::vector<FaserDigi*> fSamplerDigis;
   std::vector<FaserCluster*> fClusters;
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +61,6 @@ private:
   void sortDigits(vector<FaserDigi*>& v);
   map<int, vector<FaserDigi*>> mapDigitsByPlane(FaserEvent & evt);
   map<int, vector<FaserDigi*>> mapDigitsByRow(vector<FaserDigi*> v);
-
 };
 
 #endif

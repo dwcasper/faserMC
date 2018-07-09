@@ -61,18 +61,17 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
   FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*) 
 	  digiMan->GetHitsCollection(truthID);
 
-  G4int caloID = digiMan->GetHitsCollectionID("FaserSamplerHitsCollection");
-  FaserSamplerHitsCollection* sc = (FaserSamplerHitsCollection*)
-    digiMan->GetHitsCollection(caloID);
-
-  G4cout << "Nhits: " << hc->entries() << ", Ndigits: " << dc->entries() << ", Samples: " << sc->entries() << G4endl;
-
+  // G4int caloID = digiMan->GetHitsCollectionID("FaserSamplerHitsCollection");
+  // FaserSamplerHitsCollection* sc = (FaserSamplerHitsCollection*)
+  //   digiMan->GetHitsCollection(caloID);
  
   fFaserEvent->SetParticles(g4event->GetTrajectoryContainer());
-  fFaserEvent->SetHits(hc);
-  fFaserEvent->SetSamples(sc);
-  fFaserEvent->SetDigis(dc);
-  fFaserEvent->SetClusters();
+  fFaserEvent->SetTrackerHits(hc);
+  // fFaserEvent->SetSamples(sc);
+  fFaserEvent->SetTrackerDigis(dc);
+  // fFaserEvent->SetClusters();
+  G4cout << "Strip hits: " << fFaserEvent->TrackerHits().size() << ", Strip digits: " << fFaserEvent->TrackerDigis().size() << ", Strip clusters: " << fFaserEvent->Clusters().size() << G4endl;
+
   RootEventIO* rootEventIO = RootEventIO::GetInstance();
   rootEventIO->Write(fFaserEvent);
 

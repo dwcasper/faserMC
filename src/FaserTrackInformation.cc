@@ -66,5 +66,6 @@ void FaserTrackInformation::Print() const
   G4cout
     << "Original primary track ID " << fOriginalTrackID << " ("
     << fParticleDefinition->GetParticleName() << ","
-    << fOriginalEnergy/GeV << "[GeV])" << G4endl;
+    << fOriginalEnergy/GeV << "[GeV])" 
+    << " Source track ID = " << fSourceTrackID << " (" << fSourceEnergy/GeV << " GeV)" << G4endl;
 }

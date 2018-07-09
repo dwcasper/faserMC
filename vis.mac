@@ -48,7 +48,7 @@
 # (if too many tracks cause core dump => /tracking/storeTrajectory 0)
 #
 # Draw hits and digits at end of event:
-/vis/scene/add/hits
+#/vis/scene/add/hits
 /vis/scene/add/digis
 #
 # To draw only gammas:
@@ -129,12 +129,13 @@
 /vis/geometry/set/colour Row 0 0.7 0 0.7 0.3
 # "Support" is green
 /vis/geometry/set/colour Support 0 0 1 0 1
-# Make the "CalorimeterPlane" wrapper box invisible
-/vis/geometry/set/visibility CalorimeterPlane 0 false
+# Make the "SamplerPlane" wrapper box invisible
+/vis/geometry/set/visibility SamplerPlane 0 false
 # Absorber is light blue
 /vis/geometry/set/colour Absorber 0 0 0.2 1 0.3
-# Sampler is dark blue
-/vis/geometry/set/colour Sampler 0 0 0 1 0.4
+# Sampler wrapper box is invisible
+/vis/geometry/set/visibility Sampler 0 false
+#/vis/geometry/set/colour Sampler 0 0 0 1 0.4
 #
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenMarker true

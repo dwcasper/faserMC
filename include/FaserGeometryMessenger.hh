@@ -33,11 +33,11 @@ private:
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_sizeZ;
   G4UIcmdWithADoubleAndUnit*     cmd_sensor_stereoAngle;
   G4UIcmdWithADoubleAndUnit*     cmd_support_sizeZ;
-  G4UIcmdWithAnInteger*          cmd_detector_sensorPlanes;
-  G4UIcmdWithAnInteger*          cmd_detector_caloPlanes;
-  G4UIcmdWithADouble*            cmd_detector_absorberX0;
-  G4UIcmdWithADoubleAndUnit*     cmd_detector_samplerSizeZ;
-  G4UIcmdWithADoubleAndUnit*     cmd_detector_planePitch;
+  G4UIcmdWithAnInteger*          cmd_tracker_sensorPlanes;
+  G4UIcmdWithADoubleAndUnit*     cmd_tracker_planePitch;
+  G4UIcmdWithAnInteger*          cmd_sampler_sensorPlanes;
+  G4UIcmdWithADouble*            cmd_sampler_absorberX0;
+  G4UIcmdWithADoubleAndUnit*     cmd_detector_samplerLength;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_decayVolumeLength;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_trackerLength;
   G4UIcmdWithADoubleAndUnit*     cmd_detector_calorimeterLength;

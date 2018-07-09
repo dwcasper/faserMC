@@ -44,7 +44,7 @@ void FaserEvent::SetClusters()
   fClusters.clear();
 
   // If there are no digits, return empty `fClusters`
-  if (fDigis.size() == 0) return;
+  if (fTrackerDigis.size() == 0) return;
 
   // Collect the digits by planes of the detector
   map<int, vector<FaserDigi*>> planeMap = mapDigitsByPlane(*this);
@@ -119,7 +119,7 @@ void FaserEvent::sortDigits(vector<FaserDigi*>& v)
 map<int, vector<FaserDigi*>> FaserEvent::mapDigitsByPlane(FaserEvent & evt)
 {
   map<int, vector<FaserDigi*>> planeMap;
-  for (FaserDigi* d : evt.Digis())
+  for (FaserDigi* d : evt.TrackerDigis())
   {
     planeMap[d->Plane()].push_back( d );
   }

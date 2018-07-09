@@ -26,8 +26,8 @@ G4ClassificationOfNewTrack FaserStackingAction
   if (aTrack->GetParentID() == 0)
   {
     FaserTrackInformation* trackInfo = new FaserTrackInformation(aTrack);
-    //G4cout << "Created primary trackInfo: " << G4endl;
-    //trackInfo->Print();
+    G4cout << "Created primary trackInfo: " << G4endl;
+    trackInfo->Print();
     G4Track* theTrack = (G4Track*)aTrack;
     theTrack->SetUserInformation(trackInfo);
   }

@@ -1,6 +1,7 @@
 #include "FaserGeometryMessenger.hh"
 #include "FaserDetectorConstruction.hh"
 #include "G4UIdirectory.hh"
+#include "G4UIcommand.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcmdWithAnInteger.hh"
@@ -58,34 +59,34 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_support_sizeZ->SetUnitCandidates("mm micron cm m");
   cmd_support_sizeZ->AvailableForStates(G4State_PreInit);
 
-  cmd_detector_sensorPlanes = new G4UIcmdWithAnInteger("/faser/geo/trackerPlanes", this);
-  cmd_detector_sensorPlanes->SetGuidance("Number of silicon sensor planes in the tracker.");
-  cmd_detector_sensorPlanes->SetParameterName("sensorPlanes", true, true);
-  cmd_detector_sensorPlanes->AvailableForStates(G4State_PreInit);
+  cmd_tracker_sensorPlanes = new G4UIcmdWithAnInteger("/faser/geo/trackerPlanes", this);
+  cmd_tracker_sensorPlanes->SetGuidance("Number of silicon sensor planes in the tracker.");
+  cmd_tracker_sensorPlanes->SetParameterName("sensorPlanes", true, true);
+  cmd_tracker_sensorPlanes->AvailableForStates(G4State_PreInit);
 
-  cmd_detector_planePitch = new G4UIcmdWithADoubleAndUnit("/faser/geo/planePitch", this);
-  cmd_detector_planePitch->SetGuidance("Longitudinal spacing between sensor planes.");
-  cmd_detector_planePitch->SetParameterName("planePitch", true, true);
-  cmd_detector_planePitch->SetDefaultUnit("mm");
-  cmd_detector_planePitch->SetUnitCandidates("mm micron cm m");
-  cmd_detector_planePitch->AvailableForStates(G4State_PreInit);
+  cmd_tracker_planePitch = new G4UIcmdWithADoubleAndUnit("/faser/geo/planePitch", this);
+  cmd_tracker_planePitch->SetGuidance("Longitudinal spacing between sensor planes.");
+  cmd_tracker_planePitch->SetParameterName("planePitch", true, true);
+  cmd_tracker_planePitch->SetDefaultUnit("mm");
+  cmd_tracker_planePitch->SetUnitCandidates("mm micron cm m");
+  cmd_tracker_planePitch->AvailableForStates(G4State_PreInit);
 
-  cmd_detector_caloPlanes = new G4UIcmdWithAnInteger("/faser/geo/caloPlanes", this);
-  cmd_detector_caloPlanes->SetGuidance("Number of silicon sensor planes in the calorimeter.");
-  cmd_detector_caloPlanes->SetParameterName("caloPlanes", true, true);
-  cmd_detector_caloPlanes->AvailableForStates(G4State_PreInit);
+  cmd_sampler_sensorPlanes = new G4UIcmdWithAnInteger("/faser/geo/samplerPlanes", this);
+  cmd_sampler_sensorPlanes->SetGuidance("Number of silicon sensor planes in the calorimeter.");
+  cmd_sampler_sensorPlanes->SetParameterName("caloPlanes", true, true);
+  cmd_sampler_sensorPlanes->AvailableForStates(G4State_PreInit);
 
-  cmd_detector_absorberX0 = new G4UIcmdWithADouble("/faser/geo/absorberX0", this);
-  cmd_detector_absorberX0->SetGuidance("Calorimeter absorber thickness in radiation lengths.");
-  cmd_detector_absorberX0->SetParameterName("absorberX0", true, true);
-  cmd_detector_absorberX0->AvailableForStates(G4State_PreInit);
+  cmd_sampler_absorberX0 = new G4UIcmdWithADouble("/faser/geo/absorberX0", this);
+  cmd_sampler_absorberX0->SetGuidance("Calorimeter absorber thickness in radiation lengths.");
+  cmd_sampler_absorberX0->SetParameterName("absorberX0", true, true);
+  cmd_sampler_absorberX0->AvailableForStates(G4State_PreInit);
 
-  cmd_detector_samplerSizeZ = new G4UIcmdWithADoubleAndUnit("/faser/geo/samplerSizeZ", this);
-  cmd_detector_samplerSizeZ->SetGuidance("Thickness of calorimeter sampling layer.");
-  cmd_detector_samplerSizeZ->SetParameterName("samplerSizeZ", true, true);
-  cmd_detector_samplerSizeZ->SetDefaultUnit("um");
-  cmd_detector_samplerSizeZ->SetUnitCandidates("mm micron um cm m");
-  cmd_detector_samplerSizeZ->AvailableForStates(G4State_PreInit);
+  cmd_detector_samplerLength = new G4UIcmdWithADoubleAndUnit("/faser/geo/samplerLength", this);
+  cmd_detector_samplerLength->SetGuidance("Thickness of calorimeter sampling layer.");
+  cmd_detector_samplerLength->SetParameterName("samplerSizeZ", true, true);
+  cmd_detector_samplerLength->SetDefaultUnit("um");
+  cmd_detector_samplerLength->SetUnitCandidates("mm micron um cm m");
+  cmd_detector_samplerLength->AvailableForStates(G4State_PreInit);
 
   cmd_detector_decayVolumeLength = new G4UIcmdWithADoubleAndUnit("/faser/geo/decayVolumeLength", this);
   cmd_detector_decayVolumeLength->SetGuidance("Air volume in front of first sensor.");
@@ -115,10 +116,10 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   fDetectorConstruction->setSensorSizeZ ( FaserDetectorConstruction::default_sensor_sizeZ );
   fDetectorConstruction->setSensorStereoAngle( FaserDetectorConstruction::default_sensor_stereoAngle );
   fDetectorConstruction->setSupportSizeZ ( FaserDetectorConstruction::default_support_sizeZ );
-  fDetectorConstruction->setSensorPlanes( FaserDetectorConstruction::default_detector_sensorPlanes );
-  fDetectorConstruction->setCaloPlanes( FaserDetectorConstruction::default_detector_caloPlanes );
-  fDetectorConstruction->setAbsorberX0( FaserDetectorConstruction::default_detector_absorberX0 );
-  fDetectorConstruction->setSamplerSizeZ( FaserDetectorConstruction::default_detector_samplerSizeZ );
+  fDetectorConstruction->setSensorPlanes( FaserDetectorConstruction::default_tracker_sensorPlanes );
+  fDetectorConstruction->setCaloPlanes( FaserDetectorConstruction::default_sampler_sensorPlanes );
+  fDetectorConstruction->setAbsorberX0( FaserDetectorConstruction::default_sampler_absorberX0 );
+  fDetectorConstruction->setSamplerSizeZ( FaserDetectorConstruction::default_detector_samplerLength );
   fDetectorConstruction->setPlanePitch( FaserDetectorConstruction::default_detector_planePitch );
   fDetectorConstruction->setDecayVolumeLength( FaserDetectorConstruction::default_detector_decayVolumeLength );
   fDetectorConstruction->setTrackerLength( FaserDetectorConstruction::default_detector_trackerLength );
@@ -130,11 +131,11 @@ FaserGeometryMessenger::~FaserGeometryMessenger()
   if (cmd_detector_calorimeterLength) delete cmd_detector_calorimeterLength;
   if (cmd_detector_trackerLength) delete cmd_detector_trackerLength;
   if (cmd_detector_decayVolumeLength) delete cmd_detector_decayVolumeLength;
-  if (cmd_detector_planePitch) delete cmd_detector_planePitch;
-  if (cmd_detector_sensorPlanes) delete cmd_detector_sensorPlanes;
-  if (cmd_detector_caloPlanes) delete cmd_detector_caloPlanes;
-  if (cmd_detector_absorberX0) delete cmd_detector_absorberX0;
-  if (cmd_detector_samplerSizeZ) delete cmd_detector_samplerSizeZ;
+  if (cmd_tracker_planePitch) delete cmd_tracker_planePitch;
+  if (cmd_tracker_sensorPlanes) delete cmd_tracker_sensorPlanes;
+  if (cmd_sampler_sensorPlanes) delete cmd_sampler_sensorPlanes;
+  if (cmd_sampler_absorberX0) delete cmd_sampler_absorberX0;
+  if (cmd_detector_samplerLength) delete cmd_detector_samplerLength;
   if (cmd_support_sizeZ) delete cmd_support_sizeZ;
   if (cmd_sensor_stereoAngle) delete cmd_sensor_stereoAngle;
   if (cmd_sensor_gap) delete cmd_sensor_gap;
@@ -175,25 +176,25 @@ void FaserGeometryMessenger::SetNewValue(G4UIcommand* command, G4String newValue
     {
       fDetectorConstruction->setSupportSizeZ( cmd_support_sizeZ->GetNewDoubleValue(newValues) );
     }
-  else if (command == cmd_detector_sensorPlanes)
+  else if (command == cmd_tracker_sensorPlanes)
     {
-      fDetectorConstruction->setSensorPlanes( cmd_detector_sensorPlanes->GetNewIntValue(newValues) );
+      fDetectorConstruction->setSensorPlanes( cmd_tracker_sensorPlanes->GetNewIntValue(newValues) );
     }
-  else if (command == cmd_detector_caloPlanes)
+  else if (command == cmd_sampler_sensorPlanes)
   {
-    fDetectorConstruction->setCaloPlanes( cmd_detector_caloPlanes->GetNewIntValue(newValues) );
+    fDetectorConstruction->setCaloPlanes( cmd_sampler_sensorPlanes->GetNewIntValue(newValues) );
   }
-  else if (command == cmd_detector_absorberX0)
+  else if (command == cmd_sampler_absorberX0)
   {
-    fDetectorConstruction->setAbsorberX0( cmd_detector_absorberX0->GetNewDoubleValue(newValues) );
+    fDetectorConstruction->setAbsorberX0( cmd_sampler_absorberX0->GetNewDoubleValue(newValues) );
   }
-  else if (command == cmd_detector_samplerSizeZ)
+  else if (command == cmd_detector_samplerLength)
   {
-    fDetectorConstruction->setSamplerSizeZ( cmd_detector_samplerSizeZ->GetNewDoubleValue(newValues) );
+    fDetectorConstruction->setSamplerSizeZ( cmd_detector_samplerLength->GetNewDoubleValue(newValues) );
   }
-  else if (command == cmd_detector_planePitch)
+  else if (command == cmd_tracker_planePitch)
     {
-      fDetectorConstruction->setPlanePitch( cmd_detector_planePitch->GetNewDoubleValue(newValues) );
+      fDetectorConstruction->setPlanePitch( cmd_tracker_planePitch->GetNewDoubleValue(newValues) );
     }
   else if (command == cmd_detector_decayVolumeLength)
     {
@@ -241,25 +242,25 @@ G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
   {
     cv = cmd_support_sizeZ->ConvertToString(fDetectorConstruction->getSupportSizeZ(), "mm");
   }
-  else if (command == cmd_detector_sensorPlanes)
+  else if (command == cmd_tracker_sensorPlanes)
   {
-    cv = cmd_detector_sensorPlanes->ConvertToString(fDetectorConstruction->getSensorPlanes());
+    cv = cmd_tracker_sensorPlanes->ConvertToString(fDetectorConstruction->getSensorPlanes());
   }
-  else if (command == cmd_detector_caloPlanes)
+  else if (command == cmd_sampler_sensorPlanes)
   {
-    cv = cmd_detector_caloPlanes->ConvertToString(fDetectorConstruction->getCaloPlanes());
+    cv = cmd_sampler_sensorPlanes->ConvertToString(fDetectorConstruction->getCaloPlanes());
   }
-  else if (command == cmd_detector_absorberX0)
+  else if (command == cmd_sampler_absorberX0)
   {
-    cv = cmd_detector_absorberX0->ConvertToString(fDetectorConstruction->getAbsorberX0());
+    cv = cmd_sampler_absorberX0->ConvertToString(fDetectorConstruction->getAbsorberX0());
   }
-  else if (command == cmd_detector_samplerSizeZ)
+  else if (command == cmd_detector_samplerLength)
   {
-    cv = cmd_detector_samplerSizeZ->ConvertToString(fDetectorConstruction->getSamplerSizeZ(), "um");
+    cv = cmd_detector_samplerLength->ConvertToString(fDetectorConstruction->getSamplerSizeZ(), "um");
   }
-  else if (command == cmd_detector_planePitch)
+  else if (command == cmd_tracker_planePitch)
   {
-    cv = cmd_detector_planePitch->ConvertToString(fDetectorConstruction->getPlanePitch(), "m");
+    cv = cmd_tracker_planePitch->ConvertToString(fDetectorConstruction->getPlanePitch(), "m");
   }
   else if (command == cmd_detector_decayVolumeLength)
   {

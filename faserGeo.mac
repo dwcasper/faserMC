@@ -39,21 +39,21 @@
 #
 /faser/geo/planePitch 5.0 cm
 #
-# Number of calorimter planes;
+# Number of pre-sampler planes;
 #
-/faser/geo/caloPlanes 0
+/faser/geo/samplerPlanes 2
 #
 # Thickness of calorimeter absorber layers (in radiation lengths)
 #
 /faser/geo/absorberX0 3.0
 #
-# Thickness of the calorimeter sampling layer (in dimensions of length)
+# Thickness of the pre-sampler (planes + air gap in front)
 #
-/faser/geo/samplerSizeZ 0.32 mm
+/faser/geo/samplerLength 10.0 cm
 #
 # Length of empty air before first detector plane
 #
-/faser/geo/decayVolumeLength 3.0 m
+/faser/geo/decayVolumeLength 1.5 m
 #
 # Length of the volume instrumented for tracking
 #

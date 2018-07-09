@@ -46,6 +46,7 @@ void FaserSteppingAction::UserSteppingAction(const G4Step* theStep)
     auto info = dynamic_cast<FaserTrackInformation*>(theTrack->GetUserInformation());
     if (info->GetSourceTrackID() == 0) 
     {
+      G4cout << "Setting source track to " << theTrack->GetTrackID() << " at z = "  << thePostPoint->GetPosition().z() << G4endl;
       info->SetSourceTrackID(theTrack->GetTrackID());
       info->SetSourceEnergy(theTrack->GetTotalEnergy());
     }
