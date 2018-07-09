@@ -45,7 +45,7 @@
 #
 # Thickness of calorimeter absorber layers (in radiation lengths)
 #
-/faser/geo/absorberX0 3.0
+/faser/geo/absorberX0 1.0
 #
 # Thickness of the pre-sampler (planes + air gap in front)
 #

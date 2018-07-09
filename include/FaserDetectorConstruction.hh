@@ -9,7 +9,7 @@
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
-
+class FaserSensorPlaneConstruction;
 class FaserGeometryMessenger;
 class FaserFieldSetup;
 class G4VPhysicalVolume;
@@ -33,12 +33,10 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void ConstructDecayVolume();
   virtual void ConstructTracker();
   virtual void ConstructSampler();
-  virtual void ConstructSamplerPlane();
+  virtual void ConstructAbsorberPlane();
   virtual void ConstructCalorimeter();
-  virtual void ConstructTrackerOld();
-  virtual void ConstructTrackerPlane();
-  virtual void ConstructTrackerModule();
-  virtual void ConstructTrackerSensor();
+
+  virtual G4NistManager* getNistManager() const { return nist; }
 
   virtual void setReadoutStrips(G4int value) { sensor_readoutStrips = value; }
   virtual G4int getReadoutStrips() const { return sensor_readoutStrips; }
@@ -102,7 +100,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_detector_trackerLength = 2.0*m;
   static constexpr G4double default_detector_calorimeterLength = 0.25*m;
 
-  virtual const G4LogicalVolume* GetTrackerStrip() const { return fLogicTrackerStrip; }
+  virtual const G4LogicalVolume* GetTrackerStrip() const;
 
   protected:
 
@@ -114,10 +112,6 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4LogicalVolume* fLogicTracker;
   G4LogicalVolume* fLogicTrackerPlane;
   G4LogicalVolume* fLogicSamplerPlane;
-  G4LogicalVolume* fLogicTrackerModule;
-  G4LogicalVolume* fLogicTrackerSensor;
-  G4LogicalVolume* fLogicTrackerRow;
-  G4LogicalVolume* fLogicTrackerStrip;
 
   // tunable (from macro) parameters 
   G4int    sensor_readoutStrips;
@@ -139,9 +133,9 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   // these are not copied by the volumes that use them,
   // so they must not be changed
 
-  G4RotationMatrix* fStereoPlus;
-  G4RotationMatrix* fStereoMinus;
-  G4RotationMatrix* fOverlapAngle;
+  // G4RotationMatrix* fStereoPlus;
+  // G4RotationMatrix* fStereoMinus;
+  // G4RotationMatrix* fOverlapAngle;
 
   // mag field
   G4Cache<FaserFieldSetup*> fFieldSetup;
@@ -150,8 +144,10 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4bool checkOverlaps;
   G4NistManager* nist;
   G4Region* fRegTracker;
-  G4Region* fRegAir;
   G4Region* fRegCalorimeter;
+
+  FaserSensorPlaneConstruction* fTrackerFactory;
+  FaserSensorPlaneConstruction* fSamplerFactory;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

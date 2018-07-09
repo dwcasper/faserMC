@@ -38,7 +38,7 @@ void FaserPrimaryGenerator::GeneratePrimaryVertex(G4Event* event)
     firstCall = true;
     G4LogicalVolume* decayLV = G4LogicalVolumeStore::GetInstance()->GetVolume("DecayVolume");
     if ( decayLV ) fDecayVolume = dynamic_cast<const G4Box*>(decayLV->GetSolid());
-    G4LogicalVolume* planeLV = G4LogicalVolumeStore::GetInstance()->GetVolume("Plane");
+    G4LogicalVolume* planeLV = G4LogicalVolumeStore::GetInstance()->GetVolume("trackerPlane");
     if ( planeLV )  fPlane = dynamic_cast<const G4Box*>(planeLV->GetSolid());    
   }
 
