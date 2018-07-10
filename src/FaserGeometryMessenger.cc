@@ -95,7 +95,7 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_calo_modules = new G4UIcmdWithAnInteger("/faser/geo/caloModules", this);
   cmd_calo_modules->SetGuidance("Number of calorimeter modules in the detector.");
   cmd_calo_modules->SetParameterName("caloModules", true, true);
-  cmd_calo_modules->SetRange("caloModules == 1 || caloModules == 4 || caloModules == 9");
+  cmd_calo_modules->SetRange("caloModules == 0 || caloModules == 1 || caloModules == 4 || caloModules == 9");
   cmd_calo_modules->AvailableForStates(G4State_PreInit);
 
   cmd_calo_scintThickness = new G4UIcmdWithADoubleAndUnit("/faser/geo/caloScintThickness", this);

@@ -100,6 +100,8 @@ void FaserDetectorConstruction::ConstructSDandField()
   G4bool allLocal = true;
   fLogicTracker->SetFieldManager(fFieldSetup.Get()->GetLocalFieldManager(),
 				 allLocal);
+  fLogicDecayVolume->SetFieldManager(fFieldSetup.Get()->GetLocalFieldManager(), 
+    allLocal);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -332,7 +334,7 @@ void FaserDetectorConstruction::ConstructCalorimeter()
 
   ConstructCalorimeterModule();
 
-  G4int caloModulesAcross = (calo_modules == 9 ? 3 : (calo_modules == 4 ? 2 : 1));
+  G4int caloModulesAcross = (calo_modules == 9 ? 3 : (calo_modules == 4 ? 2 : (calo_modules == 1 ? 1 : 0)));
 
   G4double calorimeter_sizeXY = calo_moduleXY * caloModulesAcross;
   
@@ -431,7 +433,7 @@ void FaserDetectorConstruction::ConstructSampler()
   // the z length of the lab includes a gap decayVolumeLength before the first
   // sensor plane, and a gap of planePitch after the last one
   //
-  G4double sampler_sizeZ = std::max(detector_samplerLength, sampler_sensorPlanes * (absorber_sizeZ + plane_sizeZ));
+  G4double sampler_sizeZ = std::max(detector_samplerLength, sampler_sensorPlanes * (absorber_sizeZ + plane_sizeZ + detector_planePitch) + detector_planePitch);
 
   // const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
   // G4double tracker_sizeX = 2*sTracker->GetXHalfLength();
@@ -446,19 +448,21 @@ void FaserDetectorConstruction::ConstructSampler()
                         sampler_mat,     //its material
                         "Sampler");      //its name
 
-  //fSamplerRotation = new G4RotationMatrix();
-  //fSamplerRotation->rotateY(CLHEP::pi);
-  //fSamplerRotation->rotateZ(CLHEP::pi/6);
+  fSamplerRotation = new G4RotationMatrix();
+  fSamplerRotation->rotateZ(CLHEP::pi/2);
 
-  G4double firstAbsorberZ = 0.5 * (sampler_sizeZ - absorber_sizeZ) - plane_sizeZ - (sampler_sensorPlanes - 1) * (plane_sizeZ + absorber_sizeZ);
-  G4double firstPlaneZ = firstAbsorberZ + 0.5 * (absorber_sizeZ + plane_sizeZ);
+  G4double usableZ = sampler_sizeZ - 2 * (detector_planePitch);
+  G4double firstMidpoint = -0.5*(usableZ - (plane_sizeZ + absorber_sizeZ));
+
   for (int i = 0; i < sampler_sensorPlanes; i++)
   {
-      //G4RotationMatrix* theRotation = ( i%2 > 0 ? fSamplerRotation : nullptr);
-      G4RotationMatrix* theRotation = nullptr;
+      G4double thisMidpoint = firstMidpoint + i * (plane_sizeZ + absorber_sizeZ + detector_planePitch);
+      G4double thisAbsorberZ = thisMidpoint - plane_sizeZ/2.0;
+      G4double thisPlaneZ = thisMidpoint + absorber_sizeZ/2.0;
+      G4RotationMatrix* theRotation = ( i%2 > 0 ? fSamplerRotation : nullptr);
 
       new G4PVPlacement(theRotation,
-      G4ThreeVector(0, 0, firstAbsorberZ + i * (plane_sizeZ + absorber_sizeZ)),
+      G4ThreeVector(0, 0, thisAbsorberZ),
       fLogicAbsorber,
       "SamplerAbsorber_PV",
       fLogicSampler,
@@ -467,7 +471,7 @@ void FaserDetectorConstruction::ConstructSampler()
       checkOverlaps);
 
       new G4PVPlacement(theRotation,
-			G4ThreeVector(0, 0, firstPlaneZ + i * (plane_sizeZ + absorber_sizeZ)) ,
+			G4ThreeVector(0, 0, thisPlaneZ) ,
 			fLogicSamplerPlane,
 			"SamplerPlane_PV",
 			fLogicSampler,
@@ -512,6 +516,8 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   // construct the calorimeter
   ConstructCalorimeter();
   const G4Box* sCalorimeter = dynamic_cast<const G4Box*>(fLogicCalorimeter->GetSolid());
+  G4double calorimeter_sizeX = 2*sCalorimeter->GetXHalfLength();
+  G4double calorimeter_sizeY = 2*sCalorimeter->GetYHalfLength();
   G4double calorimeter_sizeZ = 2*sCalorimeter->GetZHalfLength();
 
   // world volume size
@@ -521,7 +527,8 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   G4double plane_sizeX = 2*sPlane->GetXHalfLength();
   G4double plane_sizeY = 2*sPlane->GetYHalfLength();
 
-  G4double world_sizeX = plane_sizeX + 2.0*m, world_sizeY = plane_sizeY + 2.0*m;
+  G4double world_sizeX = std::max(plane_sizeX, calorimeter_sizeX) + 1.0*m;
+  G4double world_sizeY = std::max(plane_sizeY, calorimeter_sizeY) + 1.0*m;
   G4double world_sizeZ = 2 * std::max(decay_sizeZ, tracker_sizeZ + sampler_sizeZ + calorimeter_sizeZ) + 2.0*m;
 
   // Define a region for the air volume inside the rock

@@ -125,7 +125,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_calo_planeXY = 12.12*cm;
   static constexpr G4double default_calo_moduleXY = 12.14*cm;
   static constexpr G4double default_detector_samplerLength = default_sensor_sizeZ;
-  static constexpr G4double default_detector_planePitch = 5.0*cm;
+  static constexpr G4double default_detector_planePitch = 4.0*cm;
   static constexpr G4double default_detector_decayVolumeLength = 3.0*m;
   static constexpr G4double default_detector_trackerLength = 2.0*m;
   static constexpr G4double default_detector_calorimeterLength = 0.25*m;

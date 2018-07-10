@@ -37,7 +37,7 @@
 #
 # Spacing of detector planes; this is now the minimum spacing between planes
 #
-/faser/geo/planePitch 5.0 cm
+/faser/geo/planePitch 4.0 cm
 #
 # Number of pre-sampler planes;
 #
@@ -57,7 +57,7 @@
 #
 # Number of calo modules in the detector (1, 4 or 9)
 #
-/faser/geo/caloModules 9
+/faser/geo/caloModules 0
 #
 # Thickness of the calorimeter scintillator layers
 #

@@ -120,13 +120,11 @@ void FaserSensorPlaneConstruction::ConstructModule()
   // we have to hold these pointers (and not change the objects)
   // until the end of the job
 
-  // this combination of rotations, rather than the more obvious single rotation
-  // is necessary for hit/digit drawing of strips to draw them in the right place
-  // I don't really understand it...
+  // this combination of rotations keeps the local +z axis 
+  // of the strips pointing out of the plane 
 
   fStereoPlus = new G4RotationMatrix;
-  fStereoPlus->rotateY(CLHEP::pi);
-  fStereoPlus->rotateZ(-sensor_stereoAngle);
+  fStereoPlus->rotateZ(sensor_stereoAngle);
 
   fStereoMinus = new G4RotationMatrix;
   fStereoMinus->rotateY(CLHEP::pi);
@@ -185,7 +183,7 @@ void FaserSensorPlaneConstruction::ConstructModule()
   // place sensors inside module volume
   // the same logical volume is re-used, but it is translated and rotated four different ways
   //
-  new G4PVPlacement(fStereoMinus,
+  new G4PVPlacement(fStereoPlus,
             G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
 	        fLogicSensor,
 	        G4String(fName + "Sensor_PV"),
@@ -194,7 +192,7 @@ void FaserSensorPlaneConstruction::ConstructModule()
 	        0,
 	        checkOverlaps);
 
-  new G4PVPlacement(fStereoPlus,
+  new G4PVPlacement(fStereoMinus,
 		    G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
 		    fLogicSensor,
 		    G4String(fName + "Sensor_PV"),
@@ -203,7 +201,7 @@ void FaserSensorPlaneConstruction::ConstructModule()
 		    1,
 		    checkOverlaps);
 
-  new G4PVPlacement(fStereoMinus,
+  new G4PVPlacement(fStereoPlus,
 		    G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
 		    fLogicSensor,
 		    G4String(fName + "Sensor_PV"),
@@ -212,7 +210,7 @@ void FaserSensorPlaneConstruction::ConstructModule()
 		    2,
 		    checkOverlaps);
 
-  new G4PVPlacement(fStereoPlus,
+  new G4PVPlacement(fStereoMinus,
 		    G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
 		    fLogicSensor,
 		    G4String(fName + "Sensor_PV"),

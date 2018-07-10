@@ -3,6 +3,7 @@
 #include "G4RunManager.hh"
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
+#include "G4RotationMatrix.hh"
 
 const FaserDetectorConstruction* FaserDigi::fDetectorConstruction = nullptr;
 
@@ -85,7 +86,8 @@ void FaserDigi::Draw()
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
   if (pVVisManager != nullptr)
   {
-    G4Transform3D trans(fTransform.NetRotation(), fTransform.NetTranslation());
+    // wasted a couple days figuring out that the rotation (but not translation!) needs to be inverted for correct display...
+    G4Transform3D trans(fTransform.NetRotation().inverse(), fTransform.NetTranslation());
     G4VisAttributes attribs;
     const G4LogicalVolume* strip = fDetectorConstruction->GetTrackerStrip();
     const G4VisAttributes* pVA = strip->GetVisAttributes();

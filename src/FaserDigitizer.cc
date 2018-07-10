@@ -79,7 +79,6 @@ void FaserDigitizer::Digitize()
 	     * fNSensors + sensor)  
 	     * fNRows + row)
 	     * fNStrips + strip;
-      
       G4int track = hit->Track();
 
       if (fChargeSpreadSigma > 0)
