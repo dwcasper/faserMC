@@ -76,6 +76,8 @@ faser/geo/caloModules 4
 /faser/geo/caloModuleXY 12.14 cm
 #
 # Thickness of the pre-sampler (planes + air gap in front)
+# (it will always be long enough to hold what it contains;
+# this setting is only to a larger gap around it, if desired)
 #
 /faser/geo/samplerLength 10.0 cm
 #
@@ -84,9 +86,13 @@ faser/geo/caloModules 4
 /faser/geo/decayVolumeLength 1.5 m
 #
 # Length of the volume instrumented for tracking
+# (planes will be distributed to fill this length
+# "optimally")
 #
 /faser/geo/trackerLength 2.0 m
 #
 # Length of the calorimeter
+# (it will always be long enough to hold what it contains;
+#  this setting is only to allow a larger gap in front, if desired)
 #
 /faser/geo/calorimeterLength 0.5 m
