@@ -55,9 +55,9 @@
 #
 /faser/geo/caloTowers 9
 #
-# Number of calo modules in the detector (1, 4 or 9)
+# Number of calo modules in the detector (0, 1, 4 or 9)
 #
-/faser/geo/caloModules 0
+faser/geo/caloModules 4
 #
 # Thickness of the calorimeter scintillator layers
 #
