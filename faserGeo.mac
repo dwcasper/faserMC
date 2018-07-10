@@ -47,6 +47,34 @@
 #
 /faser/geo/absorberX0 1.0
 #
+# Number of scintillator planes in the calorimeter (number of absorber planes is one less)
+#
+/faser/geo/caloPlanes 67
+#
+# Number of towers in a calorimeter module (1, 4 or 9)
+#
+/faser/geo/caloTowers 9
+#
+# Number of calo modules in the detector (1, 4 or 9)
+#
+/faser/geo/caloModules 9
+#
+# Thickness of the calorimeter scintillator layers
+#
+/faser/geo/caloScintThickness 4.0 mm
+#
+# Thickness of the calorimeter absorber layers
+#
+/faser/geo/caloAbsorbThickness 2.0 mm
+#
+# Inner dimension (width) of the calo module
+#
+/faser/geo/caloPlaneXY 12.12 cm
+#
+# Outer dimension (width) of the calo module (100 micron of stainless steel tape on each side)
+#
+/faser/geo/caloModuleXY 12.14 cm
+#
 # Thickness of the pre-sampler (planes + air gap in front)
 #
 /faser/geo/samplerLength 10.0 cm

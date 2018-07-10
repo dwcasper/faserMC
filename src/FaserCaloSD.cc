@@ -30,8 +30,8 @@ G4bool FaserCaloSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4TouchableHandle h = aStep->GetPreStepPoint()->GetTouchableHandle();
   //
   // zero-based identifiers
-  G4int plane = h->GetCopyNumber(0);     // 0 - (nPlanes - 1)
-  G4int tower = h->GetCopyNumber(1);     // 0, 0-3 or 0-8, depending on granularity
+  G4int tower = h->GetCopyNumber(0);     // 0, 0-3 or 0-8, depending on granularity
+  G4int plane = h->GetCopyNumber(1);     // 0 - (nPlanes - 1)
   G4int module = h->GetCopyNumber(2);  
 
   newHit->SetPlane( plane );

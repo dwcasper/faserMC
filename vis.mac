@@ -48,7 +48,7 @@
 # (if too many tracks cause core dump => /tracking/storeTrajectory 0)
 #
 # Draw hits and digits at end of event:
-/vis/scene/add/hits
+#/vis/scene/add/hits
 /vis/scene/add/digis
 #
 # To draw only gammas:
@@ -111,9 +111,12 @@
 # Make the "Module" wrapper box invisibile
 /vis/geometry/set/visibility trackerModule 0 false
 /vis/geometry/set/visibility samplerModule 0 false
+/vis/geometry/set/visibility caloModule 0 false
 # Make the "Plane" wrapper box invisible
 /vis/geometry/set/visibility trackerPlane 0 false
 /vis/geometry/set/visibility samplerPlane 0 false
+/vis/geometry/set/visibility caloPlane 0 false
+/vis/geometry/set/visibility tyvekSheet 0 false
 # Make the "Row" wrapper box invisible
 #/vis/geometry/set/visibility Row 0 false
 # Make the "Sensor" wrapper box invisible
@@ -139,6 +142,9 @@
 /vis/geometry/set/colour samplerSupport 0 0 1 0 1
 # Absorber is light blue
 /vis/geometry/set/colour Absorber 0 0 0.2 1 0.3
+/vis/geometry/set/colour caloAbsorber 0 0 0.2 1 0.3
+# Scint tower is orange
+/vis/geometry/set/colour caloTower 0 0.7 0.7 0.0 0.7
 #
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenMarker true

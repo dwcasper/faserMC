@@ -4,7 +4,7 @@
 #include "globals.hh"
 #include "FaserTruthParticle.hh"
 #include "FaserSensorHit.hh"
-//#include "FaserSamplerHit.hh"
+#include "FaserCaloHit.hh"
 #include "FaserDigi.hh"
 #include "FaserCluster.hh"
 #include "G4TrajectoryContainer.hh"
@@ -34,6 +34,9 @@ public:
   std::vector<FaserSensorHit*>& SamplerHits() { return fSamplerHits; }
   void SetSamplerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamplerHits.push_back((*hits)[i]); }
 
+  std::vector<FaserCaloHit*>& CaloHits() { return fCaloHits; }
+  void SetCaloHits(const FaserCaloHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fCaloHits.push_back((*hits)[i]); }
+
   std::vector<FaserDigi*> TrackerDigis()& { return fTrackerDigis; }
   void SetTrackerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fTrackerDigis.push_back((*digis)[i]); }
 
@@ -49,6 +52,7 @@ private:
   std::vector<FaserTruthParticle*> fParticles;
   std::vector<FaserSensorHit*> fTrackerHits;
   std::vector<FaserSensorHit*> fSamplerHits;
+  std::vector<FaserCaloHit*> fCaloHits;
   std::vector<FaserDigi*> fTrackerDigis;
   std::vector<FaserDigi*> fSamplerDigis;
   std::vector<FaserCluster*> fClusters;

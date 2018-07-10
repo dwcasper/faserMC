@@ -6,6 +6,7 @@
 #include "FaserEvent.hh"
 #include "FaserDigi.hh"
 #include "FaserSensorHit.hh"
+#include "FaserCaloHit.hh"
 #include "FaserTruthParticle.hh"
 #include "G4AttDef.hh"
 #include "G4AttValue.hh"
@@ -14,6 +15,7 @@
 #include "FaserGeometry.hh"
 
 std::vector<FaserSensorHit*> aGarbage;
+std::vector<FaserCaloHit*> aaGarbage;
 std::vector<FaserDigi*> bGarbage;
 std::vector<FaserTruthParticle*> cGarbage;
 std::vector<FaserCluster*> hGarbage;

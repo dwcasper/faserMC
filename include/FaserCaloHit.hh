@@ -68,20 +68,20 @@ class FaserCaloHit : public G4VHit
     static const FaserDetectorConstruction* fDetectorConstruction;
 };
 
-typedef G4THitsCollection<FaserSamplerHit> FaserSamplerHitsCollection;
+typedef G4THitsCollection<FaserCaloHit> FaserCaloHitsCollection;
 
-extern G4ThreadLocal G4Allocator<FaserSamplerHit>* FaserSamplerHitAllocator;
+extern G4ThreadLocal G4Allocator<FaserCaloHit>* FaserCaloHitAllocator;
 
-inline void* FaserSamplerHit::operator new(size_t)
+inline void* FaserCaloHit::operator new(size_t)
 {
-  if (!FaserSamplerHitAllocator)
-    FaserSamplerHitAllocator = new G4Allocator<FaserSamplerHit>;
-  return (void *) FaserSamplerHitAllocator->MallocSingle();
+  if (!FaserCaloHitAllocator)
+    FaserCaloHitAllocator = new G4Allocator<FaserCaloHit>;
+  return (void *) FaserCaloHitAllocator->MallocSingle();
 }
 
-inline void FaserSamplerHit::operator delete(void* hit)
+inline void FaserCaloHit::operator delete(void* hit)
 {
-  FaserSamplerHitAllocator->FreeSingle((FaserSamplerHit*) hit);
+  FaserCaloHitAllocator->FreeSingle((FaserCaloHit*) hit);
 }
 
 #endif

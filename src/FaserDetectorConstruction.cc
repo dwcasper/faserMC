@@ -4,6 +4,7 @@
 #include "FaserSensorPlaneConstruction.hh"
 #include "FaserGeometryMessenger.hh"
 #include "FaserSensorSD.hh"
+#include "FaserCaloSD.hh"
 #include "FaserFieldSetup.hh"
 
 #include "G4RunManager.hh"
@@ -25,6 +26,7 @@
 FaserDetectorConstruction::FaserDetectorConstruction()
   : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
     fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), 
+    fLogicSamplerPlane(nullptr), fLogicCaloModule(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
     sensor_stripPitch(default_sensor_stripPitch),
     sensor_stripLength(default_sensor_stripLength),
@@ -35,6 +37,14 @@ FaserDetectorConstruction::FaserDetectorConstruction()
     tracker_sensorPlanes(default_tracker_sensorPlanes),
     sampler_sensorPlanes(default_sampler_sensorPlanes),
     sampler_absorberX0(default_sampler_absorberX0),
+    calo_planes(default_calo_planes),
+    calo_towers(default_calo_towers),
+    calo_modules(default_calo_modules),
+    calo_scintThickness(default_calo_scintThickness),
+    calo_absorbThickness(default_calo_absorbThickness),
+    calo_tyvekThickness(default_calo_tyvekThickness),
+    calo_planeXY(default_calo_planeXY),
+    calo_moduleXY(default_calo_moduleXY),
     detector_samplerLength(default_detector_samplerLength),
     detector_planePitch(default_detector_planePitch),
     detector_decayVolumeLength(default_detector_decayVolumeLength),
@@ -72,6 +82,13 @@ void FaserDetectorConstruction::ConstructSDandField()
 						  "FaserSamplerHitsCollection");
   G4SDManager::GetSDMpointer()->AddNewDetector(samplerSD);
   SetSensitiveDetector( "samplerStrip", samplerSD, true );
+
+  G4String caloSDName = "Calorimeter";
+  FaserCaloSD* caloSD = new FaserCaloSD(caloSDName, 
+						  "FaserCaloHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(caloSD);
+  SetSensitiveDetector( "caloTower", caloSD, true );
+
 
   // not clear why we need this concurrency stuff...
   if (!fFieldSetup.Get())
@@ -243,23 +260,97 @@ void FaserDetectorConstruction::ConstructDecayVolume()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+void FaserDetectorConstruction::ConstructCalorimeterModule()
+{
+  G4Material* caloModule_mat = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+
+  G4double calo_sizeZ = (calo_planes - 1) * calo_absorbThickness + 
+    calo_planes * (calo_scintThickness + 2 * calo_tyvekThickness);
+
+  G4Box* solidCaloModule = new G4Box("CaloModule", 0.5 * calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_sizeZ);
+  fLogicCaloModule = new G4LogicalVolume(solidCaloModule, caloModule_mat, "caloModule");
+
+  G4Material* tyvek_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  G4Box* solidTyvek = new G4Box("TyvekSheet", 0.5 * calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_tyvekThickness);
+  G4LogicalVolume* logicTyvek = new G4LogicalVolume(solidTyvek, tyvek_mat, "tyvekSheet");
+
+  G4Material* scint_mat = nist->FindOrBuildMaterial("G4_POLYSTYRENE");
+  G4Box* solidScint = new G4Box("CaloScintPlane", 0.5 * calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_scintThickness);
+  G4LogicalVolume* logicScint = new G4LogicalVolume(solidScint, scint_mat, "caloPlane");
+  G4int caloTowersAcross = (calo_towers == 9 ? 3 : (calo_towers == 4 ? 2 : 1) );
+  G4double caloTowerXY = calo_moduleXY / caloTowersAcross;
+  G4Box* solidTower = new G4Box("CaloScintTower", 0.5 * caloTowerXY, 
+    0.5 * caloTowerXY, 0.5 * calo_scintThickness);
+  G4LogicalVolume* logicTower = new G4LogicalVolume(solidTower, scint_mat, "caloTower");
+  
+  G4int towerCount = 0;
+  for (int ix = 0; ix < caloTowersAcross; ix++)
+  {
+    G4double x = ((1 - caloTowersAcross)/2.0 + ix) * caloTowerXY;
+    for (int iy = 0; iy < caloTowersAcross; iy++)
+    {
+      G4double y = ((1 - caloTowersAcross)/2.0 + iy) * caloTowerXY;
+      new G4PVPlacement(nullptr, G4ThreeVector(x, y, 0.0), logicTower, "PV_CaloTower", logicScint, false, towerCount, checkOverlaps);
+      towerCount++;
+    }
+  }
+
+  G4Material* abs_mat = nist->FindOrBuildMaterial("G4_W");
+  G4Box* solidAbsorb = new G4Box("CaloAbsorbPlane", 0.5* calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_absorbThickness);
+  G4LogicalVolume* logicAbsorb = new G4LogicalVolume(solidAbsorb, abs_mat, "caloAbsorber");
+
+  G4double startZ = - calo_sizeZ/2.0;
+  G4int scintCount = 0;
+  G4int tyvekCount = 0;
+  G4int absCount = 0;
+  G4double currentZ = startZ;
+  do
+  {
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_tyvekThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicTyvek, "PV_Tyvek", fLogicCaloModule, false, tyvekCount, checkOverlaps);
+    tyvekCount++;
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_scintThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicScint, "PV_CaloScint", fLogicCaloModule, false, scintCount, checkOverlaps);
+    scintCount++;
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_tyvekThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicTyvek, "PV_Tyvek", fLogicCaloModule, false, tyvekCount, checkOverlaps);
+    tyvekCount++;
+    if (scintCount >= calo_planes) break;
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_absorbThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicAbsorb, "PV_CaloAbsorb", fLogicCaloModule, false, absCount, checkOverlaps);
+    absCount++;
+  } while (scintCount < calo_planes);
+
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 void FaserDetectorConstruction::ConstructCalorimeter()
 {
   // material for air volume
   G4Material* calorimeter_mat = nist->FindOrBuildMaterial("G4_AIR");
 
+  ConstructCalorimeterModule();
+
+  G4int caloModulesAcross = (calo_modules == 9 ? 3 : (calo_modules == 4 ? 2 : 1));
+
+  G4double calorimeter_sizeXY = calo_moduleXY * caloModulesAcross;
+  
+  const G4Box* sCaloModule = dynamic_cast<const G4Box*>(fLogicCaloModule->GetSolid());
+  G4double calorimeterModule_sizeZ = 2 * sCaloModule->GetZHalfLength();
+
   // the z length of the lab includes a gap decayVolumeLength before the first
   // sensor plane, and a gap of planePitch after the last one
   //
-  G4double calorimeterLength = std::max(detector_calorimeterLength, detector_planePitch);
+  G4double calorimeterLength = std::max(detector_calorimeterLength, std::max(detector_planePitch, calorimeterModule_sizeZ));
   G4double calorimeter_sizeZ = calorimeterLength;
 
   const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
   G4double tracker_sizeX = 2*sTracker->GetXHalfLength();
   G4double tracker_sizeY = 2*sTracker->GetYHalfLength();
 
-  G4double calorimeter_sizeX = tracker_sizeX;
-  G4double calorimeter_sizeY = tracker_sizeY;
+  G4double calorimeter_sizeX = std::max(tracker_sizeX, calorimeter_sizeXY);
+  G4double calorimeter_sizeY = std::max(tracker_sizeY, calorimeter_sizeXY);
 
   G4Box* solidCalorimeter =    
     new G4Box("Calorimeter",                 //its name
@@ -270,6 +361,28 @@ void FaserDetectorConstruction::ConstructCalorimeter()
                         calorimeter_mat,           //its material
                         "Calorimeter");      //its name
 
+  G4int caloModuleIndex = 0;
+  G4double caloModule_initialXY = - ((caloModulesAcross - 1) * calo_moduleXY)/2.0;
+  G4double caloModuleZ = - (calorimeter_sizeZ - calorimeterModule_sizeZ)/2.0;
+  for (int ix = 0; ix < caloModulesAcross; ix++)
+  {
+    G4double caloModuleX = caloModule_initialXY + ix * calo_moduleXY;
+    for (int iy = 0; iy < caloModulesAcross; iy++)
+    {
+      G4double caloModuleY = caloModule_initialXY + iy * calo_moduleXY;
+
+      new G4PVPlacement(0,
+			G4ThreeVector(caloModuleX, caloModuleY, caloModuleZ),
+			fLogicCaloModule,
+			"CaloModule_PV",
+			fLogicCalorimeter,
+			false,
+			caloModuleIndex,
+			checkOverlaps);
+
+      caloModuleIndex++;
+    }
+  }
   fLogicCalorimeter->SetRegion(fRegCalorimeter);
   fRegCalorimeter->AddRootLogicalVolume(fLogicCalorimeter);
 }
@@ -337,7 +450,7 @@ void FaserDetectorConstruction::ConstructSampler()
   //fSamplerRotation->rotateY(CLHEP::pi);
   //fSamplerRotation->rotateZ(CLHEP::pi/6);
 
-  G4double firstAbsorberZ = -0.5 * (sampler_sizeZ - absorber_sizeZ) + plane_sizeZ + (sampler_sensorPlanes - 1) * (plane_sizeZ + absorber_sizeZ);
+  G4double firstAbsorberZ = 0.5 * (sampler_sizeZ - absorber_sizeZ) - plane_sizeZ - (sampler_sensorPlanes - 1) * (plane_sizeZ + absorber_sizeZ);
   G4double firstPlaneZ = firstAbsorberZ + 0.5 * (absorber_sizeZ + plane_sizeZ);
   for (int i = 0; i < sampler_sensorPlanes; i++)
   {

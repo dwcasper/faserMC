@@ -73,7 +73,7 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
 
   cmd_sampler_sensorPlanes = new G4UIcmdWithAnInteger("/faser/geo/samplerPlanes", this);
   cmd_sampler_sensorPlanes->SetGuidance("Number of silicon sensor planes in the calorimeter.");
-  cmd_sampler_sensorPlanes->SetParameterName("caloPlanes", true, true);
+  cmd_sampler_sensorPlanes->SetParameterName("samplerPlanes", true, true);
   cmd_sampler_sensorPlanes->AvailableForStates(G4State_PreInit);
 
   cmd_sampler_absorberX0 = new G4UIcmdWithADouble("/faser/geo/absorberX0", this);
@@ -81,6 +81,51 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_sampler_absorberX0->SetParameterName("absorberX0", true, true);
   cmd_sampler_absorberX0->AvailableForStates(G4State_PreInit);
 
+  cmd_calo_planes = new G4UIcmdWithAnInteger("/faser/geo/caloPlanes", this);
+  cmd_calo_planes->SetGuidance("Number of scintillator sensor planes in a calorimeter module.");
+  cmd_calo_planes->SetParameterName("caloPlanes", true, true);
+  cmd_calo_planes->AvailableForStates(G4State_PreInit);
+
+  cmd_calo_towers = new G4UIcmdWithAnInteger("/faser/geo/caloTowers", this);
+  cmd_calo_towers->SetGuidance("Number of scinillator towers in a calorimeter module.");
+  cmd_calo_towers->SetParameterName("caloTowers", true, true);
+  cmd_calo_towers->SetRange("caloTowers == 1 || caloTowers == 4 || caloTowers == 9");
+  cmd_calo_towers->AvailableForStates(G4State_PreInit);
+
+  cmd_calo_modules = new G4UIcmdWithAnInteger("/faser/geo/caloModules", this);
+  cmd_calo_modules->SetGuidance("Number of calorimeter modules in the detector.");
+  cmd_calo_modules->SetParameterName("caloModules", true, true);
+  cmd_calo_modules->SetRange("caloModules == 1 || caloModules == 4 || caloModules == 9");
+  cmd_calo_modules->AvailableForStates(G4State_PreInit);
+
+  cmd_calo_scintThickness = new G4UIcmdWithADoubleAndUnit("/faser/geo/caloScintThickness", this);
+  cmd_calo_scintThickness->SetGuidance("Scintillator layer thickness in the calorimeter.");
+  cmd_calo_scintThickness->SetParameterName("caloScintThickness", true, true);
+  cmd_calo_scintThickness->SetDefaultUnit("mm");
+  cmd_calo_scintThickness->SetUnitCandidates("mm micron cm m");
+  cmd_calo_scintThickness->AvailableForStates(G4State_PreInit);
+
+  cmd_calo_absorbThickness = new G4UIcmdWithADoubleAndUnit("/faser/geo/caloAbsorbThickness", this);
+  cmd_calo_absorbThickness->SetGuidance("Absorber layer thickness in the calorimeter.");
+  cmd_calo_absorbThickness->SetParameterName("caloAbsorbThickness", true, true);
+  cmd_calo_absorbThickness->SetDefaultUnit("mm");
+  cmd_calo_absorbThickness->SetUnitCandidates("mm micron cm m");
+  cmd_calo_absorbThickness->AvailableForStates(G4State_PreInit);
+  
+  cmd_calo_planeXY = new G4UIcmdWithADoubleAndUnit("/faser/geo/caloPlaneXY", this);
+  cmd_calo_planeXY->SetGuidance("Inner width of the calorimeter.");
+  cmd_calo_planeXY->SetParameterName("caloPlaneXY", true, true);
+  cmd_calo_planeXY->SetDefaultUnit("cm");
+  cmd_calo_planeXY->SetUnitCandidates("mm micron cm m");
+  cmd_calo_planeXY->AvailableForStates(G4State_PreInit);
+
+  cmd_calo_moduleXY = new G4UIcmdWithADoubleAndUnit("/faser/geo/caloModuleXY", this);
+  cmd_calo_moduleXY->SetGuidance("Outer width of the calorimeter.");
+  cmd_calo_moduleXY->SetParameterName("caloModuleXY", true, true);
+  cmd_calo_moduleXY->SetDefaultUnit("cm");
+  cmd_calo_moduleXY->SetUnitCandidates("mm micron cm m");
+  cmd_calo_moduleXY->AvailableForStates(G4State_PreInit);
+  
   cmd_detector_samplerLength = new G4UIcmdWithADoubleAndUnit("/faser/geo/samplerLength", this);
   cmd_detector_samplerLength->SetGuidance("Thickness of calorimeter sampling layer.");
   cmd_detector_samplerLength->SetParameterName("samplerSizeZ", true, true);
@@ -117,8 +162,15 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   fDetectorConstruction->setSensorStereoAngle( FaserDetectorConstruction::default_sensor_stereoAngle );
   fDetectorConstruction->setSupportSizeZ ( FaserDetectorConstruction::default_support_sizeZ );
   fDetectorConstruction->setSensorPlanes( FaserDetectorConstruction::default_tracker_sensorPlanes );
-  fDetectorConstruction->setCaloPlanes( FaserDetectorConstruction::default_sampler_sensorPlanes );
+  fDetectorConstruction->setSamplerPlanes( FaserDetectorConstruction::default_sampler_sensorPlanes );
   fDetectorConstruction->setAbsorberX0( FaserDetectorConstruction::default_sampler_absorberX0 );
+  fDetectorConstruction->setCaloPlanes( FaserDetectorConstruction::default_calo_planes );
+  fDetectorConstruction->setCaloTowers( FaserDetectorConstruction::default_calo_towers );
+  fDetectorConstruction->setCaloModules( FaserDetectorConstruction::default_calo_modules );
+  fDetectorConstruction->setCaloScintThickness( FaserDetectorConstruction::default_calo_scintThickness );
+  fDetectorConstruction->setCaloAbsorbThickness( FaserDetectorConstruction::default_calo_absorbThickness );
+  fDetectorConstruction->setCaloPlaneXY( FaserDetectorConstruction::default_calo_planeXY );
+  fDetectorConstruction->setCaloModuleXY( FaserDetectorConstruction::default_calo_moduleXY );
   fDetectorConstruction->setSamplerSizeZ( FaserDetectorConstruction::default_detector_samplerLength );
   fDetectorConstruction->setPlanePitch( FaserDetectorConstruction::default_detector_planePitch );
   fDetectorConstruction->setDecayVolumeLength( FaserDetectorConstruction::default_detector_decayVolumeLength );
@@ -143,71 +195,106 @@ FaserGeometryMessenger::~FaserGeometryMessenger()
   if (cmd_sensor_stripPitch) delete cmd_sensor_stripPitch;
   if (cmd_sensor_stripLength) delete cmd_sensor_stripLength;
   if (cmd_sensor_readoutStrips) delete cmd_sensor_readoutStrips;
+  if (cmd_calo_planes) delete cmd_calo_planes;
+  if (cmd_calo_towers) delete cmd_calo_towers;
+  if (cmd_calo_modules) delete cmd_calo_modules;
+  if (cmd_calo_scintThickness) delete cmd_calo_scintThickness;
+  if (cmd_calo_absorbThickness) delete cmd_calo_absorbThickness;
+  if (cmd_calo_planeXY) delete cmd_calo_planeXY;
+  if (cmd_calo_moduleXY) delete cmd_calo_moduleXY;
   if (geometryDirectory) delete geometryDirectory;
 }
 
 void FaserGeometryMessenger::SetNewValue(G4UIcommand* command, G4String newValues)
 {
   if (command == cmd_sensor_readoutStrips) 
-    {
-      fDetectorConstruction->setReadoutStrips( cmd_sensor_readoutStrips->GetNewIntValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setReadoutStrips( cmd_sensor_readoutStrips->GetNewIntValue(newValues) );
+  }
   else if (command == cmd_sensor_stripPitch)
-    {
-      fDetectorConstruction->setStripPitch( cmd_sensor_stripPitch->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setStripPitch( cmd_sensor_stripPitch->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_sensor_stripLength)
-    {
-      fDetectorConstruction->setStripLength( cmd_sensor_stripLength->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setStripLength( cmd_sensor_stripLength->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_sensor_gap)
-    {
-      fDetectorConstruction->setSensorGap( cmd_sensor_gap->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setSensorGap( cmd_sensor_gap->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_sensor_sizeZ)
-    {
-      fDetectorConstruction->setSensorSizeZ( cmd_sensor_sizeZ->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setSensorSizeZ( cmd_sensor_sizeZ->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_sensor_stereoAngle)
-    {
-      fDetectorConstruction->setSensorStereoAngle( cmd_sensor_stereoAngle->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setSensorStereoAngle( cmd_sensor_stereoAngle->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_support_sizeZ)
-    {
-      fDetectorConstruction->setSupportSizeZ( cmd_support_sizeZ->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setSupportSizeZ( cmd_support_sizeZ->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_tracker_sensorPlanes)
-    {
-      fDetectorConstruction->setSensorPlanes( cmd_tracker_sensorPlanes->GetNewIntValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setSensorPlanes( cmd_tracker_sensorPlanes->GetNewIntValue(newValues) );
+  }
   else if (command == cmd_sampler_sensorPlanes)
   {
-    fDetectorConstruction->setCaloPlanes( cmd_sampler_sensorPlanes->GetNewIntValue(newValues) );
+    fDetectorConstruction->setSamplerPlanes( cmd_sampler_sensorPlanes->GetNewIntValue(newValues) );
   }
   else if (command == cmd_sampler_absorberX0)
   {
     fDetectorConstruction->setAbsorberX0( cmd_sampler_absorberX0->GetNewDoubleValue(newValues) );
+  }
+  else if (command == cmd_calo_planes)
+  {
+    fDetectorConstruction->setCaloPlanes( cmd_calo_planes->GetNewIntValue(newValues) );
+  }
+  else if (command == cmd_calo_towers)
+  {
+    fDetectorConstruction->setCaloTowers( cmd_calo_towers->GetNewIntValue(newValues) );
+  }
+  else if (command == cmd_calo_modules)
+  {
+    fDetectorConstruction->setCaloModules( cmd_calo_modules->GetNewIntValue(newValues) );
+  }
+  else if (command == cmd_calo_scintThickness)
+  {
+    fDetectorConstruction->setCaloScintThickness( cmd_calo_scintThickness->GetNewDoubleValue(newValues));
+  }
+  else if (command == cmd_calo_absorbThickness)
+  {
+    fDetectorConstruction->setCaloAbsorbThickness( cmd_calo_absorbThickness->GetNewDoubleValue(newValues));
+  }
+  else if (command == cmd_calo_planeXY)
+  {
+    fDetectorConstruction->setCaloPlaneXY( cmd_calo_planeXY->GetNewDoubleValue(newValues));
+  }
+  else if (command == cmd_calo_moduleXY)
+  {
+    fDetectorConstruction->setCaloModuleXY( cmd_calo_moduleXY->GetNewDoubleValue(newValues));
   }
   else if (command == cmd_detector_samplerLength)
   {
     fDetectorConstruction->setSamplerSizeZ( cmd_detector_samplerLength->GetNewDoubleValue(newValues) );
   }
   else if (command == cmd_tracker_planePitch)
-    {
-      fDetectorConstruction->setPlanePitch( cmd_tracker_planePitch->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setPlanePitch( cmd_tracker_planePitch->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_detector_decayVolumeLength)
-    {
-      fDetectorConstruction->setDecayVolumeLength( cmd_detector_decayVolumeLength->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setDecayVolumeLength( cmd_detector_decayVolumeLength->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_detector_trackerLength)
-    {
-      fDetectorConstruction->setTrackerLength( cmd_detector_trackerLength->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setTrackerLength( cmd_detector_trackerLength->GetNewDoubleValue(newValues) );
+  }
   else if (command == cmd_detector_calorimeterLength)
-    {
-      fDetectorConstruction->setCalorimeterLength( cmd_detector_calorimeterLength->GetNewDoubleValue(newValues) );
-    }
+  {
+    fDetectorConstruction->setCalorimeterLength( cmd_detector_calorimeterLength->GetNewDoubleValue(newValues) );
+  }
 }
 
 G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
@@ -248,11 +335,39 @@ G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
   }
   else if (command == cmd_sampler_sensorPlanes)
   {
-    cv = cmd_sampler_sensorPlanes->ConvertToString(fDetectorConstruction->getCaloPlanes());
+    cv = cmd_sampler_sensorPlanes->ConvertToString(fDetectorConstruction->getSamplerPlanes());
   }
   else if (command == cmd_sampler_absorberX0)
   {
     cv = cmd_sampler_absorberX0->ConvertToString(fDetectorConstruction->getAbsorberX0());
+  }
+  else if (command == cmd_calo_planes)
+  {
+    cv = cmd_calo_planes->ConvertToString(fDetectorConstruction->getCaloPlanes());
+  }
+  else if (command == cmd_calo_towers)
+  {
+    cv = cmd_calo_towers->ConvertToString(fDetectorConstruction->getCaloTowers());
+  }
+  else if (command == cmd_calo_modules)
+  {
+    cv = cmd_calo_modules->ConvertToString(fDetectorConstruction->getCaloModules());
+  }
+  else if (command == cmd_calo_scintThickness)
+  {
+    cv = cmd_calo_scintThickness->ConvertToString(fDetectorConstruction->getCaloScintThickness(), "mm");
+  }
+  else if (command == cmd_calo_absorbThickness)
+  {
+    cv = cmd_calo_absorbThickness->ConvertToString(fDetectorConstruction->getCaloAbsorbThickness(), "mm");
+  }
+  else if (command == cmd_calo_planeXY)
+  {
+    cv = cmd_calo_planeXY->ConvertToString(fDetectorConstruction->getCaloPlaneXY(), "cm");
+  }
+  else if (command == cmd_calo_moduleXY)
+  {
+    cv = cmd_calo_moduleXY->ConvertToString(fDetectorConstruction->getCaloModuleXY(), "cm");
   }
   else if (command == cmd_detector_samplerLength)
   {
