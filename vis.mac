@@ -106,7 +106,7 @@
 # Make the Calorimeter, Sampler, Tracker and Decay Volume invisible
 /vis/geometry/set/visibility Tracker 0 false
 /vis/geometry/set/visibility DecayVolume 0 false
-/vis/geometry/set/visibility Calorimeter 0 false
+#/vis/geometry/set/visibility Calorimeter 0 false
 /vis/geometry/set/visibility Sampler 0 false
 # Make the "Module" wrapper box invisibile
 /vis/geometry/set/visibility trackerModule 0 false
@@ -116,6 +116,8 @@
 /vis/geometry/set/visibility trackerPlane 0 false
 /vis/geometry/set/visibility samplerPlane 0 false
 /vis/geometry/set/visibility caloPlane 0 false
+/vis/geometry/set/visibility caloTower 0 false
+/vis/geometry/set/visibility caloAbsorber 0 false
 /vis/geometry/set/visibility tyvekSheet 0 false
 # Make the "Row" wrapper box invisible
 #/vis/geometry/set/visibility Row 0 false
@@ -126,8 +128,8 @@
 /vis/geometry/set/visibility trackerStrip 0 false
 /vis/geometry/set/visibility samplerStrip 0 false
 #/vis/geometry/set/colour samplerStrip 0 0.7 0.7 0.0 0.3
-# "Calorimeter" is transparent blue to represent air
-#/vis/geometry/set/colour Calorimeter 0 0 0 1 .3
+# "Calorimeter" is transparent gray
+/vis/geometry/set/colour Calorimeter 0 0.2 0.2 0.2 0.2
 # "DecayVolume" is transparent blue to represent air
 #/vis/geometry/set/colour DecayVolume 0 0 0 1 .3
 # "Tracker" is transparent blue to represent air
@@ -143,9 +145,9 @@
 /vis/geometry/set/colour samplerSupport 0 0 1 0 1
 # Absorber is light blue
 /vis/geometry/set/colour Absorber 0 0 0.2 1 0.3
-/vis/geometry/set/colour caloAbsorber 0 0 0.2 1 0.3
+#/vis/geometry/set/colour caloAbsorber 0 0 0.2 1 0.15
 # Scint tower is orange
-/vis/geometry/set/colour caloTower 0 0.7 0.7 0.0 0.7
+#/vis/geometry/set/colour caloTower 0 0.7 0.7 0.0 0.2
 #
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenMarker true

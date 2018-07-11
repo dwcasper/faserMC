@@ -41,6 +41,9 @@ class FaserCaloHit : public G4VHit
     void SetOriginTrack(G4int track)            { fOriginTrackID = track; }
     void SetSourceTrack(G4int track)            { fSourceTrackID = track; }
 
+    void SetTransform(G4AffineTransform transform )
+                                          { fTransform = transform; }
+
     // getters
     G4int Plane() const    	       	      { return fPlaneID; };
     G4int Tower() const                   { return fTowerID; }
@@ -53,6 +56,8 @@ class FaserCaloHit : public G4VHit
     G4int OriginTrack() const			        { return fOriginTrackID; }
     G4int SourceTrack() const             { return fSourceTrackID; }
 
+    G4AffineTransform Transform() const   { return fTransform; }
+
    private:
 
     G4int fPlaneID;
@@ -61,6 +66,7 @@ class FaserCaloHit : public G4VHit
     G4double fEdep;
     G4ThreeVector fGlobalPos;
     G4ThreeVector fLocalPos;
+    G4AffineTransform fTransform;
 
     G4int fOriginTrackID;
     G4int fSourceTrackID;

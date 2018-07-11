@@ -131,6 +131,11 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_detector_calorimeterLength = 0.25*m;
 
   virtual const G4LogicalVolume* GetTrackerStrip() const;
+  virtual const G4LogicalVolume* GetSamplerStrip() const;
+  virtual const G4LogicalVolume* GetCaloTower() const;
+
+  virtual G4double GetCaloMinZ() const { return fCaloMinZ; }
+  virtual G4double GetCaloMaxZ() const { return fCaloMaxZ; }
 
   protected:
 
@@ -143,6 +148,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4LogicalVolume* fLogicTrackerPlane;
   G4LogicalVolume* fLogicSamplerPlane;
   G4LogicalVolume* fLogicCaloModule;
+  G4LogicalVolume* fLogicCaloTower;
 
   // tunable (from macro) parameters 
   G4int    sensor_readoutStrips;
@@ -184,6 +190,10 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
 
   FaserSensorPlaneConstruction* fTrackerFactory;
   FaserSensorPlaneConstruction* fSamplerFactory;
+
+  // cached values to assist with visualization
+  G4double fCaloMinZ;
+  G4double fCaloMaxZ;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

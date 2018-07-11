@@ -61,12 +61,9 @@ int FaserDigi::operator==(const FaserDigi& right) const
 G4Colour FaserDigi::QtoC()
 {
   if (fCharge <=0) return G4Colour(0,0,0);
-  G4double q = std::min(log(fCharge)/log(30000.0),1.0);
-  G4double h = 300.0 * (1 - q); // from 300 at q=1 to 0 at q=30
-  G4double quotient = std::floor((h/60.0)/2.0);
-  G4double r = quotient * 2.0;
-  G4double hmod = (h/60.0) - r;
-  G4double x = 1.0 - fabs(hmod-1.0);
+  G4double q = std::min(log(std::max(1.0,fCharge))/log(30000.0),1.0);
+  G4double h = 300.0 * (1 - q); // from 300 at q=0 to 0 at q=1 (purple->blue->green->...->red)
+  G4double x = 1.0 - fabs(std::fmod(h/60.0, 2.0)-1.0);
   if (h < 60) return G4Colour(1.0,x,0);
   if (h < 120) return G4Colour(x,1.0,0);
   if (h < 180) return G4Colour(0,1.0,x);

@@ -6,6 +6,7 @@
 #include "FaserSensorHit.hh"
 #include "FaserCaloHit.hh"
 #include "FaserDigi.hh"
+#include "FaserCaloDigi.hh"
 #include "FaserCluster.hh"
 #include "G4TrajectoryContainer.hh"
 
@@ -43,6 +44,9 @@ public:
   std::vector<FaserDigi*> SamplerDigis()& { return fSamplerDigis; }
   void SetSamplerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fSamplerDigis.push_back((*digis)[i]); }
 
+  std::vector<FaserCaloDigi*> CaloDigis()& { return fCaloDigis; }
+  void SetCaloDigis(const FaserCaloDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fCaloDigis.push_back((*digis)[i]); }
+
   std::vector<FaserCluster*>& Clusters() { return fClusters; }
   void SetClusters();
 
@@ -55,6 +59,7 @@ private:
   std::vector<FaserCaloHit*> fCaloHits;
   std::vector<FaserDigi*> fTrackerDigis;
   std::vector<FaserDigi*> fSamplerDigis;
+  std::vector<FaserCaloDigi*> fCaloDigis;
   std::vector<FaserCluster*> fClusters;
 
   ////////////////////////////////////////////////////////////////////////////////

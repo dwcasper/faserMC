@@ -26,7 +26,7 @@
 FaserDetectorConstruction::FaserDetectorConstruction()
   : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
     fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), 
-    fLogicSamplerPlane(nullptr), fLogicCaloModule(nullptr),
+    fLogicSamplerPlane(nullptr), fLogicCaloModule(nullptr), fLogicCaloTower(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
     sensor_stripPitch(default_sensor_stripPitch),
     sensor_stripLength(default_sensor_stripLength),
@@ -67,6 +67,14 @@ FaserDetectorConstruction::~FaserDetectorConstruction()
 const G4LogicalVolume* FaserDetectorConstruction::GetTrackerStrip() const
 {
   return fTrackerFactory->GetStrip();
+}
+const G4LogicalVolume* FaserDetectorConstruction::GetSamplerStrip() const
+{
+  return fSamplerFactory->GetStrip();
+}
+const G4LogicalVolume* FaserDetectorConstruction::GetCaloTower() const
+{
+  return fLogicCaloTower;
 }
 
 void FaserDetectorConstruction::ConstructSDandField()
@@ -283,7 +291,7 @@ void FaserDetectorConstruction::ConstructCalorimeterModule()
   G4double caloTowerXY = calo_moduleXY / caloTowersAcross;
   G4Box* solidTower = new G4Box("CaloScintTower", 0.5 * caloTowerXY, 
     0.5 * caloTowerXY, 0.5 * calo_scintThickness);
-  G4LogicalVolume* logicTower = new G4LogicalVolume(solidTower, scint_mat, "caloTower");
+  fLogicCaloTower = new G4LogicalVolume(solidTower, scint_mat, "caloTower");
   
   G4int towerCount = 0;
   for (int ix = 0; ix < caloTowersAcross; ix++)
@@ -292,7 +300,7 @@ void FaserDetectorConstruction::ConstructCalorimeterModule()
     for (int iy = 0; iy < caloTowersAcross; iy++)
     {
       G4double y = ((1 - caloTowersAcross)/2.0 + iy) * caloTowerXY;
-      new G4PVPlacement(nullptr, G4ThreeVector(x, y, 0.0), logicTower, "PV_CaloTower", logicScint, false, towerCount, checkOverlaps);
+      new G4PVPlacement(nullptr, G4ThreeVector(x, y, 0.0), fLogicCaloTower, "PV_CaloTower", logicScint, false, towerCount, checkOverlaps);
       towerCount++;
     }
   }
@@ -592,7 +600,8 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                     false,                   //no boolean operation
                     0,                       //copy number
                     checkOverlaps);          //overlaps checking
-
+  fCaloMinZ = tracker_sizeZ + sampler_sizeZ;
+  fCaloMaxZ = fCaloMinZ + calorimeter_sizeZ;
 
   // place the decay volume inside
   //                                   

@@ -42,6 +42,7 @@ G4bool FaserCaloSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4ThreeVector worldPosition = aStep->GetPostStepPoint()->GetPosition();
   newHit->SetGlobalPos( worldPosition );
   newHit->SetLocalPos( h->GetHistory()->GetTopTransform().TransformPoint( worldPosition ) );
+  newHit->SetTransform( h->GetHistory()->GetTopTransform().Inverse()); // (local -> global)
 
   // truth information
   G4Track* track = aStep->GetTrack();
