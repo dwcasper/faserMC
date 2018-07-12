@@ -66,8 +66,14 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setSamplerPlanes(G4int value) { sampler_sensorPlanes = value; }
   virtual G4int getSamplerPlanes() const { return sampler_sensorPlanes; }
 
-  virtual void setAbsorberX0(G4double value) { sampler_absorberX0 = value; }
-  virtual G4double getAbsorberX0() const { return sampler_absorberX0; }
+  virtual void setAbsorberC(G4double value) { sampler_absorberC = value; }
+  virtual G4double getAbsorberC() const { return sampler_absorberC; }
+
+  virtual void setAbsorberCu(G4double value) { sampler_absorberCu = value; }
+  virtual G4double getAbsorberCu() const { return sampler_absorberCu; }
+  
+  virtual void setAbsorberW(G4double value) { sampler_absorberW = value; }
+  virtual G4double getAbsorberW() const { return sampler_absorberW; }
 
   virtual void setCaloPlanes(G4int value) { calo_planes = value; }
   virtual G4int getCaloPlanes() const { return calo_planes; }
@@ -115,7 +121,9 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_support_sizeZ = 3.3*mm;
   static constexpr G4int    default_tracker_sensorPlanes = 8;
   static constexpr G4int    default_sampler_sensorPlanes = 6;
-  static constexpr G4double default_sampler_absorberX0 = 4.0;
+  static constexpr G4double default_sampler_absorberC= 0.0;
+  static constexpr G4double default_sampler_absorberCu= 0.0;
+  static constexpr G4double default_sampler_absorberW= 1.0;
   static constexpr G4int    default_calo_planes = 67;
   static constexpr G4int    default_calo_towers = 1;
   static constexpr G4int    default_calo_modules = 4;
@@ -160,7 +168,9 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4double support_sizeZ;
   G4int    tracker_sensorPlanes;
   G4int    sampler_sensorPlanes;
-  G4double sampler_absorberX0;
+  G4double sampler_absorberC;
+  G4double sampler_absorberCu;
+  G4double sampler_absorberW;
   G4int    calo_planes;
   G4int    calo_towers;
   G4int    calo_modules;

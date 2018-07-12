@@ -28,7 +28,8 @@ FaserPhysicsMessenger::FaserPhysicsMessenger(FaserPhysicsList* physicsList)
 
 FaserPhysicsMessenger::~FaserPhysicsMessenger()
 {
-  delete fDarkPhotonMassCmd;
+  if (fDarkPhotonMassCmd) delete fDarkPhotonMassCmd;
+  if (fPhysicsDir) delete fPhysicsDir;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

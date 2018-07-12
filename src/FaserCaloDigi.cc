@@ -80,7 +80,7 @@ void FaserCaloDigi::Draw()
     G4double logScale = std::min(1.0, 0.05 + 0.95 * log10(std::max(1.0,fEnergy/100.0))/log10(3500000/100.0));
     G4double maxHeight = fDetectorConstruction->GetCaloMaxZ() - fDetectorConstruction->GetCaloMinZ();
     G4double height = logScale * maxHeight;
-    G4cout << "energy = " << fEnergy << " logScale = " << logScale << " maxH = " << maxHeight << " height = " << height << G4endl;
+    // G4cout << "energy = " << fEnergy << " logScale = " << logScale << " maxH = " << maxHeight << " height = " << height << G4endl;
     const G4LogicalVolume* tower = fDetectorConstruction->GetCaloTower();
     const G4Box* b = (const G4Box*) tower->GetSolid();
     G4Box* bin = new G4Box("caloDigit", b->GetXHalfLength(), b->GetYHalfLength(), height/2.0);

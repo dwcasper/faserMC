@@ -52,6 +52,7 @@ FaserGeneratorMessenger::~FaserGeneratorMessenger()
   if (cmd_gen_minPrimaryMomentum) delete cmd_gen_minPrimaryMomentum;
   if (cmd_gen_maxPrimaryMomentum) delete cmd_gen_maxPrimaryMomentum;
   if (cmd_gen_sourcePosition) delete cmd_gen_sourcePosition;
+  if (cmd_gen_dump) delete cmd_gen_dump;
   if (generatorDirectory) delete generatorDirectory;
 }
 

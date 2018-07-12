@@ -92,8 +92,8 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
 
   fFaserEvent->SetParticles(g4event->GetTrajectoryContainer());
   fFaserEvent->SetTrackerHits(hc);
-  fFaserEvent->SetSamplerHits(sc);
-  fFaserEvent->SetCaloHits(cc);
+  // fFaserEvent->SetSamplerHits(sc);
+  // fFaserEvent->SetCaloHits(cc);
   fFaserEvent->SetTrackerDigis(tdc);
   fFaserEvent->SetSamplerDigis(sdc);
   fFaserEvent->SetCaloDigis(cdc);

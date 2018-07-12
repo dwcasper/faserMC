@@ -118,6 +118,7 @@
 /vis/geometry/set/visibility caloPlane 0 false
 /vis/geometry/set/visibility caloTower 0 false
 /vis/geometry/set/visibility caloAbsorber 0 false
+/vis/geometry/set/visibility Absorber 0 false
 /vis/geometry/set/visibility tyvekSheet 0 false
 # Make the "Row" wrapper box invisible
 #/vis/geometry/set/visibility Row 0 false
@@ -144,8 +145,10 @@
 /vis/geometry/set/colour trackerSupport 0 0 1 0 1
 /vis/geometry/set/colour samplerSupport 0 0 1 0 1
 # Absorber is light blue
-/vis/geometry/set/colour Absorber 0 0 0.2 1 0.3
 #/vis/geometry/set/colour caloAbsorber 0 0 0.2 1 0.15
+/vis/geometry/set/colour samplerGraphiteAbsorber 0 0.2 0.2 0.2 0.7
+/vis/geometry/set/colour samplerCopperAbsorber 0 0.7 0.3 0 0.7
+/vis/geometry/set/colour samplerTungstenAbsorber 0 1 1 1 0.7
 # Scint tower is orange
 #/vis/geometry/set/colour caloTower 0 0.7 0.7 0.0 0.2
 #

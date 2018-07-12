@@ -76,10 +76,20 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   cmd_sampler_sensorPlanes->SetParameterName("samplerPlanes", true, true);
   cmd_sampler_sensorPlanes->AvailableForStates(G4State_PreInit);
 
-  cmd_sampler_absorberX0 = new G4UIcmdWithADouble("/faser/geo/absorberX0", this);
-  cmd_sampler_absorberX0->SetGuidance("Calorimeter absorber thickness in radiation lengths.");
-  cmd_sampler_absorberX0->SetParameterName("absorberX0", true, true);
-  cmd_sampler_absorberX0->AvailableForStates(G4State_PreInit);
+  cmd_sampler_absorberW = new G4UIcmdWithADouble("/faser/geo/absorberW", this);
+  cmd_sampler_absorberW->SetGuidance("Calorimeter absorber tungsten thickness in radiation lengths.");
+  cmd_sampler_absorberW->SetParameterName("absorberW", true, true);
+  cmd_sampler_absorberW->AvailableForStates(G4State_PreInit);
+
+  cmd_sampler_absorberCu = new G4UIcmdWithADouble("/faser/geo/absorberCu", this);
+  cmd_sampler_absorberCu->SetGuidance("Calorimeter absorber copper thickness in radiation lengths.");
+  cmd_sampler_absorberCu->SetParameterName("absorberCu", true, true);
+  cmd_sampler_absorberCu->AvailableForStates(G4State_PreInit);
+
+  cmd_sampler_absorberC = new G4UIcmdWithADouble("/faser/geo/absorberC", this);
+  cmd_sampler_absorberC->SetGuidance("Calorimeter absorber graphite thickness in radiation lengths.");
+  cmd_sampler_absorberC->SetParameterName("absorberC", true, true);
+  cmd_sampler_absorberC->AvailableForStates(G4State_PreInit);
 
   cmd_calo_planes = new G4UIcmdWithAnInteger("/faser/geo/caloPlanes", this);
   cmd_calo_planes->SetGuidance("Number of scintillator sensor planes in a calorimeter module.");
@@ -163,7 +173,9 @@ FaserGeometryMessenger::FaserGeometryMessenger(FaserDetectorConstruction* detect
   fDetectorConstruction->setSupportSizeZ ( FaserDetectorConstruction::default_support_sizeZ );
   fDetectorConstruction->setSensorPlanes( FaserDetectorConstruction::default_tracker_sensorPlanes );
   fDetectorConstruction->setSamplerPlanes( FaserDetectorConstruction::default_sampler_sensorPlanes );
-  fDetectorConstruction->setAbsorberX0( FaserDetectorConstruction::default_sampler_absorberX0 );
+  fDetectorConstruction->setAbsorberW( FaserDetectorConstruction::default_sampler_absorberW );
+  fDetectorConstruction->setAbsorberCu( FaserDetectorConstruction::default_sampler_absorberCu );
+  fDetectorConstruction->setAbsorberC( FaserDetectorConstruction::default_sampler_absorberC );
   fDetectorConstruction->setCaloPlanes( FaserDetectorConstruction::default_calo_planes );
   fDetectorConstruction->setCaloTowers( FaserDetectorConstruction::default_calo_towers );
   fDetectorConstruction->setCaloModules( FaserDetectorConstruction::default_calo_modules );
@@ -186,7 +198,9 @@ FaserGeometryMessenger::~FaserGeometryMessenger()
   if (cmd_tracker_planePitch) delete cmd_tracker_planePitch;
   if (cmd_tracker_sensorPlanes) delete cmd_tracker_sensorPlanes;
   if (cmd_sampler_sensorPlanes) delete cmd_sampler_sensorPlanes;
-  if (cmd_sampler_absorberX0) delete cmd_sampler_absorberX0;
+  if (cmd_sampler_absorberW) delete cmd_sampler_absorberW;
+  if (cmd_sampler_absorberCu) delete cmd_sampler_absorberCu;
+  if (cmd_sampler_absorberC) delete cmd_sampler_absorberC;
   if (cmd_detector_samplerLength) delete cmd_detector_samplerLength;
   if (cmd_support_sizeZ) delete cmd_support_sizeZ;
   if (cmd_sensor_stereoAngle) delete cmd_sensor_stereoAngle;
@@ -243,9 +257,17 @@ void FaserGeometryMessenger::SetNewValue(G4UIcommand* command, G4String newValue
   {
     fDetectorConstruction->setSamplerPlanes( cmd_sampler_sensorPlanes->GetNewIntValue(newValues) );
   }
-  else if (command == cmd_sampler_absorberX0)
+  else if (command == cmd_sampler_absorberW)
   {
-    fDetectorConstruction->setAbsorberX0( cmd_sampler_absorberX0->GetNewDoubleValue(newValues) );
+    fDetectorConstruction->setAbsorberW( cmd_sampler_absorberW->GetNewDoubleValue(newValues) );
+  }
+  else if (command == cmd_sampler_absorberCu)
+  {
+    fDetectorConstruction->setAbsorberCu( cmd_sampler_absorberCu->GetNewDoubleValue(newValues) );
+  }
+  else if (command == cmd_sampler_absorberC)
+  {
+    fDetectorConstruction->setAbsorberC( cmd_sampler_absorberC->GetNewDoubleValue(newValues) );
   }
   else if (command == cmd_calo_planes)
   {
@@ -337,9 +359,17 @@ G4String FaserGeometryMessenger::GetCurrentValue(G4UIcommand* command)
   {
     cv = cmd_sampler_sensorPlanes->ConvertToString(fDetectorConstruction->getSamplerPlanes());
   }
-  else if (command == cmd_sampler_absorberX0)
+  else if (command == cmd_sampler_absorberW)
   {
-    cv = cmd_sampler_absorberX0->ConvertToString(fDetectorConstruction->getAbsorberX0());
+    cv = cmd_sampler_absorberW->ConvertToString(fDetectorConstruction->getAbsorberW());
+  }
+  else if (command == cmd_sampler_absorberCu)
+  {
+    cv = cmd_sampler_absorberCu->ConvertToString(fDetectorConstruction->getAbsorberCu());
+  }
+  else if (command == cmd_sampler_absorberC)
+  {
+    cv = cmd_sampler_absorberC->ConvertToString(fDetectorConstruction->getAbsorberC());
   }
   else if (command == cmd_calo_planes)
   {

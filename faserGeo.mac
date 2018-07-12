@@ -44,8 +44,11 @@
 /faser/geo/samplerPlanes 2
 #
 # Thickness of calorimeter absorber layers (in radiation lengths)
+# (Graphite -> Copper -> Tungsten)
 #
-/faser/geo/absorberX0 1.0
+/faser/geo/absorberC 0.125 
+/faser/geo/absorberCu 0.375 
+/faser/geo/absorberW 0.5
 #
 # Number of scintillator planes in the calorimeter (number of absorber planes is one less)
 #
@@ -57,7 +60,7 @@
 #
 # Number of calo modules in the detector (0, 1, 4 or 9)
 #
-faser/geo/caloModules 4
+/faser/geo/caloModules 4
 #
 # Thickness of the calorimeter scintillator layers
 #

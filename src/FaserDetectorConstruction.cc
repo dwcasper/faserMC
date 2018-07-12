@@ -36,7 +36,9 @@ FaserDetectorConstruction::FaserDetectorConstruction()
     support_sizeZ(default_support_sizeZ),
     tracker_sensorPlanes(default_tracker_sensorPlanes),
     sampler_sensorPlanes(default_sampler_sensorPlanes),
-    sampler_absorberX0(default_sampler_absorberX0),
+    sampler_absorberC(default_sampler_absorberC),
+    sampler_absorberCu(default_sampler_absorberCu),
+    sampler_absorberW(default_sampler_absorberW),
     calo_planes(default_calo_planes),
     calo_towers(default_calo_towers),
     calo_modules(default_calo_modules),
@@ -373,7 +375,7 @@ void FaserDetectorConstruction::ConstructCalorimeter()
 
   G4int caloModuleIndex = 0;
   G4double caloModule_initialXY = - ((caloModulesAcross - 1) * calo_moduleXY)/2.0;
-  G4double caloModuleZ = - (calorimeter_sizeZ - calorimeterModule_sizeZ)/2.0;
+  G4double caloModuleZ = - (calorimeter_sizeZ - calorimeterModule_sizeZ)/2.0;  // fix this to put calomodule at forward end 
   for (int ix = 0; ix < caloModulesAcross; ix++)
   {
     G4double caloModuleX = caloModule_initialXY + ix * calo_moduleXY;
@@ -402,9 +404,16 @@ void FaserDetectorConstruction::ConstructCalorimeter()
 
 void FaserDetectorConstruction::ConstructAbsorberPlane()
 {
-  G4Material* absorber_mat = nist->FindOrBuildMaterial("G4_W"); // Tungsten
-  G4double tungstenRadLen = absorber_mat->GetRadlen();
-  G4double absorberSizeZ = sampler_absorberX0 * tungstenRadLen;
+  G4Material* air_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Material* absorber_C = nist->FindOrBuildMaterial("G4_GRAPHITE"); // Graphite
+  G4Material* absorber_Cu = nist->FindOrBuildMaterial("G4_Cu"); // Copper
+  G4Material* absorber_W = nist->FindOrBuildMaterial("G4_W"); // Tungsten
+  G4double tungstenThickness = sampler_absorberW * absorber_W->GetRadlen();
+  G4double copperThickness = sampler_absorberCu * absorber_Cu->GetRadlen();
+  G4double graphiteThickness = sampler_absorberC * absorber_C->GetRadlen();
+  G4double absorberSizeZ = tungstenThickness + copperThickness + graphiteThickness;
+
+  G4cout << "Presampler absorber thickness (cm) - W : " << tungstenThickness/cm << ", Cu : " << copperThickness/cm << ", Graphite: " << graphiteThickness/cm << G4endl;
 
   const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicSamplerPlane->GetSolid());
   G4double plane_sizeX = 2*sPlane->GetXHalfLength();
@@ -414,7 +423,34 @@ void FaserDetectorConstruction::ConstructAbsorberPlane()
     0.5*plane_sizeX, 0.5*plane_sizeY, 0.5*absorberSizeZ);
   fLogicAbsorber = 
     new G4LogicalVolume(solidAbsorber,
-      absorber_mat, "Absorber");
+      air_mat, "Absorber");
+
+  if (sampler_absorberC > 0)
+  {
+    G4Box* solidGraphite = new G4Box("samplerGraphiteSolid", 
+      0.5 * plane_sizeX, 0.5 * plane_sizeY, 0.5 * graphiteThickness);
+    G4LogicalVolume* logicGraphite = new G4LogicalVolume(solidGraphite, absorber_C, "samplerGraphiteAbsorber");
+    new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, -(absorberSizeZ - graphiteThickness)/2.0), 
+                      logicGraphite, "PV_SamplerGraphite", fLogicAbsorber, false, checkOverlaps);
+  }
+
+  if (sampler_absorberCu > 0)
+  {
+    G4Box* solidCopper = new G4Box("samplerCopperSolid", 
+      0.5 * plane_sizeX, 0.5 * plane_sizeY, 0.5 * copperThickness);
+    G4LogicalVolume* logicCopper = new G4LogicalVolume(solidCopper, absorber_Cu, "samplerCopperAbsorber");
+    new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, -(absorberSizeZ - copperThickness)/2.0 + graphiteThickness), 
+                      logicCopper, "PV_SamplerCopper", fLogicAbsorber, false, checkOverlaps);
+  }
+
+  if (sampler_absorberW > 0)
+  {
+    G4Box* solidTungsten = new G4Box("samplerTungstenSolid", 
+      0.5 * plane_sizeX, 0.5 * plane_sizeY, 0.5 * tungstenThickness);
+    G4LogicalVolume* logicTungsten = new G4LogicalVolume(solidTungsten, absorber_W, "samplerTungstenAbsorber");
+    new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, -(absorberSizeZ - tungstenThickness)/2.0 + graphiteThickness + copperThickness), 
+                      logicTungsten, "PV_SamplerTungsten", fLogicAbsorber, false, checkOverlaps);
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

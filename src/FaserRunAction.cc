@@ -30,7 +30,8 @@ FaserRunAction::FaserRunAction()
 FaserRunAction::~FaserRunAction()
 {
   RootEventIO::GetInstance()->Close();
-  if (fGeometry) delete fGeometry;
+  if (fGeometry != nullptr) delete fGeometry;
+  fGeometry = nullptr;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

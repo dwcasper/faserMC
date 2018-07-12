@@ -36,7 +36,9 @@ private:
   G4UIcmdWithAnInteger*          cmd_tracker_sensorPlanes;
   G4UIcmdWithADoubleAndUnit*     cmd_tracker_planePitch;
   G4UIcmdWithAnInteger*          cmd_sampler_sensorPlanes;
-  G4UIcmdWithADouble*            cmd_sampler_absorberX0;
+  G4UIcmdWithADouble*            cmd_sampler_absorberC;
+  G4UIcmdWithADouble*            cmd_sampler_absorberCu;
+  G4UIcmdWithADouble*            cmd_sampler_absorberW;
   G4UIcmdWithAnInteger*          cmd_calo_planes;
   G4UIcmdWithAnInteger*          cmd_calo_towers;
   G4UIcmdWithAnInteger*          cmd_calo_modules;

@@ -65,10 +65,15 @@ FaserFieldSetup::FaserFieldSetup()
 
 FaserFieldSetup::~FaserFieldSetup()
 {
-  delete fMagneticField;
-  delete fChordFinder;
-  delete fStepper;
-  delete fFieldMessenger;
+  if (fMagneticField) delete fMagneticField;
+  if (fLocalMagneticField) delete fLocalMagneticField;
+  if (fChordFinder) delete fChordFinder;
+  if (fLocalChordFinder) delete fLocalChordFinder;
+  if (fEquation) delete fEquation;
+  if (fLocalEquation) delete fLocalEquation;
+  if (fStepper) delete fStepper;
+  if (fLocalStepper) delete fLocalStepper;
+  if (fFieldMessenger) delete fFieldMessenger;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
