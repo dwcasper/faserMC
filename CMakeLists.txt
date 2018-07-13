@@ -107,7 +107,9 @@ endforeach()
 set(FASER_ROOT_MACROS
     root/initFaser.C
     root/readTree.C
+    root/readSampler.C
     root/FaserCluster.C
+    root/FaserSamplerCluster.C
    )
 
 foreach(_macro ${FASER_ROOT_MACROS})
