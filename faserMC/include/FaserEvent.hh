@@ -7,6 +7,7 @@
 #include "FaserSamplerHit.hh"
 #include "FaserDigi.hh"
 #include "FaserCluster.hh"
+#include "FaserSpacePoint.hh"
 #include "G4TrajectoryContainer.hh"
 
 #include <map>
@@ -40,6 +41,9 @@ public:
   std::vector<FaserCluster*>& Clusters() { return fClusters; }
   void SetClusters();
 
+  std::vector<FaserSpacePoint*>& SpacePoints() { return fSpacePoints; }
+  void SetSpacePoints();
+
 
 private:
   G4int fEventNumber;
@@ -48,6 +52,7 @@ private:
   std::vector<FaserSamplerHit*> fSamples;
   std::vector<FaserDigi*> fDigis;
   std::vector<FaserCluster*> fClusters;
+  std::vector<FaserSpacePoint*> fSpacePoints;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Utility methods for cluster finding                                        //

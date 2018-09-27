@@ -3,8 +3,10 @@
 
 #include "G4String.hh"
 
-class FaserGeometry;
 class FaserEvent;
+class FaserGeometry;
+class FaserTrackerEvent;
+class FaserTrackerGeometry;
 class TFile;
 class TTree;
 
@@ -15,8 +17,11 @@ public:
 
   static RootEventIO* GetInstance();
   static void SetFileName(G4String name);
+  void SetTrackerGeo(FaserTrackerGeometry * geo) { fTrackerGeoBranchAdx = geo; }
   void Write(FaserEvent*);
   void Write(FaserGeometry*);
+  void Write(FaserTrackerEvent*);
+  void WriteTrackerGeo();
   void Close();
 
 protected:
@@ -26,9 +31,14 @@ private:
   TFile* fFile;
   TTree* fTree;
   TTree* fGeoTree;
+  TFile* fTrackerFile;
+  TTree* fTrackerTree;
+  TTree* fTrackerGeoTree;
   int fNevents;
   FaserEvent* fBranchAdx;
   FaserGeometry* fGeoBranchAdx;
+  FaserTrackerEvent* fTrackerBranchAdx;
+  FaserTrackerGeometry* fTrackerGeoBranchAdx;
 };
 
 #endif

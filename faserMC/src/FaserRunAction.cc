@@ -4,6 +4,7 @@
 #include "FaserPrimaryGeneratorAction.hh"
 #include "FaserDetectorConstruction.hh"
 #include "FaserGeometry.hh"
+//#include "FaserTrackerGeometry.hh"
 // #include "FaserRun.hh"
 #include "RootEventIO.hh"
 
@@ -19,8 +20,9 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserRunAction::FaserRunAction()
-: G4UserRunAction()
-, fGeometry(nullptr)
+  : G4UserRunAction()
+  , fGeometry(nullptr)
+  //, fTrackerGeometry(nullptr)
 { 
 
 }
@@ -31,6 +33,7 @@ FaserRunAction::~FaserRunAction()
 {
   RootEventIO::GetInstance()->Close();
   if (fGeometry) delete fGeometry;
+  //if (fTrackerGeometry) delete fTrackerGeometry;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -40,11 +43,15 @@ void FaserRunAction::BeginOfRunAction(const G4Run*)
   // inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
   fGeometry = new FaserGeometry("/faser/");
+  //fTrackerGeometry = new FaserTrackerGeometry;
 
   // Run conditions
   RootEventIO::GetInstance()->Write(fGeometry);
   delete fGeometry;
   fGeometry = nullptr;
+  //RootEventIO::GetInstance()->Write(fTrackerGeometry);
+  //delete fTrackerGeometry;
+  //fTrackerGeometry = nullptr;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

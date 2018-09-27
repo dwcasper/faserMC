@@ -1,0 +1,8 @@
+<lcgdict>
+  <selection>
+    <class name="std::basic_string<char>" />
+    <class name="FaserTrackerGeometry" />
+    <class name="FaserTrackerEvent" />
+    <class name="FaserTrackerSpacePoint" />
+  </selection>
+</lcgdict>

@@ -7,6 +7,8 @@
 #include "Randomize.hh"
 
 #include <math.h>
+#include <iostream>
+using std::cout;
 
 FaserDigitizer::FaserDigitizer(G4String name)
   : G4VDigitizerModule(name),
@@ -70,6 +72,9 @@ void FaserDigitizer::Digitize()
       G4ThreeVector localTranslate = invTransform.NetTranslation();
       G4ThreeVector stripOffset(((strip+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
       G4ThreeVector newTranslate = localTranslate + stripOffset;
+      //cout << "INFO  FaserSensorHit\n"
+      //     << "        globalPosition="<<hit->GlobalPos()<<", localPosition="<<hit->LocalPos()<<"\n"
+      //     << "        localTranslate="<<localTranslate<<", stripOffset="<<stripOffset<<", newTranslate="<<newTranslate<<"\n";
       invTransform.SetNetTranslation(newTranslate);
       G4int rowIndex = ((plane*fNModules + module)*fNSensors + sensor)*fNRows + row;
       if (transforms.count(rowIndex) == 0) transforms[rowIndex] = invTransform;

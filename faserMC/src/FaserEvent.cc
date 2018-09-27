@@ -3,6 +3,8 @@
 #include "G4ParticleTable.hh"
 #include "G4VTrajectoryPoint.hh"
 
+#include <tuple>
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -10,9 +12,13 @@ FaserEvent::FaserEvent(G4int eventNumber)
   : fEventNumber(eventNumber)
 {}
 
+//------------------------------------------------------------------------------
+
 FaserEvent::FaserEvent()
   : FaserEvent(0)
 { }
+
+//------------------------------------------------------------------------------
 
 FaserEvent::~FaserEvent()
 { 
@@ -21,7 +27,12 @@ FaserEvent::~FaserEvent()
 
   for (auto c : fClusters) if (c) delete c;
   fClusters.clear();
+
+  for (auto s : fSpacePoints) if (s) delete s;
+  fSpacePoints.clear();
 }
+
+//------------------------------------------------------------------------------
 
 void FaserEvent::SetParticles(G4TrajectoryContainer* particles)
 {
@@ -38,6 +49,8 @@ void FaserEvent::SetParticles(G4TrajectoryContainer* particles)
     fParticles.push_back(p);
   }
 }
+
+//------------------------------------------------------------------------------
 
 void FaserEvent::SetClusters()
 {
@@ -76,6 +89,34 @@ void FaserEvent::SetClusters()
 
 }
 
+//------------------------------------------------------------------------------
+
+void FaserEvent::SetSpacePoints()
+{
+  fSpacePoints.clear();
+
+  map<std::tuple<int, int, int, int>, FaserSpacePoint*> spacePointMap;
+  for (FaserCluster * clus : fClusters)
+  {
+    // Group clusters in same (plane, module, sensor, row) and also pair
+    // sensors on opposite sides of plane (sensors 0/1 -> 0 and 2/3 -> 2).
+    int plane = clus->Plane();
+    int module = clus->Module();
+    int sensor = clus->Sensor();
+    int row = clus->Row();
+    if (sensor == 1) sensor = 0;
+    else if (sensor == 3) sensor = 2;
+    auto loc = std::make_tuple(plane, module, sensor, row);
+    // TODO: initialize space point correctly
+    if (spacePointMap.count(loc) < 1) spacePointMap[loc] = new FaserSpacePoint;
+    spacePointMap[loc]->AddCluster(clus);
+  }
+
+  for (auto & it : spacePointMap)
+  {
+    fSpacePoints.push_back(it.second);
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Utility methods for cluster finding                                        //

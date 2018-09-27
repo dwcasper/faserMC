@@ -14,15 +14,16 @@ using std::max;
 
 FaserCluster::FaserCluster() 
     : fIndex {0} 
-    , fPosition {0.0}
-    , fCharge {0.0} { }
+    , fCharge {0.0}
+    , fWeightedStrip {0.0} { }
 
 FaserCluster::FaserCluster(const FaserCluster& right)
     : fIndex(right.fIndex)
     , fCharge(right.fCharge)
     , fDigis(right.fDigis)
     , fMaxima(right.fMaxima)
-    , fPosition(right.fPosition) { }
+    , fWeightedStrip(right.fWeightedStrip)
+    , fGlobalPos(right.fGlobalPos) { }
 
 
 FaserCluster& FaserCluster::operator= (const FaserCluster& right)
@@ -32,14 +33,15 @@ FaserCluster& FaserCluster::operator= (const FaserCluster& right)
     fDigis = right.fDigis;
     fMaxima = right.fMaxima;
     fCharge = right.fCharge;
-    fPosition = right.fPosition;
+    fWeightedStrip = right.fWeightedStrip;
+    fGlobalPos = right.fGlobalPos;
 }
 
 FaserCluster::FaserCluster(int index, vector<FaserDigi*>& digis)
     : fIndex(index)
-    , fCharge(0.0)
     , fDigis(digis)
-    , fPosition(0.0)
+    , fCharge(0.0)
+    , fWeightedStrip(0.0)
 {
     for (size_t i = 0; i < digis.size(); i++) 
     {
@@ -98,10 +100,13 @@ FaserCluster::~FaserCluster()
 //------------------------------------------------------------------------------
 
 void FaserCluster::WeightedAverage() {
+    static int iCluster = -1;
+    ++iCluster;
     // bail out on 1 hit cluster
     if (fDigis.size() == 1) 
     {
-        fPosition = G4double(fDigis[0]->Strip());
+        fWeightedStrip = G4double(fDigis[0]->Strip());
+        fGlobalPos = fDigis[0]->Transform().NetTranslation();
         return;
     }
 
@@ -117,15 +122,21 @@ void FaserCluster::WeightedAverage() {
 
     G4int iMin = max(0, iLoc - 1);
     G4int iMax = min((int)fDigis.size() - 1, iLoc + 1);
-    G4double sumX = 0.0;
     G4double sumQ = 0.0;
     G4double sumXQ = 0.0;
+    G4ThreeVector sumPQ = {0.0, 0.0, 0.0};
+    //cout << "INFO  FaserCluster::WeightedAverage\n";
     for (G4int i = iMin; i <= iMax; i++) {
         G4double q = fDigis[i]->Charge();
         sumQ += q;
-        sumXQ += q * i;
+        sumXQ += q * fDigis[i]->Strip();
+        sumPQ += q * fDigis[i]->Transform().NetTranslation();
+        //cout << "DEBUG_DIGITS  " << fDigis[i]->Plane() << ";" << fDigis[i]->Module() << ";" << fDigis[i]->Sensor() << ";" << fDigis[i]->Row() << ";" << fDigis[i]->Strip() << ";" << iCluster << ";" << fDigis[i]->Transform().NetTranslation() << "\n";
     }
-    fPosition = sumXQ/sumQ;
+    fWeightedStrip = sumXQ/sumQ;
+    fGlobalPos = sumPQ/sumQ;
+    cout << "\n";
+    //cout << "DEBUG_CLUSTERS  " << Plane() << "," << Module() << "," << Sensor() << "," << Row() << "," << fWeightedStrip << "," << fGlobalPos << "\n";
     return;
 
 }

@@ -8,6 +8,7 @@
 
 class FaserRunAction;
 class FaserEvent;
+class FaserTrackerEvent;
 
 /// Event action class
 ///
@@ -22,8 +23,9 @@ class FaserEventAction : public G4UserEventAction
     virtual void EndOfEventAction(const G4Event* event);
 
   private:
-    FaserRunAction* fRunAction;
-    FaserEvent*     fFaserEvent;
+    FaserRunAction*     fRunAction;
+    FaserEvent*         fFaserEvent;
+    FaserTrackerEvent*  fFaserTrackerEvent;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

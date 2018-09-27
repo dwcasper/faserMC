@@ -47,7 +47,10 @@ int main(int argc,char** argv)
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new FaserDetectorConstruction());
+  auto * detectorConstruction = new FaserDetectorConstruction;
+  runManager->SetUserInitialization(detectorConstruction);
+  RootEventIO::GetInstance()->SetTrackerGeo(detectorConstruction->TrackerGeo());
+  RootEventIO::GetInstance()->WriteTrackerGeo();
 
   // Physics list
   G4VModularPhysicsList* physicsList = new TFTFP_BERT<FaserPhysicsList>();

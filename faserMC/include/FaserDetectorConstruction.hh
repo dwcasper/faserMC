@@ -11,6 +11,7 @@
 
 
 class FaserGeometryMessenger;
+class FaserTrackerGeometry;
 class FaserFieldSetup;
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -84,6 +85,8 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setCalorimeterLength(G4double value) { detector_calorimeterLength = value; }
   virtual G4double getCalorimeterLength() const { return detector_calorimeterLength; }
 
+  FaserTrackerGeometry * TrackerGeo() { return fTrackerGeo; }
+
   static constexpr G4double default_sensor_activeSizeY = 96.669*mm;
   static constexpr G4int    default_sensor_readoutStrips = 1280;
   static constexpr G4double default_sensor_stripPitch = 75.5*um;
@@ -106,6 +109,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   protected:
 
   FaserGeometryMessenger* fGeometryMessenger;
+  FaserTrackerGeometry* fTrackerGeo;
   G4LogicalVolume* fLogicCalorimeter;
   G4LogicalVolume* fLogicSampler;
   G4LogicalVolume* fLogicAbsorber;

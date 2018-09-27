@@ -10,10 +10,6 @@
 #include <stdexcept>
 #include <vector>
 
-using std::cout;
-using std::getline;
-using std::runtime_error;
-using std::string;
 
 //------------------------------------------------------------------------------
 
@@ -49,3 +45,4 @@ void FaserGeometry::NavigateCommandTree(G4String path, G4UIcommandTree* tree)
 }
 
 FaserGeometry::~FaserGeometry() { }
+

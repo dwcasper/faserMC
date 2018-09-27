@@ -2,6 +2,7 @@
 
 #include "FaserDetectorConstruction.hh"
 #include "FaserGeometryMessenger.hh"
+#include "FaserTrackerGeometry.hh"
 #include "FaserSensorSD.hh"
 #include "FaserSamplerSD.hh"
 #include "FaserFieldSetup.hh"
@@ -20,10 +21,16 @@
 #include "G4Region.hh"
 #include "G4AutoDelete.hh"
 
+#include <iostream>
+
+using std::cout;
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserDetectorConstruction::FaserDetectorConstruction()
-  : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
+  : G4VUserDetectorConstruction(),
+    fGeometryMessenger(new FaserGeometryMessenger(this)),
+    fTrackerGeo(new FaserTrackerGeometry),
     fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), fLogicTrackerModule(nullptr), 
     fLogicTrackerSensor(nullptr), fLogicTrackerRow(nullptr), fLogicTrackerStrip(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
@@ -48,6 +55,7 @@ FaserDetectorConstruction::FaserDetectorConstruction()
 FaserDetectorConstruction::~FaserDetectorConstruction()
 { 
   if (fGeometryMessenger) delete fGeometryMessenger;
+  if (fTrackerGeo) delete fTrackerGeo;
   if (fStereoPlus) delete fStereoPlus;
   if (fStereoMinus) delete fStereoMinus;
   if (fOverlapAngle) delete fOverlapAngle;
@@ -83,6 +91,12 @@ void FaserDetectorConstruction::ConstructSDandField()
 
 void FaserDetectorConstruction::ConstructTrackerSensor()
 {
+  G4cout << "Updating tracking geometry: nStrips = " << sensor_readoutStrips << "\n";
+  fTrackerGeo->nStrips = sensor_readoutStrips;
+
+  G4cout << "Updating tracking geometry: stripPitch = " << sensor_stripPitch << "\n";
+  fTrackerGeo->stripPitch = sensor_readoutStrips;
+
   // sensor dimensions
   //
   // In x, there are field-shaping strips at each end, and we assume a border on each edge of sensor_gap/2
@@ -92,6 +106,8 @@ void FaserDetectorConstruction::ConstructTrackerSensor()
   // In y, there are two rows of strips, separated by a gap, and we assume border on each edge of sensor_gap/2
   //
   G4double sensor_sizeY = ( sensor_stripLength * 2) + (sensor_gap * 2);
+  G4cout << "Updating tracking geometry: rowOffsetY = " << 0.5*sensor_sizeY;
+  fTrackerGeo->rowOffsetY = 0.5*sensor_sizeY;
   
   G4cout << "Sensor dimensions: ( " << sensor_sizeX/mm << " mm, " << sensor_sizeY/mm << " mm, "
 	 << sensor_sizeZ/mm << " mm )" << G4endl; 
@@ -173,6 +189,8 @@ void FaserDetectorConstruction::ConstructTrackerModule()
   // sensor stereo angle (+/-)
   //
   G4cout << "Stereo angle: " << sensor_stereoAngle/mrad << " mrad" << G4endl;
+  G4cout << "Updating tracking geometry: stereoAngle = " << sensor_stereoAngle << "\n";
+  fTrackerGeo->stereoAngle = sensor_stereoAngle;
 
   // create rotation matrices for both senses of rotation
   // we have to hold these pointers (and not change the objects)
@@ -214,6 +232,10 @@ void FaserDetectorConstruction::ConstructTrackerModule()
   G4double module_sizeX = support_sizeX;
   G4double module_sizeY = support_sizeY;
   G4double module_sizeZ = 2 * sensor_sizeZ + support_sizeZ;
+
+  double sensorOffsetY = 0.5*sensor_sizeY/cos(sensor_stereoAngle);
+  G4cout << "Updating tracking geometry: sensorOffsetY = " << sensorOffsetY;
+  fTrackerGeo->sensorOffsetY = sensorOffsetY;
 
   // module volume
   //
@@ -304,6 +326,8 @@ void FaserDetectorConstruction::ConstructTrackerPlane()
   // corresponding x separation of modules with this angle
   //
   G4double xOffset = wPrime * cos(overlapAngle);
+  G4cout << "Updating tracking geometry: moduleOffsetX = " << xOffset << "\n";
+  fTrackerGeo->moduleOffsetX = xOffset;
 
   // Rotation matrix for module overlap - again, must preserve unchanged until end of job
   //
@@ -498,6 +522,10 @@ void FaserDetectorConstruction::ConstructTracker()
 			false,
 			i,
 			checkOverlaps);
+
+      double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
+      G4cout << "Updating tracking geometry: planeZ[" << i << "] = " << zPlane << "\n";
+      fTrackerGeo->planeZ.push_back(zPlane);
   }
   
   // Central planes are evenly distributed around z = 0
@@ -513,6 +541,10 @@ void FaserDetectorConstruction::ConstructTracker()
 			false,
 			nEndPlanes + i,
 			checkOverlaps);
+
+      double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
+      G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes+i << "] = " << zPlane << "\n";
+      fTrackerGeo->planeZ.push_back(zPlane);
   }
 
   // Downstream end planes are symmetrical to upstream
@@ -528,6 +560,10 @@ void FaserDetectorConstruction::ConstructTracker()
 			false,
 			nEndPlanes + nCentralPlanes + i,
 			checkOverlaps);
+
+      double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
+      G4cout << "Updating tracking geometry: planeZ[" << i << "] = " << zPlane << "\n";
+      fTrackerGeo->planeZ.push_back(zPlane);
   }
 
 }
@@ -771,6 +807,8 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                       false,                 //no boolean operation
                       0,                     //copy number
                       checkOverlaps);        //overlaps checking
+
+  //fTrackerGeo->WriteToFile("faserTrackerGeo.root");
 
   //
   //always return the physical World
