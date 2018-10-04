@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iostream>
 
 #include "TROOT.h"
 #include "TSystem.h"
@@ -50,7 +51,11 @@ RootEventIO::RootEventIO()
 
 RootEventIO::~RootEventIO()
 {
-
+  //NB: `FaserDetectorConstruction` does not delete `fTrackerGeoBranchAdx`
+  //    (must currently be deleted here)
+  //TODO: Clean this up!
+  if (fTrackerGeoBranchAdx) delete fTrackerGeoBranchAdx;
+  fTrackerGeoBranchAdx = nullptr;
 }
 
 RootEventIO* RootEventIO::GetInstance()
@@ -162,6 +167,7 @@ void RootEventIO::Close()
   fFile->Close();
   fNevents = 0;
 
+  for (int * i : fTrackerGeoBranchAdx->planeIndices_front) std::cout << "PLANEINDICES_FRONT  RETAINED " << *i << '\n';
   G4cout << "Writing space points and geometry to tracker trees...";
   fTrackerFile->cd();
   fTrackerGeoTree->Write();

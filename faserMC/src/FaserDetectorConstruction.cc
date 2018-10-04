@@ -55,7 +55,10 @@ FaserDetectorConstruction::FaserDetectorConstruction()
 FaserDetectorConstruction::~FaserDetectorConstruction()
 { 
   if (fGeometryMessenger) delete fGeometryMessenger;
-  if (fTrackerGeo) delete fTrackerGeo;
+  //NB: `fTrackerGeo` needs to outlive the `FaserDetectorConstruction` instance,
+  //    as it's used by `RootEventIO`.
+  //TODO: Clean this up!
+  //if (fTrackerGeo) delete fTrackerGeo;
   if (fStereoPlus) delete fStereoPlus;
   if (fStereoMinus) delete fStereoMinus;
   if (fOverlapAngle) delete fOverlapAngle;
@@ -526,6 +529,7 @@ void FaserDetectorConstruction::ConstructTracker()
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
       G4cout << "Updating tracking geometry: planeZ[" << i << "] = " << zPlane << "\n";
       fTrackerGeo->planeZ.push_back(zPlane);
+      fTrackerGeo->planeIndices_front.push_back(i);
   }
   
   // Central planes are evenly distributed around z = 0
@@ -543,8 +547,10 @@ void FaserDetectorConstruction::ConstructTracker()
 			checkOverlaps);
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
-      G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes+i << "] = " << zPlane << "\n";
+      G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes + i << "] = " << zPlane << "\n";
       fTrackerGeo->planeZ.push_back(zPlane);
+      fTrackerGeo->planeIndices_central.push_back(nEndPlanes + i);
+      std::cout <<"PLANEINDICES_CENTRAL  ADDING " << nEndPlanes+i << '\n';
   }
 
   // Downstream end planes are symmetrical to upstream
@@ -562,8 +568,9 @@ void FaserDetectorConstruction::ConstructTracker()
 			checkOverlaps);
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
-      G4cout << "Updating tracking geometry: planeZ[" << i << "] = " << zPlane << "\n";
+      G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes + nCentralPlanes + i << "] = " << zPlane << "\n";
       fTrackerGeo->planeZ.push_back(zPlane);
+      fTrackerGeo->planeIndices_end.push_back(nEndPlanes + nCentralPlanes + i);
   }
 
 }

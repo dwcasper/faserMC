@@ -43,6 +43,8 @@ public:
   virtual ~FaserTrackerSpacePoint() {
   }
 
+  void print() const;
+
 };
 
 #endif

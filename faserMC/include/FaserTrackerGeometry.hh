@@ -27,13 +27,26 @@ public:
   double  moduleOffsetX = -10000.; // mm
   double  sensorOffsetY = -10000.; // mm
   double  rowOffsetY    = -10000.; // mm
+
+  std::vector<int>   planeIndices_front;
+  std::vector<int>   planeIndices_central;
+  std::vector<int>   planeIndices_end;
+  //std::vector<int> * p_planeIndices_front   = &planeIndices_front;
+  //std::vector<int> * p_planeIndices_central = &planeIndices_central;
+  //std::vector<int> * p_planeIndices_end     = &planeIndices_end;
+
   std::vector<double> planeZ; // mm
-  std::vector<double> * p_planeZ = &planeZ;
+  //std::vector<double> * p_planeZ = &planeZ;
+
+
+  FaserTrackerGeometry() {
+  }
 
   virtual ~FaserTrackerGeometry() {
   }
 
-  void WriteToFile(const std::string & fileName);
+  //void WriteToFile(const std::string & fileName);
+
 };
 
 #endif
