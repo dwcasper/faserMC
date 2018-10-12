@@ -2,12 +2,12 @@
 // Declaration of classes that need dictionaries
 //
 
-#include <vector>
 #include "FaserTrackerGeometry.hh"
 #include "FaserTrackerEvent.hh"
 #include "FaserTrackerSpacePoint.hh"
+#include "FaserTrackerTruthParticle.hh"
+#include <vector>
 
-//std::vector<int> _faserTrackerIntVectorDummy;
-//std::vector<double> _faserTrackerDoubleVectorDummy;
 std::vector<FaserTrackerSpacePoint*> _faserTrackerSpacePointVectorDummy;
+std::vector<FaserTrackerTruthParticle*> _faserTrackerTruthParticleVectorDummy;
 

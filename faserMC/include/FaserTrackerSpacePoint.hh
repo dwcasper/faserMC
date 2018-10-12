@@ -2,6 +2,7 @@
 #define FASER_TRACKER_SPACE_POINT_HH 1
 
 #include "TVector3.h"
+#include "TMath.h"
 #include <vector>
 
 //------------------------------------------------------------------------------
@@ -16,6 +17,7 @@ public:
   int       row;
   double    charge;
   TVector3  globalPos;
+  TVector3  globalPosUncertainty;
 
   FaserTrackerSpacePoint()
     : plane {-1}
@@ -23,6 +25,7 @@ public:
     , sensor {-1}
     , row {-1}
     , globalPos {0., 0., 0.}
+    , globalPosUncertainty {0.08/TMath::Sqrt(2.), 0.08/(TMath::Sqrt(2.)*TMath::Sin(0.02)), 0.}
   {
   }
 
@@ -37,6 +40,7 @@ public:
     , sensor {sensor_}
     , row {row_}
     , globalPos {globalPos_}
+    , globalPosUncertainty {0.08/TMath::Sqrt(2.), 0.08/(TMath::Sqrt(2.)*TMath::Sin(0.02)), 0.}
   {
   }
 

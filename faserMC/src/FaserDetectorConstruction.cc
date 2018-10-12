@@ -21,9 +21,6 @@
 #include "G4Region.hh"
 #include "G4AutoDelete.hh"
 
-#include <iostream>
-
-using std::cout;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -550,7 +547,6 @@ void FaserDetectorConstruction::ConstructTracker()
       G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes + i << "] = " << zPlane << "\n";
       fTrackerGeo->planeZ.push_back(zPlane);
       fTrackerGeo->planeIndices_central.push_back(nEndPlanes + i);
-      std::cout <<"PLANEINDICES_CENTRAL  ADDING " << nEndPlanes+i << '\n';
   }
 
   // Downstream end planes are symmetrical to upstream
