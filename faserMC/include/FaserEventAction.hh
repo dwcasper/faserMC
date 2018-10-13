@@ -9,6 +9,7 @@
 class FaserRunAction;
 class FaserEvent;
 class FaserTrackerEvent;
+class FaserDrawer;
 
 /// Event action class
 ///
@@ -26,6 +27,7 @@ class FaserEventAction : public G4UserEventAction
     FaserRunAction*     fRunAction;
     FaserEvent*         fFaserEvent;
     FaserTrackerEvent*  fFaserTrackerEvent;
+    FaserDrawer*        fDrawer;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -4,5 +4,6 @@
     <class name="FaserTrackerGeometry" />
     <class name="FaserTrackerEvent" />
     <class name="FaserTrackerSpacePoint" />
+    <class name="FaserTrackerTruthParticle" />
   </selection>
 </lcgdict>

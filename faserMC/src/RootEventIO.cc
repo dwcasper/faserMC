@@ -1,5 +1,4 @@
 #include <sstream>
-#include <iostream>
 
 #include "TROOT.h"
 #include "TSystem.h"
@@ -167,7 +166,6 @@ void RootEventIO::Close()
   fFile->Close();
   fNevents = 0;
 
-  for (int * i : fTrackerGeoBranchAdx->planeIndices_front) std::cout << "PLANEINDICES_FRONT  RETAINED " << *i << '\n';
   G4cout << "Writing space points and geometry to tracker trees...";
   fTrackerFile->cd();
   fTrackerGeoTree->Write();

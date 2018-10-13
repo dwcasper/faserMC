@@ -107,8 +107,8 @@ TVector3 FaserSpacePoint::GlobalPos() const
 
   // To get the global coordinates, start with respect to the row center.
   // Then shift by global positions of the centers of the plane, module, sensor, and row.
-  double x = 0.5*(uFront + uBack)*TMath::Cos(Geo::stereoAngle);
-  double y = 0.5*(uFront - uBack)*TMath::Sin(Geo::stereoAngle);
+  double x = 0.5*(uFront + uBack)/TMath::Cos(Geo::stereoAngle);
+  double y = 0.5*(uBack - uFront)/TMath::Sin(Geo::stereoAngle);
   double z = 0.;
 
   // Shift z to center of plane
