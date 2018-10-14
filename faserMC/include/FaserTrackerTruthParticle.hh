@@ -1,5 +1,4 @@
-#ifndef FASERTRACKERTRUTHPARTICLE_HH
-#define FASERTRACKERTRUTHPARTICLE_HH 1
+#pragma once
 
 #include "TVector3.h"
 #include "TLorentzVector.h"
@@ -24,4 +23,3 @@ struct FaserTrackerTruthParticle
 };
 
 
-#endif

@@ -1,9 +1,10 @@
-#ifndef FASER_TRACKER_SPACE_POINT_HH
-#define FASER_TRACKER_SPACE_POINT_HH 1
+#pragma once
 
+#include "FaserTrackerCluster.hh"
 #include "TVector3.h"
 #include "TMath.h"
 #include <vector>
+
 
 //------------------------------------------------------------------------------
 
@@ -18,6 +19,8 @@ public:
   double    charge;
   TVector3  globalPos;
   TVector3  globalPosUncertainty;
+  std::vector<FaserTrackerCluster*> analogClusters;
+  std::vector<FaserTrackerCluster*> digitalClusters;
 
   FaserTrackerSpacePoint()
     : plane {-1}
@@ -45,10 +48,15 @@ public:
   }
 
   virtual ~FaserTrackerSpacePoint() {
+    for (FaserTrackerCluster * cl : analogClusters) {
+      if (cl) delete cl;
+    }
+    for (FaserTrackerCluster * cl : digitalClusters) {
+      if (cl) delete cl;
+    }
   }
 
   void print() const;
 
 };
 
-#endif

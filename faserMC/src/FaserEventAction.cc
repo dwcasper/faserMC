@@ -15,6 +15,9 @@
 #include "FaserEvent.hh"
 #include "FaserTrackerEvent.hh"
 #include "FaserTrackerSpacePoint.hh"
+#include "FaserTrackerCluster.hh"
+#include "FaserTrackerDigit.hh"
+#include "FaserTrackerTruthHit.hh"
 #include "FaserTrackerTruthParticle.hh"
 #include "FaserDrawer.hh"
 
@@ -88,14 +91,63 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
   fFaserEvent->SetDigis(dc);
   fFaserEvent->SetClusters();
   fFaserEvent->SetSpacePoints();
+  for (FaserSensorHit * hit : fFaserEvent->Hits()) {
+    fFaserTrackerEvent->truthHits.push_back(new FaserTrackerTruthHit {
+      hit->Plane(),
+      hit->Module(),
+      hit->Sensor(),
+      hit->Row(),
+      hit->Strip(),
+      hit->Edep(),
+      {hit->GlobalPos().x(), hit->GlobalPos().y(), hit->GlobalPos().z()}
+    });
+  }
   for (FaserSpacePoint * sp : fFaserEvent->SpacePoints()) {
+    vector<FaserTrackerCluster*> trAnalogClusters;
+    for (FaserCluster * cl : sp->Clusters()) {
+      vector<FaserTrackerDigit*> trDigits;
+      for (FaserDigi * digi : cl->Digis()) {
+        G4ThreeVector globalPos = digi->Transform().NetTranslation();
+        trDigits.push_back(new FaserTrackerDigit {
+          digi->Plane(),
+          digi->Module(),
+          digi->Sensor(),
+          digi->Row(),
+          digi->Strip(),
+          digi->Charge(),
+          {globalPos.x(), globalPos.y(), globalPos.z()}
+        });
+        for (uint i = 0; i < fFaserTrackerEvent->truthHits.size(); ++i) {
+          FaserTrackerTruthHit * hit = fFaserTrackerEvent->truthHits[i];
+          FaserTrackerDigit * digit = trDigits.back();
+          if (hit->plane  != digit->plane ) continue;
+          if (hit->module != digit->module) continue;
+          if (hit->sensor != digit->sensor) continue;
+          if (hit->row    != digit->row   ) continue;
+          if (hit->strip  != digit->strip ) continue;
+          trDigits.back()->truthHitIndices.push_back(i);
+        }
+      }
+      trAnalogClusters.push_back(new FaserTrackerCluster {
+        cl->Plane(),
+        cl->Module(),
+        cl->Sensor(),
+        cl->Row(),
+        cl->WeightedStrip(),
+        cl->Charge(),
+        {cl->GlobalPos().x(), cl->GlobalPos().y(), cl->GlobalPos().z()}
+      });
+      trAnalogClusters.back()->digits = std::move(trDigits);
+    }
     fFaserTrackerEvent->spacePoints.push_back(new FaserTrackerSpacePoint {
       sp->Plane(),
       sp->Module(),
       sp->Sensor(),
       sp->Row(),
-      sp->GlobalPos()
+      {sp->GlobalPos().x(), sp->GlobalPos().y(), sp->GlobalPos().z()}
     });
+    fFaserTrackerEvent->spacePoints.back()->analogClusters = std::move(trAnalogClusters);
+    //fFaserTrackerEvent->spacePoints->digitalClusters = std::move(trDigiClusters);
   }
   for (FaserTruthParticle * tp : fFaserEvent->Particles()) {
     const G4ThreeVector & vertex = tp->Vertex();

@@ -1,5 +1,4 @@
-#ifndef FASER_TRACKER_GEOMETRY_HH
-#define FASER_TRACKER_GEOMETRY_HH 1
+#pragma once
 
 #include <vector>
 #include <string>
@@ -49,4 +48,3 @@ public:
 
 };
 
-#endif

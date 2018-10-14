@@ -1,7 +1,7 @@
-#ifndef FASER_TRACKER_EVENT_HH
-#define FASER_TRACKER_EVENT_HH 1
+#pragma once
 
 #include "FaserTrackerSpacePoint.hh"
+#include "FaserTrackerTruthHit.hh"
 #include "FaserTrackerTruthParticle.hh"
 #include <vector>
 
@@ -13,6 +13,7 @@ public:
 
   int eventNumber;
   std::vector<FaserTrackerSpacePoint*> spacePoints;
+  std::vector<FaserTrackerTruthHit*> truthHits;
   std::vector<FaserTrackerTruthParticle*> truthParticles;
 
   FaserTrackerEvent()
@@ -36,4 +37,3 @@ public:
 
 };
 
-#endif
