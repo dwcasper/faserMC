@@ -164,10 +164,10 @@ if(DO_FULL_BUILD)
   install(TARGETS faser DESTINATION bin)
   install(TARGETS FaserRootClassesDict DESTINATION lib64)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/FaserRootClasses_rdict.pcm DESTINATION lib64)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/FaserTrackerClasses_rdict.pcm DESTINATION lib64)
   install(FILES ${FASER_SCRIPTS} DESTINATION .)
   install(FILES ${FASER_ROOT_MACROS} DESTINATION root)
 endif()
 
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/FaserTrackerClasses_rdict.pcm DESTINATION lib64)
 install(TARGETS FaserTrackerClassesDict DESTINATION lib64)
 
