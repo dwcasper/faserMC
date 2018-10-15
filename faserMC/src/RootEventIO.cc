@@ -16,11 +16,11 @@
 #include "G4EventManager.hh"
 #include "G4Event.hh"
 
-static G4String fileName = "FaserMCEvent_Default.root";
+static G4String fileName = "FaserMCEvent_sim.root";
 static G4String treeName = "faser";
 static G4String geoTreeName = "faserGeo";
 
-static G4String trackerFileName = "FaserMCEvent_tracking.root";
+static G4String trackerFileName = "FaserMCEvent_digi.root";
 static G4String trackerTreeName = "events";
 static G4String trackerGeoTreeName = "geo";
 

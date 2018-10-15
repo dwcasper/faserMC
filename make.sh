@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script for automated installation of `faserMC` simulation package. Before
-# running, set the environment variables in `set_up_environment.sh` to the
+# running, set the environment variables in `setUpEnvironment.sh` to the
 # correct locations. Then, set `FASERMC_DO_FULL_BUILD` below to `true` to install
 # the full simulation package or `false` to install the shared libraries only.
 
@@ -26,8 +26,8 @@ makeFaserMC() {
 
     if [ -z $FASERMC_DIR ]; then
         local faserMCDir="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd )"
-        echo 'Sourcing `'"${faserMCDir}/set_up_environment.sh"'` to set up the environment...'
-        source ${faserMCDir}/set_up_environment.sh
+        echo 'Sourcing `'"${faserMCDir}/setUpEnvironment.sh"'` to set up the environment...'
+        source ${faserMCDir}/setUpEnvironment.sh
     fi
 
     if [ "$2" != "" ]; then
