@@ -91,6 +91,7 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
   fFaserEvent->SetDigis(dc);
   fFaserEvent->SetClusters();
   fFaserEvent->SetSpacePoints();
+
   for (FaserSensorHit * hit : fFaserEvent->Hits()) {
     fFaserTrackerEvent->truthHits.push_back(new FaserTrackerTruthHit {
       hit->Plane(),
@@ -102,33 +103,19 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
       {hit->GlobalPos().x(), hit->GlobalPos().y(), hit->GlobalPos().z()}
     });
   }
+
   for (FaserSpacePoint * sp : fFaserEvent->SpacePoints()) {
-    vector<FaserTrackerCluster*> trAnalogClusters;
+    auto * trSP = new FaserTrackerSpacePoint {
+      sp->Plane(),
+      sp->Module(),
+      sp->Sensor(),
+      sp->Row(),
+      {sp->GlobalPos().x(), sp->GlobalPos().y(), sp->GlobalPos().z()}
+    };
+    fFaserTrackerEvent->spacePoints.push_back(trSP);
+
     for (FaserCluster * cl : sp->Clusters()) {
-      vector<FaserTrackerDigit*> trDigits;
-      for (FaserDigi * digi : cl->Digis()) {
-        G4ThreeVector globalPos = digi->Transform().NetTranslation();
-        trDigits.push_back(new FaserTrackerDigit {
-          digi->Plane(),
-          digi->Module(),
-          digi->Sensor(),
-          digi->Row(),
-          digi->Strip(),
-          digi->Charge(),
-          {globalPos.x(), globalPos.y(), globalPos.z()}
-        });
-        for (uint i = 0; i < fFaserTrackerEvent->truthHits.size(); ++i) {
-          FaserTrackerTruthHit * hit = fFaserTrackerEvent->truthHits[i];
-          FaserTrackerDigit * digit = trDigits.back();
-          if (hit->plane  != digit->plane ) continue;
-          if (hit->module != digit->module) continue;
-          if (hit->sensor != digit->sensor) continue;
-          if (hit->row    != digit->row   ) continue;
-          if (hit->strip  != digit->strip ) continue;
-          trDigits.back()->truthHitIndices.push_back(i);
-        }
-      }
-      trAnalogClusters.push_back(new FaserTrackerCluster {
+      auto * trCluster = new FaserTrackerCluster {
         cl->Plane(),
         cl->Module(),
         cl->Sensor(),
@@ -136,19 +123,35 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
         cl->WeightedStrip(),
         cl->Charge(),
         {cl->GlobalPos().x(), cl->GlobalPos().y(), cl->GlobalPos().z()}
-      });
-      trAnalogClusters.back()->digits = std::move(trDigits);
+      };
+      trSP->analogClusters.push_back(trCluster);
+
+      for (FaserDigi * digi : cl->Digis()) {
+        G4ThreeVector globalPos = digi->Transform().NetTranslation();
+        auto * trDigit = new FaserTrackerDigit {
+          digi->Plane(),
+          digi->Module(),
+          digi->Sensor(),
+          digi->Row(),
+          digi->Strip(),
+          digi->Charge(),
+          {globalPos.x(), globalPos.y(), globalPos.z()}
+        };
+        trCluster->digits.push_back(trDigit);
+
+        for (uint i = 0; i < fFaserTrackerEvent->truthHits.size(); ++i) {
+          FaserTrackerTruthHit * hit = fFaserTrackerEvent->truthHits[i];
+          if (hit->plane  != trDigit->plane ) continue;
+          if (hit->module != trDigit->module) continue;
+          if (hit->sensor != trDigit->sensor) continue;
+          if (hit->row    != trDigit->row   ) continue;
+          if (hit->strip  != trDigit->strip ) continue;
+          trDigit->truthHitIndices.push_back(i);
+        }
+      }
     }
-    fFaserTrackerEvent->spacePoints.push_back(new FaserTrackerSpacePoint {
-      sp->Plane(),
-      sp->Module(),
-      sp->Sensor(),
-      sp->Row(),
-      {sp->GlobalPos().x(), sp->GlobalPos().y(), sp->GlobalPos().z()}
-    });
-    fFaserTrackerEvent->spacePoints.back()->analogClusters = std::move(trAnalogClusters);
-    //fFaserTrackerEvent->spacePoints->digitalClusters = std::move(trDigiClusters);
   }
+
   for (FaserTruthParticle * tp : fFaserEvent->Particles()) {
     const G4ThreeVector & vertex = tp->Vertex();
     const G4ThreeVector & momentum = tp->Momentum();
@@ -160,8 +163,10 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
       TLorentzVector{momentum.x(), momentum.y(), momentum.z(), tp->Energy()},
     });
   }
+
   fDrawer->DrawSpacePoints(fFaserEvent);
   fDrawer->DrawPropagatedTrajectory(fFaserEvent);
+
   RootEventIO* rootEventIO = RootEventIO::GetInstance();
   rootEventIO->Write(fFaserEvent);
   rootEventIO->Write(fFaserTrackerEvent);

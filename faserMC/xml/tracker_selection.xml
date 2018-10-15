@@ -4,6 +4,8 @@
     <class name="FaserTrackerGeometry" />
     <class name="FaserTrackerEvent" />
     <class name="FaserTrackerSpacePoint" />
+    <class name="FaserTrackerCluster" />
+    <class name="FaserTrackerDigit" />
     <class name="FaserTrackerTruthHit" />
     <class name="FaserTrackerTruthParticle" />
   </selection>
