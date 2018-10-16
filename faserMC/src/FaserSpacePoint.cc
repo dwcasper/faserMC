@@ -21,7 +21,7 @@ namespace Geo {
 
   double moduleOffsetX = 48.5064; // mm, - for module 0, + for module 1
   double sensorOffsetY = 96.938/(2.*TMath::Cos(stereoAngle)); // mm, + for sensors 0/1, - for sensors 2/3
-  double rowOffsetY = 0.5*(48.2 + 0.269); // mm, - for row 0, + for row 1
+  //double rowOffsetY = 0.5*(48.2 + 0.269); // mm, - for row 0, + for row 1
 
   std::map<int, double> planePosZ = { // mm
     { 0,    0.00 },
@@ -59,9 +59,9 @@ FaserSpacePoint::FaserSpacePoint(std::vector<FaserCluster*> & clusters)
 int FaserSpacePoint::Sensor() const
 {
   if (fClusters.size()==0) return -1;
-  int sensor= fClusters[0]->Sensor();
+  int sensor = fClusters[0]->Sensor();
 
-  // Group sensors 0/1 -> 0 and 2/3 -> 2.
+  // Group top sensors 0/1 -> 0 and bottom 2/3 -> 2.
   if (sensor==0 || sensor==1) return 0;
   else if (sensor==2 || sensor==3) return 2;
 
@@ -82,15 +82,25 @@ TVector3 FaserSpacePoint::GlobalPos() const
 {
   double stripFront = 0.;
   double stripBack = 0.;
-  double sumAbsQ = 0.;
+  double sumAbsQ_front = 0.;
+  double sumAbsQ_back = 0.;
   static int iCluster = -1;
+  G4ThreeVector weightedClusterGlobalPos_front {0.,0.,0.};
+  G4ThreeVector weightedClusterGlobalPos_back  {0.,0.,0.};
+
   for (const FaserCluster * clus : fClusters)
   {
     int sensor = clus->Sensor();
     double absCharge = fabs(clus->Charge());
-    if (sensor==1 || sensor==3) stripFront += absCharge * clus->WeightedStrip();
-    else if (sensor==0 || sensor==2) stripBack += absCharge * clus->WeightedStrip();
-    sumAbsQ += absCharge;
+    if (sensor==1 || sensor==3) {
+      stripFront += absCharge * clus->WeightedStrip();
+      weightedClusterGlobalPos_front += clus->GlobalPos();
+      sumAbsQ_front += absCharge;
+    } else if (sensor==0 || sensor==2) {
+      stripBack += absCharge * clus->WeightedStrip();
+      weightedClusterGlobalPos_back += clus->GlobalPos();
+      sumAbsQ_back += absCharge;
+    }
     //cout << "DEBUG_CLUSTERS  " << ++iCluster
     //                    << "," << absCharge
     //                    << "," << clus->GlobalPos().x()
@@ -98,12 +108,40 @@ TVector3 FaserSpacePoint::GlobalPos() const
     //                    << "," << clus->GlobalPos().z()
     //                    << "\n";
   }
-  stripFront /= sumAbsQ;
-  stripBack  /= sumAbsQ;
 
   // Local coordinates along front/back rows in mm:
-  double uFront = (0.5*(Geo::nStrips - 1) - stripFront) * Geo::stripPitch;
-  double uBack  = (0.5*(Geo::nStrips - 1) - stripBack) * Geo::stripPitch;
+  bool frontPresent = false;
+  bool backPresent = false;
+  double uFront = 0.;
+  double uBack  = 0.;
+  if (sumAbsQ_front != 0) {
+    frontPresent = true;
+    stripFront /= sumAbsQ_front;
+    uFront = (0.5*(Geo::nStrips - 1) - stripFront) * Geo::stripPitch;
+  }
+  if (sumAbsQ_back != 0) {
+    backPresent = true;
+    stripBack  /= sumAbsQ_back;
+    uBack = (0.5*(Geo::nStrips - 1) - stripBack) * Geo::stripPitch;
+  }
+
+  //if (!frontPresent && !backPresent) return {-10000., -10000., -10000.};
+
+  //if (!frontPresent) return {weightedClusterGlobalPos_back.x(),
+  //                           weightedClusterGlobalPos_back.y(),
+  //                           weightedClusterGlobalPos_back.z()};
+
+  //if (!backPresent) return {weightedClusterGlobalPos_front.x(),
+  //                          weightedClusterGlobalPos_front.y(),
+  //                          weightedClusterGlobalPos_front.z()};
+
+  // Reject space point unless both front and back clusters are present
+  if (!frontPresent || !backPresent) {
+    return {-10000., -10000., -10000.};
+  }
+
+  // Else both front & back clusters present => combine front/back pair, using
+  // local to global coordinate transformation:
 
   // To get the global coordinates, start with respect to the row center.
   // Then shift by global positions of the centers of the plane, module, sensor, and row.
@@ -124,12 +162,8 @@ TVector3 FaserSpacePoint::GlobalPos() const
   else if (Sensor()==2 || Sensor()==3) y += -Geo::sensorOffsetY;
   else throw runtime_error {"FaserSpacePoint::GlobalPos: invalid sensor: "+to_string(Sensor())};
 
-  // Shift to center of row
-  if (Row()==0) y += -Geo::rowOffsetY;
-  else if (Row()==1) y += Geo::rowOffsetY;
-  else throw runtime_error {"FaserSpacePoint::GlobalPos: invalid row: "+to_string(Row())};
-
-  //cout << "DEBUG_SP  " << x << "," << y << "," << z << "\n";
+  // Do *not* shift to the center of the row -- the correct origin of the local
+  // coordinate system is the *sensor* center, *not* the row center.
 
   return {x, y, z};
 }
@@ -148,7 +182,7 @@ void FaserSpacePoint::AddCluster(FaserCluster * cluster)
   if (cluster->Module() != Module()) throw runtime_error {"FaserSpacePoint::AddCluster: incompatible modules"};
 
   int sensor = fClusters[0]->Sensor();
-  // Group sensors 0/1 -> 0 and 2/3 -> 2.
+  // Group top sensors 0/1 -> 0 and bottom 2/3 -> 2.
   if (sensor==1) sensor = 0;
   else if (sensor==3) sensor = 2;
   if (sensor!= Sensor()) throw runtime_error {"FaserSpacePoint::AddCluster: incompatible sensors"};
