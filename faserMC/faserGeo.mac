@@ -33,7 +33,7 @@
 #
 # Number of detector planes
 #
-/faser/geo/trackerPlanes 8
+/faser/geo/trackerPlanes 9
 #
 # Spacing of detector planes; this is now the minimum spacing between planes
 #

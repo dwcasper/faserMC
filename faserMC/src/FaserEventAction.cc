@@ -164,8 +164,8 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
     });
   }
 
-  fDrawer->DrawSpacePoints(fFaserEvent);
-  fDrawer->DrawPropagatedTrajectory(fFaserEvent);
+  //fDrawer->DrawSpacePoints(fFaserEvent);
+  //fDrawer->DrawPropagatedTrajectory(fFaserEvent);
 
   RootEventIO* rootEventIO = RootEventIO::GetInstance();
   rootEventIO->Write(fFaserEvent);

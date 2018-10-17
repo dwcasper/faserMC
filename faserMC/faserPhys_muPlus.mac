@@ -6,8 +6,8 @@
 /faser/generator/minMomentum 1.0 GeV
 /faser/generator/maxMomentum 500.0 GeV
 /faser/generator/sourcePosition 0.0 0.0 -475.0 m
-/faser/generator/particleName mu-
-/particle/select mu-
+/faser/generator/particleName mu+
+/particle/select mu+
 /particle/property/stable true
 #
 # One use case is to adjust the production cut for a specific region

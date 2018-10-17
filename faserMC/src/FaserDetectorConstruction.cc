@@ -482,32 +482,35 @@ void FaserDetectorConstruction::ConstructTracker()
                         tracker_mat,             //its material
                         "Tracker");              //its name
 
-  // in the optimized setup, we have to figure out where to place the planes
-  int nEndPlanes = 0;  // this is the number at each end
-  int nCentralPlanes = 0;
-  switch (detector_sensorPlanes % 4)
-  {
-  case 0:
-    nEndPlanes = detector_sensorPlanes/4;
-    nCentralPlanes = detector_sensorPlanes/2;
-    break;
-  case 1:
-    nCentralPlanes = (detector_sensorPlanes+1)/2;
-    nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
-    break;
-  case 2:
-    // choose 2-2-2 over 1-4-1 even though they are theoretically equivalent
-    nCentralPlanes = detector_sensorPlanes/2 - 1;
-    nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
-    break;
-  case 3:
-    nCentralPlanes = (detector_sensorPlanes - 1)/2;
-    nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
-    break;
-  default:
-    G4cout << "Impossible condition reached" << G4endl;
-    throw;
-  }
+  //// in the optimized setup, we have to figure out where to place the planes
+  //int nEndPlanes = 0;  // this is the number at each end
+  //int nCentralPlanes = 0;
+  //switch (detector_sensorPlanes % 4)
+  //{
+  //case 0:
+  //  nEndPlanes = detector_sensorPlanes/4;
+  //  nCentralPlanes = detector_sensorPlanes/2;
+  //  break;
+  //case 1:
+  //  nCentralPlanes = (detector_sensorPlanes+1)/2;
+  //  nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
+  //  break;
+  //case 2:
+  //  // choose 2-2-2 over 1-4-1 even though they are theoretically equivalent
+  //  nCentralPlanes = detector_sensorPlanes/2 - 1;
+  //  nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
+  //  break;
+  //case 3:
+  //  nCentralPlanes = (detector_sensorPlanes - 1)/2;
+  //  nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
+  //  break;
+  //default:
+  //  G4cout << "Impossible condition reached" << G4endl;
+  //  throw;
+  //}
+
+  int nEndPlanes = 3;
+  int nCentralPlanes = 3;
 
   // Do the front end planes
   //
