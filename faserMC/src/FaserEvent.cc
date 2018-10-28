@@ -22,14 +22,20 @@ FaserEvent::FaserEvent()
 
 FaserEvent::~FaserEvent()
 { 
-  for (auto p : fParticles) if (p) delete p;
-  fParticles.clear();
+  //for (auto h : fHits) if (h) delete h;
+  //fHits.clear();
 
-  for (auto c : fClusters) if (c) delete c;
-  fClusters.clear();
+  //for (auto d : fDigis) if (d) delete d;
+  //fDigis.clear();
 
-  for (auto s : fSpacePoints) if (s) delete s;
-  fSpacePoints.clear();
+  //for (auto c : fClusters) if (c) delete c;
+  //fClusters.clear();
+
+  //for (auto s : fSpacePoints) if (s) delete s;
+  //fSpacePoints.clear();
+
+  //for (auto p : fParticles) if (p) delete p;
+  //fParticles.clear();
 }
 
 //------------------------------------------------------------------------------
@@ -95,27 +101,23 @@ void FaserEvent::SetSpacePoints()
 {
   fSpacePoints.clear();
 
-  map<std::tuple<int, int, int, int>, FaserSpacePoint*> spacePointMap;
-  for (FaserCluster * clus : fClusters)
-  {
-    // Group clusters in same (plane, module, sensor, row) and also pair
-    // sensors on opposite sides of plane (sensors 0/1 -> 0 and 2/3 -> 2).
-    int plane = clus->Plane();
-    int module = clus->Module();
-    int sensor = clus->Sensor();
-    int row = clus->Row();
-    if (sensor == 1) sensor = 0;
-    else if (sensor == 3) sensor = 2;
-    auto loc = std::make_tuple(plane, module, sensor, row);
-    // TODO: initialize space point correctly
-    if (spacePointMap.count(loc) < 1) spacePointMap[loc] = new FaserSpacePoint;
-    spacePointMap[loc]->AddCluster(clus);
+  // Group clusters on opposite sides of each module in the same row
+  for (uint i = 0; i < fClusters.size(); ++i) {
+    for (uint j = i+1; j < fClusters.size(); ++j) {
+      FaserCluster * cl_i = fClusters[i];
+      FaserCluster * cl_j = fClusters[j];
+      if (cl_i->Plane()  != cl_j->Plane() ) continue;
+      if (cl_i->Module() != cl_j->Module()) continue;
+      if (cl_i->Row()    != cl_j->Row()   ) continue;
+      if (cl_i->Sensor() == cl_j->Sensor()) continue; // opposite sides so skip if `==` here
+
+      auto sp = new FaserSpacePoint;
+      sp->AddCluster(cl_i);
+      sp->AddCluster(cl_j);
+      fSpacePoints.push_back(sp);
+    }
   }
 
-  for (auto & it : spacePointMap)
-  {
-    fSpacePoints.push_back(it.second);
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

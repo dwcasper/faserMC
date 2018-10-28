@@ -1,6 +1,5 @@
 #pragma once
 
-#include "FaserTrackerDigit.hh"
 #include "TVector3.h"
 #include <vector>
 
@@ -18,7 +17,8 @@ public:
   double    weightedStrip;
   double    charge;
   TVector3  globalPos;
-  std::vector<FaserTrackerDigit*> digits;
+  std::vector<uint> digitIndices;
+  std::vector<uint> truthHitIndices;
 
   FaserTrackerCluster()
     : plane {-1}
@@ -50,9 +50,6 @@ public:
   }
 
   virtual ~FaserTrackerCluster() {
-    for (FaserTrackerDigit * digit : digits) {
-      if (digit) delete digit;
-    }
   }
 
   void print() const;

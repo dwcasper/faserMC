@@ -9,6 +9,7 @@ class FaserTrackerTruthHit
 {
 public:
 
+  int       trackID;
   int       plane;
   int       module;
   int       sensor;
@@ -18,7 +19,8 @@ public:
   TVector3  globalPos;
 
   FaserTrackerTruthHit()
-    : plane {-1}
+    : trackID {-1}
+    , plane {-1}
     , module {-1}
     , sensor {-1}
     , row {-1}
@@ -29,6 +31,7 @@ public:
   }
 
   FaserTrackerTruthHit(
+    int trackID_,
     int plane_,
     int module_,
     int sensor_,
@@ -36,7 +39,8 @@ public:
     int strip_,
     double energy_,
     TVector3 globalPos_
-  ) : plane {plane_}
+  ) : trackID {trackID_}
+    , plane {plane_}
     , module {module_}
     , sensor {sensor_}
     , row {row_}
