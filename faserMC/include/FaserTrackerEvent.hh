@@ -32,24 +32,24 @@ public:
   }
 
   virtual ~FaserTrackerEvent() {
-    //for (FaserTrackerDigit * digit : digits) {
-    //    if (digit) delete digit;
-    //}
-    //for (FaserTrackerCluster * cl : analogClusters) {
-    //    if (cl) delete cl;
-    //}
-    //for (FaserTrackerCluster * cl : digitalClusters) {
-    //    if (cl) delete cl;
-    //}
-    //for (FaserTrackerSpacePoint * sp : spacePoints) {
-    //    if (sp) delete sp;
-    //}
-    //for (FaserTrackerTruthParticle * tp : truthParticles) {
-    //    if (tp) delete tp;
-    //}
-    //for (FaserTrackerTruthHit * th : truthHits) {
-    //    if (th) delete th;
-    //}
+    for (FaserTrackerDigit * digit : digits) {
+        if (digit) delete digit;
+    }
+    for (FaserTrackerCluster * cl : analogClusters) {
+        if (cl) delete cl;
+    }
+    for (FaserTrackerCluster * cl : digitalClusters) {
+        if (cl) delete cl;
+    }
+    for (FaserTrackerSpacePoint * sp : spacePoints) {
+        if (sp) delete sp;
+    }
+    for (FaserTrackerTruthParticle * tp : truthParticles) {
+        if (tp) delete tp;
+    }
+    for (FaserTrackerTruthHit * th : truthHits) {
+        if (th) delete th;
+    }
   }
 
 };

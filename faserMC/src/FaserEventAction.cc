@@ -92,6 +92,18 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
   fFaserEvent->SetClusters();
   fFaserEvent->SetSpacePoints();
 
+  for (FaserTruthParticle * tp : fFaserEvent->Particles()) {
+    const G4ThreeVector & vertex = tp->Vertex();
+    const G4ThreeVector & momentum = tp->Momentum();
+    fFaserTrackerEvent->truthParticles.push_back(new FaserTrackerTruthParticle {
+      tp->TrackID(),
+      tp->ParentID(),
+      tp->PdgCode(),
+      TVector3{vertex.x(), vertex.y(), vertex.z()},
+      TLorentzVector{momentum.x(), momentum.y(), momentum.z(), tp->Energy()},
+    });
+  }
+
   for (FaserSensorHit * hit : fFaserEvent->Hits()) {
     fFaserTrackerEvent->truthHits.push_back(new FaserTrackerTruthHit {
       hit->Track(),
@@ -147,7 +159,7 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
     for (uint i = 0; i < trCluster->digitIndices.size(); ++i) {
       FaserTrackerDigit * trDigit = fFaserTrackerEvent->digits[i];
       for (uint j : trDigit->truthHitIndices) {
-        if (std::find(trCluster->truthHitIndices.begin(), trCluster->truthHitIndices.end(), j) != trCluster->truthHitIndices.end()) {
+        if (std::find(trCluster->truthHitIndices.begin(), trCluster->truthHitIndices.end(), j) == trCluster->truthHitIndices.end()) {
             trCluster->truthHitIndices.push_back(j);
         }
       }
@@ -172,24 +184,12 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
     for (uint i = 0; i < trSP->analogClusterIndices.size(); ++i) {
       FaserTrackerCluster * trCluster = fFaserTrackerEvent->analogClusters[i];
       for (uint j : trCluster->truthHitIndices) {
-        if (std::find(trSP->truthHitIndices.begin(), trSP->truthHitIndices.end(), j) != trSP->truthHitIndices.end()) {
+        if (std::find(trSP->truthHitIndices.begin(), trSP->truthHitIndices.end(), j) == trSP->truthHitIndices.end()) {
           trSP->truthHitIndices.push_back(j);
         }
       }
     }
     fFaserTrackerEvent->spacePoints.push_back(trSP);
-  }
-
-  for (FaserTruthParticle * tp : fFaserEvent->Particles()) {
-    const G4ThreeVector & vertex = tp->Vertex();
-    const G4ThreeVector & momentum = tp->Momentum();
-    fFaserTrackerEvent->truthParticles.push_back(new FaserTrackerTruthParticle {
-      tp->TrackID(),
-      tp->ParentID(),
-      tp->PdgCode(),
-      TVector3{vertex.x(), vertex.y(), vertex.z()},
-      TLorentzVector{momentum.x(), momentum.y(), momentum.z(), tp->Energy()},
-    });
   }
 
   //fDrawer->DrawSpacePoints(fFaserEvent);
