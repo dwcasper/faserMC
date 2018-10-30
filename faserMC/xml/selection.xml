@@ -12,8 +12,9 @@
     <class name="G4ThreeVector" />
     <class name="FaserTruthParticle" />
     <class name="FaserSensorHit" />
-    <class name="FaserSamplerHit" />
+    <class name="FaserCaloHit" />
     <class name="FaserDigi" />
+    <class name="FaserCaloDigi" />
     <class name="FaserCluster" />
     <class name="FaserSpacePoint" />
     <class name="G4AffineTransform" />
@@ -23,10 +24,13 @@
     <class name="FaserSensorHit">
       <method name="Draw"/>
     </class>
-    <class name="FaserSamplerHit">
+    <class name="FaserCaloHit">
       <method name="Draw"/>
     </class>
     <class name="FaserDigi">
+      <method name="Draw"/>
+    </class>
+    <class name="FaserCaloDigi">
       <method name="Draw"/>
     </class>
   </exclusion>

@@ -1,4 +1,4 @@
-#include "FaserSensorSD.hh"
+#include "FaserCaloSD.hh"
 #include "FaserTrackInformation.hh"
 
 #include "G4HCofThisEvent.hh"
@@ -7,9 +7,7 @@
 #include "G4SDManager.hh"
 #include "G4ios.hh"
 
-//#include "RootIO.hh"
-
-FaserSensorSD::FaserSensorSD(const G4String& name,
+FaserCaloSD::FaserCaloSD(const G4String& name,
 			     const G4String& hitsCollectionName)
   : G4VSensitiveDetector(name),
     fHitsCollection(NULL)
@@ -17,56 +15,43 @@ FaserSensorSD::FaserSensorSD(const G4String& name,
   collectionName.insert(hitsCollectionName);
 }
 
-FaserSensorSD::~FaserSensorSD()
+FaserCaloSD::~FaserCaloSD()
 { 
-  //RootIO::GetInstance()->Close();
+
 }
 
-G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
+G4bool FaserCaloSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
   G4double edep = aStep->GetTotalEnergyDeposit();
   if (edep == 0.0) return false;
 
-  FaserSensorHit* newHit = new FaserSensorHit();
+  FaserCaloHit* newHit = new FaserCaloHit();
 
   G4TouchableHandle h = aStep->GetPreStepPoint()->GetTouchableHandle();
   //
   // zero-based identifiers
-  G4int strip = h->GetReplicaNumber(0);  // 0 - (sensor_readoutStrips - 1)
-  G4int row = h->GetCopyNumber(1);       // 0 - 1
-  G4int sensor = h->GetCopyNumber(2);    // 0 - 3
-  G4int module = h->GetCopyNumber(3);    // 0 - 1
-  G4int plane = h->GetCopyNumber(4);     // 0 - (nPlanes - 1)
+  G4int tower = h->GetCopyNumber(0);     // 0, 0-3 or 0-8, depending on granularity
+  G4int plane = h->GetCopyNumber(1);     // 0 - (nPlanes - 1)
+  G4int module = h->GetCopyNumber(2);  
 
   newHit->SetPlane( plane );
+  newHit->SetTower( tower);
   newHit->SetModule( module );
-  newHit->SetSensor( sensor );
-  newHit->SetRow( row );
-  newHit->SetStrip( strip );
 
   newHit->SetEdep( edep );
-  G4ThreeVector worldPosition = aStep->GetPreStepPoint()->GetPosition();
+  G4ThreeVector worldPosition = aStep->GetPostStepPoint()->GetPosition();
   newHit->SetGlobalPos( worldPosition );
   newHit->SetLocalPos( h->GetHistory()->GetTopTransform().TransformPoint( worldPosition ) );
-  newHit->SetTransform( h->GetHistory()->GetTopTransform().Inverse() );
+  newHit->SetTransform( h->GetHistory()->GetTopTransform().Inverse()); // (local -> global)
 
   // truth information
   G4Track* track = aStep->GetTrack();
-  newHit->SetEnergy( track->GetTotalEnergy() );
 
   FaserTrackInformation* info = (FaserTrackInformation*) track->GetUserInformation();
   if ( info != nullptr )
   {
-    // G4cout << "At z = " << worldPosition.z() << " TrackID = " << track->GetTrackID() << " OriginID = " << info->GetOriginalTrackID() << " SourceID = " << info->GetSourceTrackID() << G4endl;
-    if (info->GetSourceTrackID() > -1)
-    {
-      newHit->SetTrack(info->GetSourceTrackID());
-    }
-    else
-    {
-      newHit->SetTrack(track->GetTrackID());
-    }
     newHit->SetOriginTrack( info->GetOriginalTrackID() );
+    newHit->SetSourceTrack( info->GetSourceTrackID() );
   }
   else
   {
@@ -78,11 +63,11 @@ G4bool FaserSensorSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   return true;
 }
 
-void FaserSensorSD::Initialize(G4HCofThisEvent* hce)
+void FaserCaloSD::Initialize(G4HCofThisEvent* hce)
 {
   // Create hits collection
   fHitsCollection =
-    new FaserSensorHitsCollection(SensitiveDetectorName, collectionName[0]);  
+    new FaserCaloHitsCollection(SensitiveDetectorName, collectionName[0]);  
 
   // add hits collection to the collection of all hit collections for event
   G4SDManager* sdMan = G4SDManager::GetSDMpointer();
@@ -91,9 +76,8 @@ void FaserSensorSD::Initialize(G4HCofThisEvent* hce)
   hce->AddHitsCollection( hcID, fHitsCollection);
 }
 
-void FaserSensorSD::EndOfEvent(G4HCofThisEvent*)
+void FaserCaloSD::EndOfEvent(G4HCofThisEvent*)
 {
-  G4cout << "FaserSensorSD::EndOfEvent" << G4endl;
   if (verboseLevel > 1)
   {
     G4int nofHits = fHitsCollection->entries();

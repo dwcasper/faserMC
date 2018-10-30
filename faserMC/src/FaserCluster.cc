@@ -35,6 +35,8 @@ FaserCluster& FaserCluster::operator= (const FaserCluster& right)
     fCharge = right.fCharge;
     fWeightedStrip = right.fWeightedStrip;
     fGlobalPos = right.fGlobalPos;
+
+    return *this;
 }
 
 FaserCluster::FaserCluster(int index, vector<FaserDigi*>& digis)

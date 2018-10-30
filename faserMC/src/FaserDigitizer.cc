@@ -10,8 +10,8 @@
 #include <iostream>
 using std::cout;
 
-FaserDigitizer::FaserDigitizer(G4String name)
-  : G4VDigitizerModule(name),
+FaserDigitizer::FaserDigitizer(G4String name, G4String input, G4String output)
+  : G4VDigitizerModule(name), fModuleName(name), fInputName(input), fOutputName(output),
     fDigiMessenger(new FaserDigiMessenger(this)),
     fNModules(2),
     fNSensors(4),
@@ -21,8 +21,9 @@ FaserDigitizer::FaserDigitizer(G4String name)
     fChargeSmear(defaultChargeSmear),
     fChargeNorm(defaultChargeNorm)
 {
-  G4String colName = "FaserDigiCollection";
-  collectionName.push_back(colName);
+  // G4String colName = "FaserDigiCollection";
+  // collectionName.push_back(colName);
+  collectionName.push_back(fOutputName);
 }
 
 FaserDigitizer::~FaserDigitizer()
@@ -34,7 +35,7 @@ void FaserDigitizer::Digitize()
   G4RunManager* runMan = G4RunManager::GetRunManager();
   FaserDetectorConstruction* dc = (FaserDetectorConstruction*)
 	  runMan->GetUserDetectorConstruction();
-  fNPlanes = dc->getSensorPlanes();
+  // fNPlanes = dc->getSensorPlanes();
   fNStrips = dc->getReadoutStrips();
   fStripPitch = dc->getStripPitch();
 
@@ -43,11 +44,11 @@ void FaserDigitizer::Digitize()
   std::map<G4int, std::map<G4int, G4double> > contributions;
 
   fDigiCollection = new FaserDigiCollection
-	  ("FaserDigitizer", "FaserDigiCollection");
+	  (fModuleName, fOutputName);
   
   // get tracker hits
   G4DigiManager* digiMan = G4DigiManager::GetDMpointer();
-  G4int sensorID = digiMan->GetHitsCollectionID("FaserSensorHitsCollection");
+  G4int sensorID = digiMan->GetHitsCollectionID( fInputName );
   FaserSensorHitsCollection* FSHC = (FaserSensorHitsCollection*)
 	  (digiMan->GetHitsCollection(sensorID));
 
@@ -83,7 +84,6 @@ void FaserDigitizer::Digitize()
 	     * fNSensors + sensor)  
 	     * fNRows + row)
 	     * fNStrips + strip;
-      
       G4int track = hit->Track();
 
       if (fChargeSpreadSigma > 0)
@@ -91,48 +91,48 @@ void FaserDigitizer::Digitize()
 	// find deposited energy in the strip of incidence      
         G4double hitXscaled = hit->LocalPos().x() / fStripPitch; // in interval [-0.5, 0.5]
         G4double erfLeft = erf((-0.5 - hitXscaled)/erfNormalization)/2;
-	G4double erfRight = erf((0.5 - hitXscaled)/erfNormalization)/2;
-	G4double delta = eDepTotal * (erfRight - erfLeft);
-	charges[index] += delta;
-	contributions[index][track] += delta;
+        G4double erfRight = erf((0.5 - hitXscaled)/erfNormalization)/2;
+        G4double delta = eDepTotal * (erfRight - erfLeft);
+        charges[index] += delta;
+        contributions[index][track] += delta;
 
-	G4int dx;
-	G4double edep;
-	G4double erfBound;
-	G4int indexBase = index / fNStrips * fNStrips; // just the row part
+        G4int dx;
+        G4double edep;
+        G4double erfBound;
+        G4int indexBase = index / fNStrips * fNStrips; // just the row part
 	
 	// spread charge to the left
-	for (G4int iStrip=index % fNStrips-1; iStrip>=0; iStrip--)
-	{
-	  dx = iStrip - strip;
-	  erfBound = erf((-0.5 + dx - hitXscaled)/erfNormalization)/2;
-	  edep = eDepTotal * (erfLeft-erfBound);
+        for (G4int iStrip=index % fNStrips-1; iStrip>=0; iStrip--)
+        {
+          dx = iStrip - strip;
+          erfBound = erf((-0.5 + dx - hitXscaled)/erfNormalization)/2;
+          edep = eDepTotal * (erfLeft-erfBound);
 
-	  if (edep < fBandGap) break;
+          if (edep < fBandGap) break;
 
-	  charges[iStrip + indexBase] += edep;
-	  contributions[iStrip + indexBase][track] += edep;
-	  erfLeft = erfBound;
-	}
+          charges[iStrip + indexBase] += edep;
+          contributions[iStrip + indexBase][track] += edep;
+          erfLeft = erfBound;
+        }
 
 	// spread charge to the right
-	for (G4int iStrip=index % fNStrips+1; iStrip<fNStrips; iStrip++)
-	{
-	  dx = iStrip - strip;
-	  erfBound = erf((0.5 + dx - hitXscaled)/erfNormalization)/2;
-	  edep = eDepTotal * (erfBound-erfRight);
-	  
-	  if (edep < fBandGap) break;
-	  
-	  charges[iStrip + indexBase] += edep;
-	  contributions[iStrip + indexBase][track] += edep;
-	  erfRight = erfBound;
-	}
+        for (G4int iStrip=index % fNStrips+1; iStrip<fNStrips; iStrip++)
+        {
+          dx = iStrip - strip;
+          erfBound = erf((0.5 + dx - hitXscaled)/erfNormalization)/2;
+          edep = eDepTotal * (erfBound-erfRight);
+          
+          if (edep < fBandGap) break;
+          
+          charges[iStrip + indexBase] += edep;
+          contributions[iStrip + indexBase][track] += edep;
+          erfRight = erfBound;
+        }
       }
       else 
       {
-	charges[index] += eDepTotal;
-	contributions[index][track] += eDepTotal;
+        charges[index] += eDepTotal;
+        contributions[index][track] += eDepTotal;
       }
     }
 
@@ -148,37 +148,36 @@ void FaserDigitizer::Digitize()
       {
         FaserDigi* digi = new FaserDigi();
                 
-	G4int remainder = index;
-	digi->SetStrip(remainder % fNStrips);
-	remainder /= fNStrips;
-	digi->SetRow(remainder % fNRows);
-	remainder /= fNRows;
-	digi->SetSensor(remainder % fNSensors);
-	remainder /= fNSensors;
-	digi->SetModule(remainder % fNModules);
-	remainder /= fNModules;
-	digi->SetPlane(remainder);
-	
-	digi->SetCharge(q);
-	for (auto tq : contributions[index])
-	{
-	  digi->AddTrack(tq.first, tq.second);
-	}
+        G4int remainder = index;
+        digi->SetStrip(remainder % fNStrips);
+        remainder /= fNStrips;
+        digi->SetRow(remainder % fNRows);
+        remainder /= fNRows;
+        digi->SetSensor(remainder % fNSensors);
+        remainder /= fNSensors;
+        digi->SetModule(remainder % fNModules);
+        remainder /= fNModules;
+        digi->SetPlane(remainder);
+        
+        digi->SetCharge(q);
+        for (auto tq : contributions[index])
+        {
+          digi->AddTrack(tq.first, tq.second);
+        }
 
-	G4int rowIndex = ((digi->Plane()*fNModules + 
-			   digi->Module())*fNSensors + 
-			   digi->Sensor())*fNRows + digi->Row();
-	G4AffineTransform rowInv = transforms[rowIndex];
-	G4ThreeVector localTranslate = rowInv.NetTranslation();
-	G4ThreeVector stripOffset(((digi->Strip()+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
-	G4ThreeVector rowTranslate = localTranslate - stripOffset;
-	rowInv.SetNetTranslation(rowTranslate);
-	G4AffineTransform stripTransform = rowInv.Inverse(); // local to global
-	digi->SetTransform(stripTransform);
-                
-	fDigiCollection->insert(digi);
+        G4int rowIndex = ((digi->Plane()*fNModules + 
+              digi->Module())*fNSensors + 
+              digi->Sensor())*fNRows + digi->Row();
+        G4AffineTransform rowInv = transforms[rowIndex];
+        G4ThreeVector localTranslate = rowInv.NetTranslation();
+        G4ThreeVector stripOffset(((digi->Strip()+0.5) - fNStrips/2) * fStripPitch, 0., 0.); // x offset from center of row
+        G4ThreeVector rowTranslate = localTranslate - stripOffset;
+        rowInv.SetNetTranslation(rowTranslate);
+        G4AffineTransform stripTransform = rowInv.Inverse(); // local to global
+        digi->SetTransform(stripTransform);
+                      
+        fDigiCollection->insert(digi);
       }
-      
     }
   }
 

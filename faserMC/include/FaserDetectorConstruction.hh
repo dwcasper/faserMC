@@ -9,7 +9,7 @@
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
-
+class FaserSensorPlaneConstruction;
 class FaserGeometryMessenger;
 class FaserTrackerGeometry;
 class FaserFieldSetup;
@@ -33,12 +33,12 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
     
   virtual void ConstructDecayVolume();
   virtual void ConstructTracker();
+  virtual void ConstructSampler();
+  virtual void ConstructAbsorberPlane();
+  virtual void ConstructCalorimeterModule();
   virtual void ConstructCalorimeter();
-  virtual void ConstructCalorimeterPlane();
-  virtual void ConstructTrackerOld();
-  virtual void ConstructTrackerPlane();
-  virtual void ConstructTrackerModule();
-  virtual void ConstructTrackerSensor();
+
+  virtual G4NistManager* getNistManager() const { return nist; }
 
   virtual void setReadoutStrips(G4int value) { sensor_readoutStrips = value; }
   virtual G4int getReadoutStrips() const { return sensor_readoutStrips; }
@@ -61,17 +61,44 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setSupportSizeZ(G4double value) { support_sizeZ = value; }
   virtual G4double getSupportSizeZ() const { return support_sizeZ; }
 
-  virtual void setSensorPlanes(G4int value) { detector_sensorPlanes = value; }
-  virtual G4int getSensorPlanes() const { return detector_sensorPlanes; }
+  virtual void setSensorPlanes(G4int value) { tracker_sensorPlanes = value; }
+  virtual G4int getSensorPlanes() const { return tracker_sensorPlanes; }
 
-  virtual void setCaloPlanes(G4int value) { detector_caloPlanes = value; }
-  virtual G4int getCaloPlanes() const { return detector_caloPlanes; }
+  virtual void setSamplerPlanes(G4int value) { sampler_sensorPlanes = value; }
+  virtual G4int getSamplerPlanes() const { return sampler_sensorPlanes; }
 
-  virtual void setAbsorberX0(G4double value) { detector_absorberX0 = value; }
-  virtual G4double getAbsorberX0() const { return detector_absorberX0; }
+  virtual void setAbsorberC(G4double value) { sampler_absorberC = value; }
+  virtual G4double getAbsorberC() const { return sampler_absorberC; }
 
-  virtual void setSamplerSizeZ(G4double value) { detector_samplerSizeZ = value; }
-  virtual G4double getSamplerSizeZ() const { return detector_samplerSizeZ; }
+  virtual void setAbsorberCu(G4double value) { sampler_absorberCu = value; }
+  virtual G4double getAbsorberCu() const { return sampler_absorberCu; }
+  
+  virtual void setAbsorberW(G4double value) { sampler_absorberW = value; }
+  virtual G4double getAbsorberW() const { return sampler_absorberW; }
+
+  virtual void setCaloPlanes(G4int value) { calo_planes = value; }
+  virtual G4int getCaloPlanes() const { return calo_planes; }
+
+  virtual void setCaloTowers(G4int value) { calo_towers = value; }
+  virtual G4int getCaloTowers() const { return calo_towers; }
+
+  virtual void setCaloModules(G4int value) { calo_modules = value; }
+  virtual G4int getCaloModules() const { return calo_modules; }
+
+  virtual void setCaloScintThickness(G4double value) { calo_scintThickness = value; }
+  virtual G4double getCaloScintThickness() const { return calo_scintThickness; }
+
+  virtual void setCaloAbsorbThickness(G4double value) { calo_absorbThickness = value; }
+  virtual G4double getCaloAbsorbThickness() const { return calo_absorbThickness; }
+
+  virtual void setCaloPlaneXY(G4double value) { calo_planeXY = value; }
+  virtual G4double getCaloPlaneXY() const { return calo_planeXY; }
+
+  virtual void setCaloModuleXY(G4double value) { calo_moduleXY = value; }
+  virtual G4double getCaloModuleXY() const { return calo_moduleXY; }
+
+  virtual void setSamplerSizeZ(G4double value) { detector_samplerLength = value; }
+  virtual G4double getSamplerSizeZ() const { return detector_samplerLength; }
 
   virtual void setPlanePitch(G4double value) { detector_planePitch = value; }
   virtual G4double getPlanePitch() const { return detector_planePitch; }
@@ -95,16 +122,31 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   static constexpr G4double default_sensor_sizeZ = 0.32*mm;
   static constexpr G4double default_sensor_stereoAngle = 26.0*mrad;
   static constexpr G4double default_support_sizeZ = 3.3*mm;
-  static constexpr G4int    default_detector_sensorPlanes = 8;
-  static constexpr G4int    default_detector_caloPlanes = 6;
-  static constexpr G4double default_detector_absorberX0 = 4.0;
-  static constexpr G4double default_detector_samplerSizeZ = default_sensor_sizeZ;
-  static constexpr G4double default_detector_planePitch = 5.0*cm;
+  static constexpr G4int    default_tracker_sensorPlanes = 8;
+  static constexpr G4int    default_sampler_sensorPlanes = 6;
+  static constexpr G4double default_sampler_absorberC= 0.0;
+  static constexpr G4double default_sampler_absorberCu= 0.0;
+  static constexpr G4double default_sampler_absorberW= 1.0;
+  static constexpr G4int    default_calo_planes = 67;
+  static constexpr G4int    default_calo_towers = 1;
+  static constexpr G4int    default_calo_modules = 4;
+  static constexpr G4double default_calo_scintThickness = 4.0*mm;
+  static constexpr G4double default_calo_absorbThickness = 2.0*mm;
+  static constexpr G4double default_calo_tyvekThickness = 120.0*um;
+  static constexpr G4double default_calo_planeXY = 12.12*cm;
+  static constexpr G4double default_calo_moduleXY = 12.14*cm;
+  static constexpr G4double default_detector_samplerLength = default_sensor_sizeZ;
+  static constexpr G4double default_detector_planePitch = 4.0*cm;
   static constexpr G4double default_detector_decayVolumeLength = 3.0*m;
   static constexpr G4double default_detector_trackerLength = 2.0*m;
   static constexpr G4double default_detector_calorimeterLength = 0.25*m;
 
-  virtual const G4LogicalVolume* GetTrackerStrip() const { return fLogicTrackerStrip; }
+  virtual const G4LogicalVolume* GetTrackerStrip() const;
+  virtual const G4LogicalVolume* GetSamplerStrip() const;
+  virtual const G4LogicalVolume* GetCaloTower() const;
+
+  virtual G4double GetCaloMinZ() const { return fCaloMinZ; }
+  virtual G4double GetCaloMaxZ() const { return fCaloMaxZ; }
 
   protected:
 
@@ -116,11 +158,9 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4LogicalVolume* fLogicDecayVolume;
   G4LogicalVolume* fLogicTracker;
   G4LogicalVolume* fLogicTrackerPlane;
-  G4LogicalVolume* fLogicCalorimeterPlane;
-  G4LogicalVolume* fLogicTrackerModule;
-  G4LogicalVolume* fLogicTrackerSensor;
-  G4LogicalVolume* fLogicTrackerRow;
-  G4LogicalVolume* fLogicTrackerStrip;
+  G4LogicalVolume* fLogicSamplerPlane;
+  G4LogicalVolume* fLogicCaloModule;
+  G4LogicalVolume* fLogicCaloTower;
 
   // tunable (from macro) parameters 
   G4int    sensor_readoutStrips;
@@ -130,10 +170,20 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4double sensor_sizeZ;
   G4double sensor_stereoAngle;
   G4double support_sizeZ;
-  G4int    detector_sensorPlanes;
-  G4int    detector_caloPlanes;
-  G4double detector_absorberX0;
-  G4double detector_samplerSizeZ;
+  G4int    tracker_sensorPlanes;
+  G4int    sampler_sensorPlanes;
+  G4double sampler_absorberC;
+  G4double sampler_absorberCu;
+  G4double sampler_absorberW;
+  G4int    calo_planes;
+  G4int    calo_towers;
+  G4int    calo_modules;
+  G4double calo_scintThickness;
+  G4double calo_absorbThickness;
+  G4double calo_tyvekThickness;
+  G4double calo_planeXY;
+  G4double calo_moduleXY;
+  G4double detector_samplerLength;
   G4double detector_planePitch;
   G4double detector_decayVolumeLength;
   G4double detector_trackerLength;
@@ -141,10 +191,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
 
   // these are not copied by the volumes that use them,
   // so they must not be changed
-
-  G4RotationMatrix* fStereoPlus;
-  G4RotationMatrix* fStereoMinus;
-  G4RotationMatrix* fOverlapAngle;
+  G4RotationMatrix* fSamplerRotation;
 
   // mag field
   G4Cache<FaserFieldSetup*> fFieldSetup;
@@ -153,8 +200,14 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   G4bool checkOverlaps;
   G4NistManager* nist;
   G4Region* fRegTracker;
-  G4Region* fRegAir;
-  G4Region* fRegCalo;
+  G4Region* fRegCalorimeter;
+
+  FaserSensorPlaneConstruction* fTrackerFactory;
+  FaserSensorPlaneConstruction* fSamplerFactory;
+
+  // cached values to assist with visualization
+  G4double fCaloMinZ;
+  G4double fCaloMaxZ;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -8,7 +8,6 @@
 
 class G4Run;
 class FaserGeometry;
-class FaserTrackerGeometry;
 
 /// Run action class
 ///
@@ -25,7 +24,6 @@ class FaserRunAction : public G4UserRunAction
 
   private:
   FaserGeometry* fGeometry;
-  //FaserTrackerGeometry* fTrackerGeometry;
 };
 
 #endif

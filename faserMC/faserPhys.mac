@@ -14,8 +14,8 @@
 #
 # Magnetic field
 #
-# This sets the field outside the tracker
-/faser/field/setGlobalField  0.5 tesla
-# This sets the field inside the tracker
+# This sets the field outside the tracker and decay volume
+/faser/field/setGlobalField  0.0 tesla
+# This sets the field inside the tracker and decay volume
 /faser/field/setTrackerField 0.5 tesla
 /faser/field/update

@@ -37,17 +37,26 @@ void FaserSteppingAction::UserSteppingAction(const G4Step* theStep)
   G4StepPoint* thePostPoint = theStep->GetPostStepPoint();
   G4LogicalVolume* thePostLV = thePostPoint->GetPhysicalVolume()->GetLogicalVolume();
   G4Region* thePostR = thePostLV->GetRegion();
+
   if (thePreR->GetName() != "DefaultRegionForTheWorld" &&
       thePostR->GetName() == "DefaultRegionForTheWorld")
     theTrack->SetTrackStatus(fStopAndKill);
+
+
   if (thePreR->GetName() != "Calorimeter" &&
       thePostR->GetName() == "Calorimeter")
   {
     auto info = dynamic_cast<FaserTrackInformation*>(theTrack->GetUserInformation());
-    if (info->GetSourceTrackID() == 0) 
+    if (info->GetSuspendedStepID() > -1) 
     {
-      info->SetSourceTrackID(theTrack->GetTrackID());
-      info->SetSourceEnergy(theTrack->GetTotalEnergy());
+      // G4cout << "Setting source track to " << theTrack->GetTrackID() << " at z = "  << thePostPoint->GetPosition().z() << G4endl;
+      // info->SetSourceTrackID(theTrack->GetTrackID());
+      // info->SetSourceEnergy(theTrack->GetTotalEnergy());
+    }
+    else
+    {
+      info->SetSuspendedStepID(theTrack->GetCurrentStepNumber());
+      theTrack->SetTrackStatus(fSuspend);
     }
   }
 }

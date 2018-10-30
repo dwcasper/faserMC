@@ -1,10 +1,11 @@
 // adapted from Geant4 example
 
 #include "FaserDetectorConstruction.hh"
+#include "FaserSensorPlaneConstruction.hh"
 #include "FaserGeometryMessenger.hh"
 #include "FaserTrackerGeometry.hh"
 #include "FaserSensorSD.hh"
-#include "FaserSamplerSD.hh"
+#include "FaserCaloSD.hh"
 #include "FaserFieldSetup.hh"
 
 #include "G4RunManager.hh"
@@ -25,11 +26,10 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserDetectorConstruction::FaserDetectorConstruction()
-  : G4VUserDetectorConstruction(),
-    fGeometryMessenger(new FaserGeometryMessenger(this)),
+  : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
     fTrackerGeo(new FaserTrackerGeometry),
-    fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), fLogicTrackerModule(nullptr), 
-    fLogicTrackerSensor(nullptr), fLogicTrackerRow(nullptr), fLogicTrackerStrip(nullptr),
+    fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), 
+    fLogicSamplerPlane(nullptr), fLogicCaloModule(nullptr), fLogicCaloTower(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
     sensor_stripPitch(default_sensor_stripPitch),
     sensor_stripLength(default_sensor_stripLength),
@@ -37,43 +37,71 @@ FaserDetectorConstruction::FaserDetectorConstruction()
     sensor_sizeZ(default_sensor_sizeZ),
     sensor_stereoAngle(default_sensor_stereoAngle),
     support_sizeZ(default_support_sizeZ),
-    detector_sensorPlanes(default_detector_sensorPlanes),
-    detector_caloPlanes(default_detector_caloPlanes),
-    detector_absorberX0(default_detector_absorberX0),
-    detector_samplerSizeZ(default_detector_samplerSizeZ),
+    tracker_sensorPlanes(default_tracker_sensorPlanes),
+    sampler_sensorPlanes(default_sampler_sensorPlanes),
+    sampler_absorberC(default_sampler_absorberC),
+    sampler_absorberCu(default_sampler_absorberCu),
+    sampler_absorberW(default_sampler_absorberW),
+    calo_planes(default_calo_planes),
+    calo_towers(default_calo_towers),
+    calo_modules(default_calo_modules),
+    calo_scintThickness(default_calo_scintThickness),
+    calo_absorbThickness(default_calo_absorbThickness),
+    calo_tyvekThickness(default_calo_tyvekThickness),
+    calo_planeXY(default_calo_planeXY),
+    calo_moduleXY(default_calo_moduleXY),
+    detector_samplerLength(default_detector_samplerLength),
     detector_planePitch(default_detector_planePitch),
     detector_decayVolumeLength(default_detector_decayVolumeLength),
-  fStereoPlus(nullptr), fStereoMinus(nullptr), fOverlapAngle(nullptr),
-  checkOverlaps(true), nist(nullptr), fRegTracker(nullptr), fRegAir(nullptr)
+    fSamplerRotation(nullptr),
+    checkOverlaps(true), nist(nullptr), fRegTracker(nullptr), fRegCalorimeter(nullptr),
+    fTrackerFactory { new FaserSensorPlaneConstruction(this, "tracker") }, 
+    fSamplerFactory { new FaserSensorPlaneConstruction(this, "sampler") }
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserDetectorConstruction::~FaserDetectorConstruction()
 { 
-  if (fGeometryMessenger) delete fGeometryMessenger;
-  //NB: `fTrackerGeo` needs to outlive the `FaserDetectorConstruction` instance,
-  //    as it's used by `RootEventIO`.
-  //TODO: Clean this up!
-  //if (fTrackerGeo) delete fTrackerGeo;
-  if (fStereoPlus) delete fStereoPlus;
-  if (fStereoMinus) delete fStereoMinus;
-  if (fOverlapAngle) delete fOverlapAngle;
+  if (fGeometryMessenger != nullptr) delete fGeometryMessenger;
+  if (fTrackerFactory != nullptr) delete fTrackerFactory;
+  if (fSamplerFactory != nullptr) delete fSamplerFactory;
+  if (fSamplerRotation != nullptr) delete fSamplerRotation;
+}
+
+const G4LogicalVolume* FaserDetectorConstruction::GetTrackerStrip() const
+{
+  return fTrackerFactory->GetStrip();
+}
+const G4LogicalVolume* FaserDetectorConstruction::GetSamplerStrip() const
+{
+  return fSamplerFactory->GetStrip();
+}
+const G4LogicalVolume* FaserDetectorConstruction::GetCaloTower() const
+{
+  return fLogicCaloTower;
 }
 
 void FaserDetectorConstruction::ConstructSDandField()
 {
-  G4String sensorSDName = "Faser/SensorSD";
-  FaserSensorSD* aSensorSD = new FaserSensorSD(sensorSDName, 
-						  "FaserSensorHitsCollection");
-  G4SDManager::GetSDMpointer()->AddNewDetector(aSensorSD);
-  SetSensitiveDetector( "Strip", aSensorSD, true );
+  G4String trackerSDName = "Tracker";
+  FaserSensorSD* trackerSD = new FaserSensorSD(trackerSDName, 
+						  "FaserTrackerHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(trackerSD);
+  SetSensitiveDetector( "trackerStrip", trackerSD, true );
 
-  G4String samplerSDName = "Faser/SamplerSD";
-  FaserSamplerSD* aSamplerSD = new FaserSamplerSD(samplerSDName,
-              "FaserSamplerHitsCollection");
-  G4SDManager::GetSDMpointer()->AddNewDetector(aSamplerSD);
-  SetSensitiveDetector( "Sampler", aSamplerSD, true);
+  G4String samplerSDName = "Sampler";
+  FaserSensorSD* samplerSD = new FaserSensorSD(samplerSDName, 
+						  "FaserSamplerHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(samplerSD);
+  SetSensitiveDetector( "samplerStrip", samplerSD, true );
+
+  G4String caloSDName = "Calorimeter";
+  FaserCaloSD* caloSD = new FaserCaloSD(caloSDName, 
+						  "FaserCaloHitsCollection");
+  G4SDManager::GetSDMpointer()->AddNewDetector(caloSD);
+  SetSensitiveDetector( "caloTower", caloSD, true );
+
 
   // not clear why we need this concurrency stuff...
   if (!fFieldSetup.Get())
@@ -85,363 +113,16 @@ void FaserDetectorConstruction::ConstructSDandField()
   G4bool allLocal = true;
   fLogicTracker->SetFieldManager(fFieldSetup.Get()->GetLocalFieldManager(),
 				 allLocal);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void FaserDetectorConstruction::ConstructTrackerSensor()
-{
-  G4cout << "Updating tracking geometry: nStrips = " << sensor_readoutStrips << "\n";
-  fTrackerGeo->nStrips = sensor_readoutStrips;
-
-  G4cout << "Updating tracking geometry: stripPitch = " << sensor_stripPitch << "\n";
-  fTrackerGeo->stripPitch = sensor_readoutStrips;
-
-  // sensor dimensions
-  //
-  // In x, there are field-shaping strips at each end, and we assume a border on each edge of sensor_gap/2
-  //
-  G4double sensor_sizeX = ( sensor_readoutStrips + 2 ) * sensor_stripPitch + sensor_gap;
-
-  // In y, there are two rows of strips, separated by a gap, and we assume border on each edge of sensor_gap/2
-  //
-  G4double sensor_sizeY = ( sensor_stripLength * 2) + (sensor_gap * 2);
-  G4cout << "Updating tracking geometry: rowOffsetY = " << 0.5*sensor_sizeY;
-  fTrackerGeo->rowOffsetY = 0.5*sensor_sizeY;
-  
-  G4cout << "Sensor dimensions: ( " << sensor_sizeX/mm << " mm, " << sensor_sizeY/mm << " mm, "
-	 << sensor_sizeZ/mm << " mm )" << G4endl; 
-
-  // sensor volume
-  //
-  G4Material* sensor_mat = nist->FindOrBuildMaterial("G4_Si");
-  G4Box* solidSensor =    
-    new G4Box("Sensor",                       //its name
-       0.5*sensor_sizeX, 0.5*sensor_sizeY, 0.5*sensor_sizeZ);     //its size
-      
-  fLogicTrackerSensor =                         
-    new G4LogicalVolume(solidSensor,          //its solid
-                        sensor_mat,           //its material
-                        "Sensor");            //its name
-  
-  // strip row - this contains only the active volume of the strips
-  //
-  G4Box* solidRow = 
-    new G4Box("Row",
-	      0.5*(sensor_readoutStrips * sensor_stripPitch), 0.5*sensor_stripLength, 0.5*sensor_sizeZ);
-  fLogicTrackerRow =
-    new G4LogicalVolume(solidRow,
-			sensor_mat,
-			"Row");
-
-  // place the two rows inside the sensor
-  new G4PVPlacement(0,
-		    G4ThreeVector(0, -0.5*(sensor_stripLength + sensor_gap), 0),
-		    fLogicTrackerRow,
-		    "Row_PV",
-		    fLogicTrackerSensor,
-		    false,
-		    0,
-		    checkOverlaps);
-
-  new G4PVPlacement(0,
-		    G4ThreeVector(0, +0.5*(sensor_stripLength + sensor_gap), 0),
-		    fLogicTrackerRow,
-		    "Row_PV",
-		    fLogicTrackerSensor,
-		    false,
-		    1,
-		    checkOverlaps);
-  
-  // a single strip; this will be replicated
-  //	      
-  G4Box* solidStrip =
-    new G4Box("Strip",
-	      0.5*sensor_stripPitch, 0.5*sensor_stripLength, 0.5*sensor_sizeZ);
-  fLogicTrackerStrip = 
-    new G4LogicalVolume(solidStrip,
-		       sensor_mat,
-		       "Strip");
-
-  // place the requested number of strips inside the row
-  //
-  new G4PVReplica("Strip_PV",
-		  fLogicTrackerStrip,
-		  fLogicTrackerRow,
-		  kXAxis,
-		  sensor_readoutStrips,
-		  sensor_stripPitch,
-		  0);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void FaserDetectorConstruction::ConstructTrackerModule()
-{
-  // Construct a single Si sensor region
-  //
-  ConstructTrackerSensor();
-
-  const G4Box* sSensor = dynamic_cast<const G4Box*>(fLogicTrackerSensor->GetSolid());
-  G4double sensor_sizeX = 2*sSensor->GetXHalfLength();
-  G4double sensor_sizeY = 2*sSensor->GetYHalfLength();
-
-  // sensor stereo angle (+/-)
-  //
-  G4cout << "Stereo angle: " << sensor_stereoAngle/mrad << " mrad" << G4endl;
-  G4cout << "Updating tracking geometry: stereoAngle = " << sensor_stereoAngle << "\n";
-  fTrackerGeo->stereoAngle = sensor_stereoAngle;
-
-  // create rotation matrices for both senses of rotation
-  // we have to hold these pointers (and not change the objects)
-  // until the end of the job
-
-  // this combination of rotations, rather than the more obvious single rotation
-  // is necessary for hit/digit drawing of strips to draw them in the right place
-  // I don't really understand it...
-
-  fStereoPlus = new G4RotationMatrix;
-  fStereoPlus->rotateY(CLHEP::pi);
-  fStereoPlus->rotateZ(-sensor_stereoAngle);
-
-  fStereoMinus = new G4RotationMatrix;
-  fStereoMinus->rotateY(CLHEP::pi);
-  fStereoMinus->rotateZ(sensor_stereoAngle);
-
-  // support dimensions - assume a 2:1 rectangular shape
-  //
-  G4double support_sizeX = sensor_sizeX * cos(sensor_stereoAngle) + sensor_sizeY * sin(sensor_stereoAngle);
-  G4double support_sizeY = sensor_sizeY * cos(sensor_stereoAngle) + sensor_sizeX * sin(sensor_stereoAngle) 
-    + sensor_sizeY/cos(sensor_stereoAngle);
-  G4cout << "Support dimensions: " << support_sizeX/mm << " mm (X), "
-	 << support_sizeY/mm << " mm (Y), " << support_sizeZ/mm << " mm (Z)" << G4endl;
-
-  //support volume
-  //
-  G4Material* support_mat = nist->FindOrBuildMaterial("G4_GRAPHITE");
-  G4Box* solidSupport =
-    new G4Box("Support", 0.5*support_sizeX, 0.5*support_sizeY, 0.5*support_sizeZ);
-
-  G4LogicalVolume* logicSupport =
-    new G4LogicalVolume(solidSupport,
-			support_mat,
-			"Support");
-
-  // module dimensions
-  //
-  G4double module_sizeX = support_sizeX;
-  G4double module_sizeY = support_sizeY;
-  G4double module_sizeZ = 2 * sensor_sizeZ + support_sizeZ;
-
-  double sensorOffsetY = 0.5*sensor_sizeY/cos(sensor_stereoAngle);
-  G4cout << "Updating tracking geometry: sensorOffsetY = " << sensorOffsetY;
-  fTrackerGeo->sensorOffsetY = sensorOffsetY;
-
-  // module volume
-  //
-  G4Material* module_mat = nist->FindOrBuildMaterial("G4_AIR");
-  G4Box* solidModule = 
-    new G4Box("Module", 0.5*module_sizeX, 0.5*module_sizeY, 0.5*module_sizeZ);
-
-  fLogicTrackerModule = 
-    new G4LogicalVolume(solidModule,
-			module_mat,
-			"Module");
-
-  // place support inside module volume
-  //
-  new G4PVPlacement(0,                     //no rotation
-                    G4ThreeVector(),       //at (0,0,0)
-                    logicSupport,          //its logical volume
-                    "Support_PV",          //its name
-                    fLogicTrackerModule,   //its mother  volume
-                    false,                 //no boolean operation
-                    0,                     //copy number
-                    checkOverlaps);        //overlaps checking
-  
-  // place sensors inside module volume
-  // the same logical volume is re-used, but it is translated and rotated four different ways
-  //
-  new G4PVPlacement(fStereoMinus,
-                    G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
-	            fLogicTrackerSensor,
-	            "Sensor_PV",
-	            fLogicTrackerModule,
-	            false,
-	            0,
-	            checkOverlaps);
-
-  new G4PVPlacement(fStereoPlus,
-		    G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
-		    fLogicTrackerSensor,
-		    "Sensor_PV",
-		    fLogicTrackerModule,
-		    false,
-		    1,
-		    checkOverlaps);
-
-  new G4PVPlacement(fStereoMinus,
-		    G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
-		    fLogicTrackerSensor,
-		    "Sensor_PV",
-		    fLogicTrackerModule,
-		    false,
-		    2,
-		    checkOverlaps);
-
-  new G4PVPlacement(fStereoPlus,
-		    G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
-		    fLogicTrackerSensor,
-		    "Sensor_PV",
-		    fLogicTrackerModule,
-		    false,
-		    3,
-		    checkOverlaps);
-
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void FaserDetectorConstruction::ConstructTrackerPlane()
-{
-
-  // Construct a tracker module (two of them overlap to form a plane)
-  ConstructTrackerModule();
-
-  const G4Box* sModule = dynamic_cast<const G4Box*>(fLogicTrackerModule->GetSolid());
-  G4double module_sizeX = 2*sModule->GetXHalfLength();
-  G4double module_sizeY = 2*sModule->GetYHalfLength();
-  G4double module_sizeZ = 2*sModule->GetZHalfLength();
-
-  // effective half-width of the wafer due to stereo rotation
-  //
-  const G4Box* sSensor = dynamic_cast<const G4Box*>(fLogicTrackerSensor->GetSolid());
-  G4double sensor_sizeX = 2*sSensor->GetXHalfLength();
-  G4double wPrime = (sensor_sizeX/2) / cos(sensor_stereoAngle);
-
-  // overlap angle that will allow maximum x-separation without any gap
-  //
-  G4double overlapAngle = asin( module_sizeZ/wPrime )/2;
-  
-  // corresponding x separation of modules with this angle
-  //
-  G4double xOffset = wPrime * cos(overlapAngle);
-  G4cout << "Updating tracking geometry: moduleOffsetX = " << xOffset << "\n";
-  fTrackerGeo->moduleOffsetX = xOffset;
-
-  // Rotation matrix for module overlap - again, must preserve unchanged until end of job
-  //
-  fOverlapAngle = new G4RotationMatrix;
-  fOverlapAngle->rotateY(overlapAngle);
-
-  // work out the size of the plane box that will contain both modules
-  //
-  G4double plane_sizeX = 2 * xOffset + module_sizeX * cos(overlapAngle) + module_sizeZ * sin(overlapAngle);
-  G4double plane_sizeY = module_sizeY;
-  G4double plane_sizeZ = module_sizeX * sin(overlapAngle) + module_sizeZ * cos(overlapAngle);
-  G4cout << "Plane dimensions: " << plane_sizeX/mm << " mm (X), "
-	 << plane_sizeY/mm << " mm (Y), " << plane_sizeZ/mm << " mm (Z)" << G4endl;
-
-  // plane volume
-  //
-  G4Material* plane_mat = nist->FindOrBuildMaterial("G4_AIR");
-  G4Box* solidPlane =
-    new G4Box("Plane", 0.5*plane_sizeX, 0.5*plane_sizeY, 0.5*plane_sizeZ);
-
-  fLogicTrackerPlane =
-    new G4LogicalVolume(solidPlane,
-                        plane_mat,
-                        "Plane");
-
-  // place modules inside plane
-  //
-  new G4PVPlacement(fOverlapAngle,
-		    G4ThreeVector(-xOffset, 0, 0),
-		    fLogicTrackerModule,
-		    "Module_PV",
-		    fLogicTrackerPlane,
-		    false,
-		    0,
-		    checkOverlaps);
-
-  new G4PVPlacement(fOverlapAngle,
-		    G4ThreeVector(+xOffset, 0, 0),
-		    fLogicTrackerModule,
-		    "Module_PV",
-		    fLogicTrackerPlane,
-		    false,
-		    1,
- 		    checkOverlaps);
-
-  // define a region encompassing the tracker plane(s)
-  //
-  fRegTracker = new G4Region("Tracker");
-  fLogicTrackerPlane->SetRegion(fRegTracker);
-  fRegTracker->AddRootLogicalVolume(fLogicTrackerPlane);
-
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void FaserDetectorConstruction::ConstructTrackerOld()
-{
-
-  // construct a two-sided sensor plane
-  ConstructTrackerPlane();
-
-  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicTrackerPlane->GetSolid());
-  G4double plane_sizeX = 2*sPlane->GetXHalfLength();
-  G4double plane_sizeY = 2*sPlane->GetYHalfLength();
-  G4double plane_sizeZ = 2*sPlane->GetZHalfLength();
-
-  // tracker material
-  //
-  G4Material* tracker_mat = nist->FindOrBuildMaterial("G4_AIR");
-
-  // air volume transverse size
-  //
-  G4double tracker_sizeX = plane_sizeX + 10.0*cm;
-  G4double tracker_sizeY = plane_sizeY + 10.0*cm;
-
-  // length of volume enclosing sensor planes (plus air gap behind)
-  //
-  detector_trackerLength = detector_sensorPlanes * detector_planePitch + 
-    plane_sizeZ;
-
-  // solid to hold sensor planes (and tracker magnetic field)
-  //
-  G4Box* solidTracker =    
-    new G4Box("Tracker",                    //its name
-        0.5*tracker_sizeX, 0.5*tracker_sizeY, 0.5*detector_trackerLength); //its size
-      
-
-  fLogicTracker =                         
-    new G4LogicalVolume(solidTracker,            //its solid
-                        tracker_mat,             //its material
-                        "Tracker");              //its name
-
-  G4double firstPlaneZ = -detector_trackerLength/2 + plane_sizeZ/2;
-
-  for (G4int i = 0; i < detector_sensorPlanes; i++)
-  {
-      new G4PVPlacement(0,
-			G4ThreeVector(0, 0, firstPlaneZ + i*detector_planePitch),
-			fLogicTrackerPlane,
-			"Plane_PV",
-			fLogicTracker,
-			false,
-			i,
-			checkOverlaps);
-  }
+  fLogicDecayVolume->SetFieldManager(fFieldSetup.Get()->GetLocalFieldManager(), 
+    allLocal);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void FaserDetectorConstruction::ConstructTracker()
 {
-
-  // construct a two-sided sensor plane
-  ConstructTrackerPlane();
+  //fTrackerFactory = new FaserSensorPlaneConstruction(this, G4String("tracker"));
+  fLogicTrackerPlane = fTrackerFactory->Construct();
 
   const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicTrackerPlane->GetSolid());
   G4double plane_sizeX = 2*sPlane->GetXHalfLength();
@@ -461,14 +142,14 @@ void FaserDetectorConstruction::ConstructTracker()
   //
   // Must have at least 3 planes
   //
-  detector_sensorPlanes = std::max(detector_sensorPlanes, 3);
+  tracker_sensorPlanes = std::max(tracker_sensorPlanes, 3);
 
   // Now user specified - check for sanity; the volume must be long enough
   // to hold all requested planes at the minumum possible spacing
   //
   detector_trackerLength = std::max(detector_trackerLength, 
-				    (detector_sensorPlanes - 1) * detector_planePitch + 
-				    detector_sensorPlanes * plane_sizeZ);
+				    (tracker_sensorPlanes - 1) * detector_planePitch + 
+				    tracker_sensorPlanes * plane_sizeZ);
 
   // solid to hold sensor planes (and tracker magnetic field)
   //
@@ -482,35 +163,32 @@ void FaserDetectorConstruction::ConstructTracker()
                         tracker_mat,             //its material
                         "Tracker");              //its name
 
-  //// in the optimized setup, we have to figure out where to place the planes
-  //int nEndPlanes = 0;  // this is the number at each end
-  //int nCentralPlanes = 0;
-  //switch (detector_sensorPlanes % 4)
-  //{
-  //case 0:
-  //  nEndPlanes = detector_sensorPlanes/4;
-  //  nCentralPlanes = detector_sensorPlanes/2;
-  //  break;
-  //case 1:
-  //  nCentralPlanes = (detector_sensorPlanes+1)/2;
-  //  nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
-  //  break;
-  //case 2:
-  //  // choose 2-2-2 over 1-4-1 even though they are theoretically equivalent
-  //  nCentralPlanes = detector_sensorPlanes/2 - 1;
-  //  nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
-  //  break;
-  //case 3:
-  //  nCentralPlanes = (detector_sensorPlanes - 1)/2;
-  //  nEndPlanes = (detector_sensorPlanes - nCentralPlanes)/2;
-  //  break;
-  //default:
-  //  G4cout << "Impossible condition reached" << G4endl;
-  //  throw;
-  //}
-
-  int nEndPlanes = 3;
-  int nCentralPlanes = 3;
+  // in the optimized setup, we have to figure out where to place the planes
+  int nEndPlanes = 0;  // this is the number at each end
+  int nCentralPlanes = 0;
+  switch (tracker_sensorPlanes % 4)
+  {
+  case 0:
+    nEndPlanes = tracker_sensorPlanes/4;
+    nCentralPlanes = tracker_sensorPlanes/2;
+    break;
+  case 1:
+    nCentralPlanes = (tracker_sensorPlanes+1)/2;
+    nEndPlanes = (tracker_sensorPlanes - nCentralPlanes)/2;
+    break;
+  case 2:
+    // choose 2-2-2 over 1-4-1 even though they are theoretically equivalent
+    nCentralPlanes = tracker_sensorPlanes/2 - 1;
+    nEndPlanes = (tracker_sensorPlanes - nCentralPlanes)/2;
+    break;
+  case 3:
+    nCentralPlanes = (tracker_sensorPlanes - 1)/2;
+    nEndPlanes = (tracker_sensorPlanes - nCentralPlanes)/2;
+    break;
+  default:
+    G4cout << "Impossible condition reached" << G4endl;
+    throw;
+  }
 
   // Do the front end planes
   //
@@ -571,7 +249,10 @@ void FaserDetectorConstruction::ConstructTracker()
       fTrackerGeo->planeZ.push_back(zPlane);
       fTrackerGeo->planeIndices_end.push_back(nEndPlanes + nCentralPlanes + i);
   }
-
+  // define a region encompassing the tracker
+  //
+  fLogicTracker->SetRegion(fRegTracker);
+  fRegTracker->AddRootLogicalVolume(fLogicTracker);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -602,21 +283,157 @@ void FaserDetectorConstruction::ConstructDecayVolume()
     new G4LogicalVolume(solidEnv,            //its solid
                         decay_mat,           //its material
                         "DecayVolume");      //its name
+
+  fLogicDecayVolume->SetRegion(fRegTracker);
+  fRegTracker->AddRootLogicalVolume(fLogicDecayVolume);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void FaserDetectorConstruction::ConstructCalorimeterPlane()
+void FaserDetectorConstruction::ConstructCalorimeterModule()
 {
-  G4Material* absorber_mat = nist->FindOrBuildMaterial("G4_W"); // Tungsten
-  G4double tungstenRadLen = absorber_mat->GetRadlen();
-  G4double absorberSizeZ = detector_absorberX0 * tungstenRadLen;
+  G4Material* caloModule_mat = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL");
 
-  G4Material* sampler_mat = nist->FindOrBuildMaterial("G4_Si");
+  G4double calo_sizeZ = (calo_planes - 1) * calo_absorbThickness + 
+    calo_planes * (calo_scintThickness + 2 * calo_tyvekThickness);
 
-  G4Material* calo_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Box* solidCaloModule = new G4Box("CaloModule", 0.5 * calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_sizeZ);
+  fLogicCaloModule = new G4LogicalVolume(solidCaloModule, caloModule_mat, "caloModule");
 
-  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
+  G4Material* tyvek_mat = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  G4Box* solidTyvek = new G4Box("TyvekSheet", 0.5 * calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_tyvekThickness);
+  G4LogicalVolume* logicTyvek = new G4LogicalVolume(solidTyvek, tyvek_mat, "tyvekSheet");
+
+  G4Material* scint_mat = nist->FindOrBuildMaterial("G4_POLYSTYRENE");
+  G4Box* solidScint = new G4Box("CaloScintPlane", 0.5 * calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_scintThickness);
+  G4LogicalVolume* logicScint = new G4LogicalVolume(solidScint, scint_mat, "caloPlane");
+  G4int caloTowersAcross = (calo_towers == 9 ? 3 : (calo_towers == 4 ? 2 : 1) );
+  G4double caloTowerXY = calo_moduleXY / caloTowersAcross;
+  G4Box* solidTower = new G4Box("CaloScintTower", 0.5 * caloTowerXY, 
+    0.5 * caloTowerXY, 0.5 * calo_scintThickness);
+  fLogicCaloTower = new G4LogicalVolume(solidTower, scint_mat, "caloTower");
+  
+  G4int towerCount = 0;
+  for (int ix = 0; ix < caloTowersAcross; ix++)
+  {
+    G4double x = ((1 - caloTowersAcross)/2.0 + ix) * caloTowerXY;
+    for (int iy = 0; iy < caloTowersAcross; iy++)
+    {
+      G4double y = ((1 - caloTowersAcross)/2.0 + iy) * caloTowerXY;
+      new G4PVPlacement(nullptr, G4ThreeVector(x, y, 0.0), fLogicCaloTower, "PV_CaloTower", logicScint, false, towerCount, checkOverlaps);
+      towerCount++;
+    }
+  }
+
+  G4Material* abs_mat = nist->FindOrBuildMaterial("G4_W");
+  G4Box* solidAbsorb = new G4Box("CaloAbsorbPlane", 0.5* calo_moduleXY, 0.5 * calo_moduleXY, 0.5 * calo_absorbThickness);
+  G4LogicalVolume* logicAbsorb = new G4LogicalVolume(solidAbsorb, abs_mat, "caloAbsorber");
+
+  G4double startZ = - calo_sizeZ/2.0;
+  G4int scintCount = 0;
+  G4int tyvekCount = 0;
+  G4int absCount = 0;
+  G4double currentZ = startZ;
+  do
+  {
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_tyvekThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicTyvek, "PV_Tyvek", fLogicCaloModule, false, tyvekCount, checkOverlaps);
+    tyvekCount++;
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_scintThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicScint, "PV_CaloScint", fLogicCaloModule, false, scintCount, checkOverlaps);
+    scintCount++;
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_tyvekThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicTyvek, "PV_Tyvek", fLogicCaloModule, false, tyvekCount, checkOverlaps);
+    tyvekCount++;
+    if (scintCount >= calo_planes) break;
+    currentZ = startZ + tyvekCount * calo_tyvekThickness + scintCount * calo_scintThickness + absCount * calo_absorbThickness + calo_absorbThickness / 2.0;
+    new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, currentZ), logicAbsorb, "PV_CaloAbsorb", fLogicCaloModule, false, absCount, checkOverlaps);
+    absCount++;
+  } while (scintCount < calo_planes);
+
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void FaserDetectorConstruction::ConstructCalorimeter()
+{
+  // material for air volume
+  G4Material* calorimeter_mat = nist->FindOrBuildMaterial("G4_AIR");
+
+  ConstructCalorimeterModule();
+
+  G4int caloModulesAcross = (calo_modules == 9 ? 3 : (calo_modules == 4 ? 2 : (calo_modules == 1 ? 1 : 0)));
+
+  G4double calorimeter_sizeXY = calo_moduleXY * caloModulesAcross;
+  
+  const G4Box* sCaloModule = dynamic_cast<const G4Box*>(fLogicCaloModule->GetSolid());
+  G4double calorimeterModule_sizeZ = 2 * sCaloModule->GetZHalfLength();
+
+  // the z length of the lab includes a gap decayVolumeLength before the first
+  // sensor plane, and a gap of planePitch after the last one
+  //
+  G4double calorimeterLength = std::max(detector_calorimeterLength, std::max(detector_planePitch, calorimeterModule_sizeZ));
+  G4double calorimeter_sizeZ = calorimeterLength;
+
+  const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
+  G4double tracker_sizeX = 2*sTracker->GetXHalfLength();
+  G4double tracker_sizeY = 2*sTracker->GetYHalfLength();
+
+  G4double calorimeter_sizeX = std::max(tracker_sizeX, calorimeter_sizeXY);
+  G4double calorimeter_sizeY = std::max(tracker_sizeY, calorimeter_sizeXY);
+
+  G4Box* solidCalorimeter =    
+    new G4Box("Calorimeter",                 //its name
+        0.5*calorimeter_sizeX, 0.5*calorimeter_sizeY, 0.5*calorimeter_sizeZ); //its size
+      
+  fLogicCalorimeter =                         
+    new G4LogicalVolume(solidCalorimeter,            //its solid
+                        calorimeter_mat,           //its material
+                        "Calorimeter");      //its name
+
+  G4int caloModuleIndex = 0;
+  G4double caloModule_initialXY = - ((caloModulesAcross - 1) * calo_moduleXY)/2.0;
+  G4double caloModuleZ = - (calorimeter_sizeZ - calorimeterModule_sizeZ)/2.0;  // fix this to put calomodule at forward end 
+  for (int ix = 0; ix < caloModulesAcross; ix++)
+  {
+    G4double caloModuleX = caloModule_initialXY + ix * calo_moduleXY;
+    for (int iy = 0; iy < caloModulesAcross; iy++)
+    {
+      G4double caloModuleY = caloModule_initialXY + iy * calo_moduleXY;
+
+      new G4PVPlacement(0,
+			G4ThreeVector(caloModuleX, caloModuleY, caloModuleZ),
+			fLogicCaloModule,
+			"CaloModule_PV",
+			fLogicCalorimeter,
+			false,
+			caloModuleIndex,
+			checkOverlaps);
+
+      caloModuleIndex++;
+    }
+  }
+  fLogicCalorimeter->SetRegion(fRegCalorimeter);
+  fRegCalorimeter->AddRootLogicalVolume(fLogicCalorimeter);
+}
+
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void FaserDetectorConstruction::ConstructAbsorberPlane()
+{
+  G4Material* air_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Material* absorber_C = nist->FindOrBuildMaterial("G4_GRAPHITE"); // Graphite
+  G4Material* absorber_Cu = nist->FindOrBuildMaterial("G4_Cu"); // Copper
+  G4Material* absorber_W = nist->FindOrBuildMaterial("G4_W"); // Tungsten
+  G4double tungstenThickness = sampler_absorberW * absorber_W->GetRadlen();
+  G4double copperThickness = sampler_absorberCu * absorber_Cu->GetRadlen();
+  G4double graphiteThickness = sampler_absorberC * absorber_C->GetRadlen();
+  G4double absorberSizeZ = tungstenThickness + copperThickness + graphiteThickness;
+
+  G4cout << "Presampler absorber thickness (cm) - W : " << tungstenThickness/cm << ", Cu : " << copperThickness/cm << ", Graphite: " << graphiteThickness/cm << G4endl;
+
+  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicSamplerPlane->GetSolid());
   G4double plane_sizeX = 2*sPlane->GetXHalfLength();
   G4double plane_sizeY = 2*sPlane->GetYHalfLength();
 
@@ -624,87 +441,109 @@ void FaserDetectorConstruction::ConstructCalorimeterPlane()
     0.5*plane_sizeX, 0.5*plane_sizeY, 0.5*absorberSizeZ);
   fLogicAbsorber = 
     new G4LogicalVolume(solidAbsorber,
-      absorber_mat, "Absorber");
+      air_mat, "Absorber");
 
-  G4Box* solidSampler = new G4Box("Sampler",
-    0.5*plane_sizeX, 0.5*plane_sizeY, 0.5*detector_samplerSizeZ);
-  fLogicSampler = new G4LogicalVolume(solidSampler, 
-    sampler_mat, "Sampler");
-  
-  G4Box* solidCaloPlane = new G4Box("CalorimeterPlane", 
-    0.5*plane_sizeX, 0.5*plane_sizeY, 0.5*(absorberSizeZ + detector_samplerSizeZ));
+  if (sampler_absorberC > 0)
+  {
+    G4Box* solidGraphite = new G4Box("samplerGraphiteSolid", 
+      0.5 * plane_sizeX, 0.5 * plane_sizeY, 0.5 * graphiteThickness);
+    G4LogicalVolume* logicGraphite = new G4LogicalVolume(solidGraphite, absorber_C, "samplerGraphiteAbsorber");
+    new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, -(absorberSizeZ - graphiteThickness)/2.0), 
+                      logicGraphite, "PV_SamplerGraphite", fLogicAbsorber, false, checkOverlaps);
+  }
 
-  fLogicCalorimeterPlane = new G4LogicalVolume(solidCaloPlane, calo_mat, "CalorimeterPlane");
+  if (sampler_absorberCu > 0)
+  {
+    G4Box* solidCopper = new G4Box("samplerCopperSolid", 
+      0.5 * plane_sizeX, 0.5 * plane_sizeY, 0.5 * copperThickness);
+    G4LogicalVolume* logicCopper = new G4LogicalVolume(solidCopper, absorber_Cu, "samplerCopperAbsorber");
+    new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, -(absorberSizeZ - copperThickness)/2.0 + graphiteThickness), 
+                      logicCopper, "PV_SamplerCopper", fLogicAbsorber, false, checkOverlaps);
+  }
 
-  new G4PVPlacement(0,                       //no rotation
-                  G4ThreeVector(0, 0, +0.5*absorberSizeZ ),
-                  fLogicSampler,           //its logical volume
-                  "Sampler_PV",            //its name
-                  fLogicCalorimeterPlane,  //its mother  volume
-                  false,                   //no boolean operation
-                  0,                       //copy number
-                  checkOverlaps);          //overlaps checking
-
-  new G4PVPlacement(0,                       //no rotation
-                  G4ThreeVector(0, 0, -0.5*detector_samplerSizeZ ),
-                  fLogicAbsorber,           //its logical volume
-                  "Absorber_PV",            //its name
-                  fLogicCalorimeterPlane,  //its mother  volume
-                  false,                   //no boolean operation
-                  0,                       //copy number
-                  checkOverlaps);          //overlaps checking
+  if (sampler_absorberW > 0)
+  {
+    G4Box* solidTungsten = new G4Box("samplerTungstenSolid", 
+      0.5 * plane_sizeX, 0.5 * plane_sizeY, 0.5 * tungstenThickness);
+    G4LogicalVolume* logicTungsten = new G4LogicalVolume(solidTungsten, absorber_W, "samplerTungstenAbsorber");
+    new G4PVPlacement(nullptr, G4ThreeVector(0.0, 0.0, -(absorberSizeZ - tungstenThickness)/2.0 + graphiteThickness + copperThickness), 
+                      logicTungsten, "PV_SamplerTungsten", fLogicAbsorber, false, checkOverlaps);
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void FaserDetectorConstruction::ConstructCalorimeter()
+void FaserDetectorConstruction::ConstructSampler()
 {
-  
-  ConstructCalorimeterPlane();
-  
-  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicCalorimeterPlane->GetSolid());
+  fLogicSamplerPlane = fSamplerFactory->Construct();
+
+  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicSamplerPlane->GetSolid());
   G4double plane_sizeZ = 2*sPlane->GetZHalfLength();
-  
+
+  const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
+  G4double sampler_sizeX = 2*sTracker->GetXHalfLength();
+  G4double sampler_sizeY = 2*sTracker->GetYHalfLength();
+
+  ConstructAbsorberPlane();
+
+  const G4Box* sAbs = dynamic_cast<const G4Box*>(fLogicAbsorber->GetSolid());
+  G4double absorber_sizeZ = 2*sAbs->GetZHalfLength();
+
   // just empty air for now
-  G4Material* calorimeter_mat = nist->FindOrBuildMaterial("G4_AIR");
+  G4Material* sampler_mat = nist->FindOrBuildMaterial("G4_AIR");
 
   // the z length of the lab includes a gap decayVolumeLength before the first
   // sensor plane, and a gap of planePitch after the last one
   //
-  G4double calorimeter_sizeZ = std::max(detector_calorimeterLength, detector_caloPlanes * plane_sizeZ);
+  G4double sampler_sizeZ = std::max(detector_samplerLength, sampler_sensorPlanes * (absorber_sizeZ + plane_sizeZ + detector_planePitch) + detector_planePitch);
 
-  const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
-  G4double tracker_sizeX = 2*sTracker->GetXHalfLength();
-  G4double tracker_sizeY = 2*sTracker->GetYHalfLength();
+  // const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
+  // G4double tracker_sizeX = 2*sTracker->GetXHalfLength();
+  // G4double tracker_sizeY = 2*sTracker->GetYHalfLength();
 
-  G4double calorimeter_sizeX = tracker_sizeX;
-  G4double calorimeter_sizeY = tracker_sizeY;
-
-  G4Box* solidCalorimeter =    
-    new G4Box("Calorimeter",                 //its name
-        0.5*calorimeter_sizeX, 0.5*calorimeter_sizeY, 0.5*calorimeter_sizeZ); //its size
+  G4Box* solidSampler =    
+    new G4Box("Sampler",                 //its name
+        0.5*sampler_sizeX, 0.5*sampler_sizeY, 0.5*sampler_sizeZ); //its size
       
-  fLogicCalorimeter =                         
-    new G4LogicalVolume(solidCalorimeter,    //its solid
-                        calorimeter_mat,     //its material
-                        "Calorimeter");      //its name
+  fLogicSampler =                         
+    new G4LogicalVolume(solidSampler,    //its solid
+                        sampler_mat,     //its material
+                        "Sampler");      //its name
 
-  G4double firstPlaneZ = -0.5 * (calorimeter_sizeZ - plane_sizeZ) + (detector_caloPlanes - 1) * plane_sizeZ;
-  for (int i = 0; i < detector_caloPlanes; i++)
+  fSamplerRotation = new G4RotationMatrix();
+  fSamplerRotation->rotateZ(CLHEP::pi/2);
+
+  G4double usableZ = sampler_sizeZ - 2 * (detector_planePitch);
+  G4double firstMidpoint = -0.5*(usableZ - (plane_sizeZ + absorber_sizeZ));
+
+  for (int i = 0; i < sampler_sensorPlanes; i++)
   {
-      new G4PVPlacement(0,
-			G4ThreeVector(0, 0, firstPlaneZ + i*plane_sizeZ),
-			fLogicCalorimeterPlane,
-			"CalorimeterPlane_PV",
-			fLogicCalorimeter,
+      G4double thisMidpoint = firstMidpoint + i * (plane_sizeZ + absorber_sizeZ + detector_planePitch);
+      G4double thisAbsorberZ = thisMidpoint - plane_sizeZ/2.0;
+      G4double thisPlaneZ = thisMidpoint + absorber_sizeZ/2.0;
+      G4RotationMatrix* theRotation = ( i%2 > 0 ? fSamplerRotation : nullptr);
+
+      new G4PVPlacement(theRotation,
+      G4ThreeVector(0, 0, thisAbsorberZ),
+      fLogicAbsorber,
+      "SamplerAbsorber_PV",
+      fLogicSampler,
+      false,
+      i,
+      checkOverlaps);
+
+      new G4PVPlacement(theRotation,
+			G4ThreeVector(0, 0, thisPlaneZ) ,
+			fLogicSamplerPlane,
+			"SamplerPlane_PV",
+			fLogicSampler,
 			false,
 			i,
 			checkOverlaps);
   }
 
-  fRegCalo = new G4Region("Calorimeter");
-  fLogicCalorimeterPlane->SetRegion(fRegCalo);
-  fRegCalo->AddRootLogicalVolume(fLogicCalorimeterPlane);
+  fLogicSampler->SetRegion(fRegCalorimeter);
+  fRegCalorimeter->AddRootLogicalVolume(fLogicSampler);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -715,22 +554,32 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   //
   nist = G4NistManager::Instance();
   
+  fRegTracker = new G4Region("Tracker");
+  fRegCalorimeter = new G4Region("Calorimeter");
+
   // construct the tracker (and everything inside)
   ConstructTracker();
 
   const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
   G4double tracker_sizeZ = 2*sTracker->GetZHalfLength();
 
-  // construct the decay volue
+  // construct the decay volume
   ConstructDecayVolume();
 
- const G4Box* sDecay = dynamic_cast<const G4Box*>(fLogicDecayVolume->GetSolid());
+  const G4Box* sDecay = dynamic_cast<const G4Box*>(fLogicDecayVolume->GetSolid());
   G4double decay_sizeZ = 2*sDecay->GetZHalfLength();
+
+  // construct the pre-sampler
+  ConstructSampler();
+
+  const G4Box* sSampler = dynamic_cast<const G4Box*>(fLogicSampler->GetSolid());
+  G4double sampler_sizeZ = 2*sSampler->GetZHalfLength();
 
   // construct the calorimeter
   ConstructCalorimeter();
-
- const G4Box* sCalorimeter = dynamic_cast<const G4Box*>(fLogicCalorimeter->GetSolid());
+  const G4Box* sCalorimeter = dynamic_cast<const G4Box*>(fLogicCalorimeter->GetSolid());
+  G4double calorimeter_sizeX = 2*sCalorimeter->GetXHalfLength();
+  G4double calorimeter_sizeY = 2*sCalorimeter->GetYHalfLength();
   G4double calorimeter_sizeZ = 2*sCalorimeter->GetZHalfLength();
 
   // world volume size
@@ -740,19 +589,22 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
   G4double plane_sizeX = 2*sPlane->GetXHalfLength();
   G4double plane_sizeY = 2*sPlane->GetYHalfLength();
 
-  G4double world_sizeX = plane_sizeX + 2.0*m, world_sizeY = plane_sizeY + 2.0*m;
-  G4double world_sizeZ = 2 * std::max(decay_sizeZ, tracker_sizeZ + calorimeter_sizeZ) + 2.0*m;
+  G4double world_sizeX = std::max(plane_sizeX, calorimeter_sizeX) + 1.0*m;
+  G4double world_sizeY = std::max(plane_sizeY, calorimeter_sizeY) + 1.0*m;
+  G4double world_sizeZ = 2 * std::max(decay_sizeZ, tracker_sizeZ + sampler_sizeZ + calorimeter_sizeZ) + 2.0*m;
 
   // Define a region for the air volume inside the rock
   // we will abort tracking of particles that enter the surrounding default region
   //
-  fRegAir = new G4Region("Air");
-  fLogicTracker->SetRegion(fRegAir);
-  fRegAir->AddRootLogicalVolume(fLogicTracker);
-  fLogicDecayVolume->SetRegion(fRegAir);
-  fRegAir->AddRootLogicalVolume(fLogicDecayVolume);
-  fLogicCalorimeter->SetRegion(fRegAir);
-  fRegAir->AddRootLogicalVolume(fLogicCalorimeter);
+  // fRegAir = new G4Region("Air");
+  // fLogicTracker->SetRegion(fRegAir);
+  // fRegAir->AddRootLogicalVolume(fLogicTracker);
+  // fLogicDecayVolume->SetRegion(fRegAir);
+  // fRegAir->AddRootLogicalVolume(fLogicDecayVolume);
+  // fLogicSampler->SetRegion(fRegAir);
+  // fRegAir->AddRootLogicalVolume(fLogicSampler);
+  // fLogicCalorimeter->SetRegion(fRegAir);
+  // fRegAir->AddRootLogicalVolume(fLogicCalorimeter);
 
   //     
   // World
@@ -781,16 +633,29 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                     0,                       //copy number
                     checkOverlaps);          //overlaps checking
 
+  // place the sampler volume inside
+  //
+  new G4PVPlacement(0,                       //no rotation
+                    G4ThreeVector(0, 0, tracker_sizeZ + sampler_sizeZ/2 ),
+                    fLogicSampler,           //its logical volume
+                    "Sampler_PV",            //its name
+                    logicWorld,              //its mother  volume
+                    false,                   //no boolean operation
+                    0,                       //copy number
+                    checkOverlaps);          //overlaps checking
+
   // place the calorimeter volume inside
   //
   new G4PVPlacement(0,                       //no rotation
-                    G4ThreeVector(0, 0, tracker_sizeZ + calorimeter_sizeZ/2 ),
-                    fLogicCalorimeter,           //its logical volume
+                    G4ThreeVector(0, 0, tracker_sizeZ + sampler_sizeZ + calorimeter_sizeZ/2 ),
+                    fLogicCalorimeter,       //its logical volume
                     "Calorimeter_PV",            //its name
                     logicWorld,              //its mother  volume
                     false,                   //no boolean operation
                     0,                       //copy number
                     checkOverlaps);          //overlaps checking
+  fCaloMinZ = tracker_sizeZ + sampler_sizeZ;
+  fCaloMaxZ = fCaloMinZ + calorimeter_sizeZ;
 
   // place the decay volume inside
   //                                   

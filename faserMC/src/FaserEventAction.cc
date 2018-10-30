@@ -6,13 +6,19 @@
 #include "G4Event.hh"
 #include "G4RunManager.hh"
 
+#include "FaserEvent.hh"
+#include "RootEventIO.hh"
+
 #include "FaserSensorHit.hh"
-#include "FaserSamplerHit.hh"
+#include "FaserCaloHit.hh"
 
 #include "G4DigiManager.hh"
 #include "FaserDigitizer.hh"
+#include "FaserCaloDigitizer.hh"
+
 #include "FaserDigi.hh"
-#include "FaserEvent.hh"
+#include "FaserCaloDigi.hh"
+
 #include "FaserTrackerEvent.hh"
 #include "FaserTrackerSpacePoint.hh"
 #include "FaserTrackerCluster.hh"
@@ -21,8 +27,6 @@
 #include "FaserTrackerTruthParticle.hh"
 #include "FaserDrawer.hh"
 
-//#include "RootIO.hh"
-#include "RootEventIO.hh"
 #include "TVector3.h"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -34,8 +38,13 @@ FaserEventAction::FaserEventAction(FaserRunAction* runAction)
   , fFaserTrackerEvent(nullptr)
   , fDrawer(new FaserDrawer {TVector3{0.,0.5,0.}})
 {
-  FaserDigitizer* fd = new FaserDigitizer("FaserDigitizer");
+  FaserDigitizer* fd = new FaserDigitizer("FaserTrackerDigitizer", "FaserTrackerHitsCollection", "FaserTrackerDigiCollection");
   G4DigiManager::GetDMpointer()->AddNewModule(fd);
+  fd = new FaserDigitizer("FaserSamplerDigitizer", "FaserSamplerHitsCollection", "FaserSamplerDigiCollection");
+  G4DigiManager::GetDMpointer()->AddNewModule(fd);
+
+  FaserCaloDigitizer* fcd = new FaserCaloDigitizer("FaserCaloDigitizer", "FaserCaloHitsCollection", "FaserCaloDigiCollection");
+  G4DigiManager::GetDMpointer()->AddNewModule(fcd);
 } 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -67,28 +76,46 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
 
   G4DigiManager* digiMan = G4DigiManager::GetDMpointer();
 
-  FaserDigitizer* digiModule = (FaserDigitizer*) digiMan->FindDigitizerModule("FaserDigitizer");
-  digiModule->Digitize();  
-  
-  G4int digiID = digiMan->GetDigiCollectionID("FaserDigitizer/FaserDigiCollection");
-  FaserDigiCollection* dc = (FaserDigiCollection*) 
-	  digiMan->GetDigiCollection(digiID);
-  
-  G4int truthID = digiMan->GetHitsCollectionID("FaserSensorHitsCollection");
-  FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*) 
-	  digiMan->GetHitsCollection(truthID);
+  FaserDigitizer* trackerDigiModule = (FaserDigitizer*) digiMan->FindDigitizerModule("FaserTrackerDigitizer");
+  trackerDigiModule->Digitize();  
 
-  G4int caloID = digiMan->GetHitsCollectionID("FaserSamplerHitsCollection");
-  FaserSamplerHitsCollection* sc = (FaserSamplerHitsCollection*)
+  FaserDigitizer* samplerDigiModule = (FaserDigitizer*) digiMan->FindDigitizerModule("FaserSamplerDigitizer");
+  samplerDigiModule->Digitize();  
+
+  FaserCaloDigitizer* caloDigiModule = (FaserCaloDigitizer*) digiMan->FindDigitizerModule("FaserCaloDigitizer");
+  caloDigiModule->Digitize();
+  
+  G4int trackerDigiID = digiMan->GetDigiCollectionID("FaserTrackerDigiCollection");
+  FaserDigiCollection* tdc = (FaserDigiCollection*) 
+	  digiMan->GetDigiCollection(trackerDigiID);
+
+  G4int samplerDigiID = digiMan->GetDigiCollectionID("FaserSamplerDigiCollection");
+  FaserDigiCollection* sdc = (FaserDigiCollection*)
+    digiMan->GetDigiCollection(samplerDigiID);
+
+  G4int caloDigiID = digiMan->GetDigiCollectionID("FaserCaloDigiCollection");
+  FaserCaloDigiCollection* cdc = (FaserCaloDigiCollection*)
+    digiMan->GetDigiCollection(caloDigiID);
+  
+  G4int trackerID = digiMan->GetHitsCollectionID("FaserTrackerHitsCollection");
+  FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*) 
+	  digiMan->GetHitsCollection(trackerID);
+
+  G4int samplerID = digiMan->GetHitsCollectionID("FaserSamplerHitsCollection");
+  FaserSensorHitsCollection* sc = (FaserSensorHitsCollection*)
+    digiMan->GetHitsCollection(samplerID);
+
+  G4int caloID = digiMan->GetHitsCollectionID("FaserCaloHitsCollection");
+  FaserCaloHitsCollection* cc = (FaserCaloHitsCollection*)
     digiMan->GetHitsCollection(caloID);
 
-  G4cout << "Nhits: " << hc->entries() << ", Ndigits: " << dc->entries() << ", Samples: " << sc->entries() << G4endl;
-
- 
   fFaserEvent->SetParticles(g4event->GetTrajectoryContainer());
-  fFaserEvent->SetHits(hc);
-  fFaserEvent->SetSamples(sc);
-  fFaserEvent->SetDigis(dc);
+  fFaserEvent->SetTrackerHits(hc);
+  // fFaserEvent->SetSamplerHits(sc);
+  // fFaserEvent->SetCaloHits(cc);
+  fFaserEvent->SetTrackerDigis(tdc);
+  fFaserEvent->SetSamplerDigis(sdc);
+  fFaserEvent->SetCaloDigis(cdc);
   fFaserEvent->SetClusters();
   fFaserEvent->SetSpacePoints();
 
@@ -104,7 +131,7 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
     });
   }
 
-  for (FaserSensorHit * hit : fFaserEvent->Hits()) {
+  for (FaserSensorHit * hit : fFaserEvent->TrackerHits()) {
     fFaserTrackerEvent->truthHits.push_back(new FaserTrackerTruthHit {
       hit->Track(),
       hit->Plane(),
@@ -117,7 +144,7 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
     });
   }
 
-  for (FaserDigi * digi : fFaserEvent->Digis()) {
+  for (FaserDigi * digi : fFaserEvent->TrackerDigis()) {
     G4ThreeVector globalPos = digi->Transform().NetTranslation();
     auto * trDigit = new FaserTrackerDigit {
       digi->Plane(),
@@ -150,8 +177,8 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
       cl->Charge(),
       {cl->GlobalPos().x(), cl->GlobalPos().y(), cl->GlobalPos().z()}
     };
-    for (uint i = 0; i < fFaserEvent->Digis().size(); ++i) {
-      FaserDigi * eventDigi = fFaserEvent->Digis().at(i);
+    for (uint i = 0; i < fFaserEvent->TrackerDigis().size(); ++i) {
+      FaserDigi * eventDigi = fFaserEvent->TrackerDigis().at(i);
       if (std::find(cl->Digis().begin(), cl->Digis().end(), eventDigi) != cl->Digis().end()) {
         trCluster->digitIndices.push_back(i);
       }
@@ -192,6 +219,9 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
     fFaserTrackerEvent->spacePoints.push_back(trSP);
   }
 
+  G4cout << "Strip hits: " << fFaserEvent->TrackerHits().size() << ", Strip digits: " << fFaserEvent->TrackerDigis().size() << ", Strip clusters: " << fFaserEvent->Clusters().size() << G4endl;
+  G4cout << "Sampler hits: " << fFaserEvent->SamplerHits().size() << ", Sampler digits: " << fFaserEvent->SamplerDigis().size() << G4endl;
+  G4cout << "Calo hits: " << fFaserEvent->CaloHits().size() << ", Calo digits: " << fFaserEvent->CaloDigis().size() << G4endl; 
   //fDrawer->DrawSpacePoints(fFaserEvent);
   //fDrawer->DrawPropagatedTrajectory(fFaserEvent);
 

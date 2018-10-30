@@ -14,8 +14,14 @@ FaserTrackInformation::FaserTrackInformation()
   fOriginalMomentum = G4ThreeVector(0.,0.,0.);
   fOriginalEnergy = 0.;
   fOriginalTime = 0.;
-  fSourceTrackID = 0;
-  fSourceEnergy = 0;
+  fTrackingStatus = 1;
+  fSourceTrackID = -1;
+  fSourceDefinition = nullptr;
+  fSourcePosition = G4ThreeVector(0.,0.,0.);
+  fSourceMomentum = G4ThreeVector(0.,0.,0.);
+  fSourceEnergy = 0.;
+  fSourceTime = 0.;
+  fSuspendedStepID = -1;
 }
 
 FaserTrackInformation::FaserTrackInformation(const G4Track* aTrack)
@@ -27,8 +33,15 @@ FaserTrackInformation::FaserTrackInformation(const G4Track* aTrack)
   fOriginalMomentum = aTrack->GetMomentum();
   fOriginalEnergy = aTrack->GetTotalEnergy();
   fOriginalTime = aTrack->GetGlobalTime();
-  fSourceTrackID = 0;
+  fTrackingStatus = 1;
+
+  fSourceTrackID = -1;
+  fSourceDefinition = nullptr;
+  fSourcePosition = G4ThreeVector(0.,0.,0.);
+  fSourceMomentum = G4ThreeVector(0.,0.,0.);
+  fSourceTime = 0.;
   fSourceEnergy = 0;
+  fSuspendedStepID = -1;
 }
 
 FaserTrackInformation::FaserTrackInformation(const FaserTrackInformation* aTrackInfo)
@@ -40,8 +53,14 @@ FaserTrackInformation::FaserTrackInformation(const FaserTrackInformation* aTrack
   fOriginalMomentum = aTrackInfo->fOriginalMomentum;
   fOriginalEnergy = aTrackInfo->fOriginalEnergy;
   fOriginalTime = aTrackInfo->fOriginalTime;
+  fTrackingStatus = aTrackInfo->fTrackingStatus;
   fSourceTrackID = aTrackInfo->fSourceTrackID;
+  fSourceDefinition = aTrackInfo->fSourceDefinition;
+  fSourcePosition = aTrackInfo->fSourcePosition;
+  fSourceMomentum = aTrackInfo->fSourceMomentum;
   fSourceEnergy = aTrackInfo->fSourceEnergy;
+  fSourceTime = aTrackInfo->fSourceTime;
+  fSuspendedStepID = -1;
 }
 
 FaserTrackInformation::~FaserTrackInformation()
@@ -56,15 +75,35 @@ FaserTrackInformation& FaserTrackInformation
   fOriginalMomentum = aTrackInfo.fOriginalMomentum;
   fOriginalEnergy = aTrackInfo.fOriginalEnergy;
   fOriginalTime = aTrackInfo.fOriginalTime;
+  fTrackingStatus = aTrackInfo.fTrackingStatus;
   fSourceTrackID = aTrackInfo.fSourceTrackID;
+  fSourceDefinition = aTrackInfo.fSourceDefinition;
+  fSourcePosition = aTrackInfo.fSourcePosition;
+  fSourceMomentum = aTrackInfo.fSourceMomentum;
   fSourceEnergy = aTrackInfo.fSourceEnergy;
+  fSourceTime = aTrackInfo.fSourceTime;
+  fSuspendedStepID = -1;
   return *this;
+}
+
+void FaserTrackInformation::SetSourceTrackInformation(const G4Track* aTrack)
+{
+  fSourceTrackID = aTrack->GetTrackID();
+  fSourceDefinition = aTrack->GetDefinition();
+  fSourcePosition = aTrack->GetPosition();
+  fSourceMomentum = aTrack->GetMomentum();
+  fSourceEnergy = aTrack->GetTotalEnergy();
+  fSourceTime = aTrack->GetGlobalTime();
 }
 
 void FaserTrackInformation::Print() const
 {
+  G4cout 
+    << "Source track ID " << fSourceTrackID << " (" 
+    << fSourceDefinition->GetParticleName() << ","
+    << fSourceEnergy/GeV << "[GeV]) at " << fSourcePosition << G4endl;
   G4cout
-    << "Original primary track ID " << fOriginalTrackID << " ("
+    << "Original primary track ID " << fOriginalTrackID << " (" 
     << fParticleDefinition->GetParticleName() << ","
     << fOriginalEnergy/GeV << "[GeV])" << G4endl;
 }
