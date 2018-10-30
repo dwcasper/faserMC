@@ -1,0 +1,24 @@
+#
+# FASER physics setup
+#
+# This macro is executed AFTER the G4 run manager is initialized
+#
+/faser/generator/minMomentum 1.0 GeV
+/faser/generator/maxMomentum 500.0 GeV
+/faser/generator/sourcePosition 0.0 0.0 -475.0 m
+/faser/generator/particleName mu+
+/particle/select mu+
+/particle/property/stable true
+#
+# One use case is to adjust the production cut for a specific region
+# (the tracking planes)
+#
+/run/setCutForRegion Tracker 1.0 um
+#
+# Magnetic field
+#
+# This sets the field outside the tracker
+/faser/field/setGlobalField  0.5 tesla
+# This sets the field inside the tracker
+/faser/field/setTrackerField 0.5 tesla
+/faser/field/update
