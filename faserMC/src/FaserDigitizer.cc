@@ -10,11 +10,13 @@
 #include <iostream>
 using std::cout;
 
+// TODO: Read in e.g. `fNModules` from `faserGeo.mac` instead of hardcoding here
+
 FaserDigitizer::FaserDigitizer(G4String name, G4String input, G4String output)
   : G4VDigitizerModule(name), fModuleName(name), fInputName(input), fOutputName(output),
     fDigiMessenger(new FaserDigiMessenger(this)),
-    fNModules(2),
-    fNSensors(4),
+    fNModules(8),
+    fNSensors(2),
     fNRows(2),
     fThreshold(defaultThreshold),
     fChargeSpreadSigma(defaultChargeSpreadSigma),

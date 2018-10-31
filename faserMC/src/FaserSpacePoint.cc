@@ -15,13 +15,16 @@ using std::runtime_error;
 // TODO: Read this info in from FaserGeometry instead of hardcoding here:
 
 namespace Geo {
-  int nStrips = 1280;
-  double stripPitch = 0.0755; // mm
-  double stereoAngle = 0.026; // rad
+  // TODO: Remove this namespace & read directly from `faserGeo.mac` & `FaserDetectorConstruction`.
+  //       (This is being developed on the `uniformGeoHandling` branch of `faserMC`.)
 
-  double moduleOffsetX = 48.5064; // mm, - for module 0, + for module 1
-  double sensorOffsetY = 96.938/(2.*TMath::Cos(stereoAngle)); // mm, + for sensors 0/1, - for sensors 2/3
-  //double rowOffsetY = 0.5*(48.2 + 0.269); // mm, - for row 0, + for row 1
+  // ITk geometry
+  //int nStrips = 1280;
+  //double stripPitch = 0.0755; // mm
+  //double stereoAngle = 0.026; // rad
+
+  //double moduleOffsetX = 48.5064; // mm, - for module 0, + for module 1
+  //double sensorOffsetY = 96.938/(2.*TMath::Cos(stereoAngle)); // mm, + for sensors 0/1, - for sensors 2/3
 
   //std::map<int, double> planePosZ = { // mm
   //  { 0,    0.00 },
@@ -33,17 +36,90 @@ namespace Geo {
   //  { 6, 1942.02 },
   //  { 7, 1992.02 },
   //};
+  //std::map<int, double> planePosZ = { // mm
+  //  { 0, -0.000156387},
+  //  { 1, 49.9998},
+  //  { 2, 99.9998},
+  //  { 3, 938.03},
+  //  { 4, 988.03},
+  //  { 5, 1038.03},
+  //  { 6, 1892.02},
+  //  { 7, 1942.02},
+  //  { 8, 1992.02},
+  //};
+
+  // SCT geometry
+  int nStrips = 768;
+  double stripPitch = 0.08; // mm
+  double stereoAngle = 0.026; // rad
+
+  double offsetX(int iModule) {
+    switch (iModule) { // mm
+    case 0:
+    case 4:
+      return -3 * 28.865;
+    case 1:
+    case 5:
+      return -1 * 28.865;
+    case 2:
+    case 6:
+      return  1 * 28.865;
+    case 3:
+    case 7:
+      return  3 * 28.865;
+    default:
+      return 0;
+    }
+  }
+
+  double offsetY(int iModule) {
+    switch (iModule) { // mm
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      return -60.13;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      return  60.13;
+    default:
+      return 0;
+    }
+  }
+
+  double offsetZ(int iModule) {
+    switch (iModule) { // mm
+    case 0:
+    case 2:
+      return -3 * 2.5;
+    case 1:
+    case 3:
+      return  1 * 2.5;
+    case 4:
+    case 6:
+      return  3 * 2.5;
+    case 5:
+    case 7:
+      return -1 * 2.5;
+    default:
+      return 0;
+    }
+  }
+
   std::map<int, double> planePosZ = { // mm
-    { 0, -0.000156387},
-    { 1, 49.9998},
-    { 2, 99.9998},
-    { 3, 938.03},
-    { 4, 988.03},
-    { 5, 1038.03},
-    { 6, 1892.02},
-    { 7, 1942.02},
-    { 8, 1992.02},
+    { 0,    4.01 },
+    { 1,   54.01 },
+    { 2,  104.01 },
+    { 3,  930.01 },
+    { 4,  980.01 },
+    { 5, 1030.01 },
+    { 6, 1888.01 },
+    { 7, 1938.01 },
+    { 8, 1988.01 },
   };
+
 }
 
 
@@ -95,7 +171,6 @@ TVector3 FaserSpacePoint::GlobalPos() const
   double stripBack = 0.;
   double sumAbsQ_front = 0.;
   double sumAbsQ_back = 0.;
-  static int iCluster = -1;
   G4ThreeVector weightedClusterGlobalPos_front {0.,0.,0.};
   G4ThreeVector weightedClusterGlobalPos_back  {0.,0.,0.};
 
@@ -112,12 +187,6 @@ TVector3 FaserSpacePoint::GlobalPos() const
       weightedClusterGlobalPos_back += clus->GlobalPos();
       sumAbsQ_back += absCharge;
     }
-    //cout << "DEBUG_CLUSTERS  " << ++iCluster
-    //                    << "," << absCharge
-    //                    << "," << clus->GlobalPos().x()
-    //                    << "," << clus->GlobalPos().y()
-    //                    << "," << clus->GlobalPos().z()
-    //                    << "\n";
   }
 
   // Local coordinates along front/back rows in mm:
@@ -160,21 +229,10 @@ TVector3 FaserSpacePoint::GlobalPos() const
   double y = 0.5*(uBack - uFront)/TMath::Sin(Geo::stereoAngle);
   double z = 0.;
 
-  // Shift z to center of plane
-  z = Geo::planePosZ.count(Plane()) < 1 ? -10000. : Geo::planePosZ[Plane()];
-
-  // Shift to center of module
-  if (Module()==0) x += -Geo::moduleOffsetX;
-  else if (Module()==1) x += Geo::moduleOffsetX;
-  else throw runtime_error {"FaserSpacePoint::GlobalPos: invalid module: "+to_string(Module())};
-
-  // Shift to center of sensor
-  if (Sensor()==0 || Sensor()==1) y += Geo::sensorOffsetY;
-  else if (Sensor()==2 || Sensor()==3) y += -Geo::sensorOffsetY;
-  else throw runtime_error {"FaserSpacePoint::GlobalPos: invalid sensor: "+to_string(Sensor())};
-
-  // Do *not* shift to the center of the row -- the correct origin of the local
-  // coordinate system is the *sensor* center, *not* the row center.
+  // Shift to the center of the module (origin of local coordinate system)
+  x += Geo::offsetX(Module());
+  y += Geo::offsetY(Module());
+  z += Geo::planePosZ.count(Plane()) < 1 ? -10000. : Geo::planePosZ[Plane()] + Geo::offsetZ(Module());
 
   return {x, y, z};
 }
