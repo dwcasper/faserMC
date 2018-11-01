@@ -258,7 +258,6 @@ void FaserSensorPlaneConstruction::ConstructModule()
 
   default: ;
   }
-
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
