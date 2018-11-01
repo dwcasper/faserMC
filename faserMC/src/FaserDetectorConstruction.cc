@@ -26,7 +26,9 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FaserDetectorConstruction::FaserDetectorConstruction()
-  : G4VUserDetectorConstruction(), fGeometryMessenger(new FaserGeometryMessenger(this)),
+  : G4VUserDetectorConstruction(),
+    fGeoConfig(GeometryConfig::SCT),
+    fGeometryMessenger(new FaserGeometryMessenger(this)),
     fTrackerGeo(new FaserTrackerGeometry),
     fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), 
     fLogicSamplerPlane(nullptr), fLogicCaloModule(nullptr), fLogicCaloTower(nullptr),

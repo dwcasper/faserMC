@@ -130,12 +130,27 @@ void FaserSensorPlaneConstruction::ConstructModule()
   fStereoMinus->rotateY(CLHEP::pi);
   fStereoMinus->rotateZ(sensor_stereoAngle);
 
-  // support dimensions - assume a 2:1 rectangular shape
+  // support dimensions
   //
-  G4double support_sizeX = sensor_sizeX * cos(sensor_stereoAngle) + sensor_sizeY * sin(sensor_stereoAngle);
-  G4double support_sizeY = sensor_sizeY * cos(sensor_stereoAngle) + sensor_sizeX * sin(sensor_stereoAngle) 
-    + sensor_sizeY/cos(sensor_stereoAngle);
+  G4double support_sizeX;
+  G4double support_sizeY;
   G4double support_sizeZ = fParent->getSupportSizeZ();
+  switch (fParent->geoConfig()) {
+  case GeometryConfig::ITk:
+	//assume a 2:1 rectangular shape
+    support_sizeX = sensor_sizeX * cos(sensor_stereoAngle) + sensor_sizeY * sin(sensor_stereoAngle);
+    support_sizeY = sensor_sizeY * cos(sensor_stereoAngle) + sensor_sizeX * sin(sensor_stereoAngle) + sensor_sizeY/cos(sensor_stereoAngle);
+    break;
+  case GeometryConfig::SCT:
+    support_sizeX = sensor_sizeX * cos(sensor_stereoAngle) + sensor_sizeY * sin(sensor_stereoAngle);
+    support_sizeY = sensor_sizeY * cos(sensor_stereoAngle) + sensor_sizeX * sin(sensor_stereoAngle);
+    break;
+  default:
+    support_sizeX = 0;
+    support_sizeY = 0;
+  }
+  G4cout << "Support dimensions: " << support_sizeX/mm << " mm (X), "
+         << support_sizeY/mm << " mm (Y), " << support_sizeZ/mm << " mm (Z)" << G4endl;
   G4cout << fName << " support dimensions: " << support_sizeX/mm << " mm (X), "
 	 << support_sizeY/mm << " mm (Y), " << support_sizeZ/mm << " mm (Z)" << G4endl;
 
@@ -183,41 +198,66 @@ void FaserSensorPlaneConstruction::ConstructModule()
   // place sensors inside module volume
   // the same logical volume is re-used, but it is translated and rotated four different ways
   //
-  new G4PVPlacement(fStereoPlus,
-            G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
-	        fLogicSensor,
-	        G4String(fName + "Sensor_PV"),
-	        fLogicModule,
-	        false,
-	        0,
-	        checkOverlaps);
+  switch (fParent->geoConfig()) {
+  case GeometryConfig::ITk:
+    new G4PVPlacement(fStereoPlus,
+              G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
+              fLogicSensor,
+              G4String(fName + "Sensor_PV"),
+              fLogicModule,
+              false,
+              0,
+              checkOverlaps);
 
-  new G4PVPlacement(fStereoMinus,
-		    G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
-		    fLogicSensor,
-		    G4String(fName + "Sensor_PV"),
-		    fLogicModule,
-		    false,
-		    1,
-		    checkOverlaps);
+    new G4PVPlacement(fStereoMinus,
+              G4ThreeVector(0.0, 0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
+              fLogicSensor,
+              G4String(fName + "Sensor_PV"),
+              fLogicModule,
+              false,
+              1,
+              checkOverlaps);
 
-  new G4PVPlacement(fStereoPlus,
-		    G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
-		    fLogicSensor,
-		    G4String(fName + "Sensor_PV"),
-		    fLogicModule,
-		    false,
-		    2,
-		    checkOverlaps);
+    new G4PVPlacement(fStereoPlus,
+              G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), support_sizeZ/2 + sensor_sizeZ/2),
+              fLogicSensor,
+              G4String(fName + "Sensor_PV"),
+              fLogicModule,
+              false,
+              2,
+              checkOverlaps);
 
-  new G4PVPlacement(fStereoMinus,
-		    G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
-		    fLogicSensor,
-		    G4String(fName + "Sensor_PV"),
-		    fLogicModule,
-		    false,
-		    3,
-		    checkOverlaps);
+    new G4PVPlacement(fStereoMinus,
+              G4ThreeVector(0.0, -0.5*sensor_sizeY/cos(sensor_stereoAngle), -(support_sizeZ/2 + sensor_sizeZ/2)),
+              fLogicSensor,
+              G4String(fName + "Sensor_PV"),
+              fLogicModule,
+              false,
+              3,
+              checkOverlaps);
+    break;
+
+  case GeometryConfig::SCT:
+    new G4PVPlacement(fStereoPlus,
+              G4ThreeVector(0.0, 0.0, support_sizeZ/2 + sensor_sizeZ/2),
+              fLogicSensor,
+              G4String(fName + "Sensor_PV"),
+              fLogicModule,
+              false,
+              0,
+              checkOverlaps);
+
+    new G4PVPlacement(fStereoMinus,
+              G4ThreeVector(0.0, 0.0, -(support_sizeZ/2 + sensor_sizeZ/2)),
+              fLogicSensor,
+              G4String(fName + "Sensor_PV"),
+              fLogicModule,
+              false,
+              1,
+              checkOverlaps);
+
+  default: ;
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -238,26 +278,57 @@ G4LogicalVolume* FaserSensorPlaneConstruction::Construct()
   G4double sensor_stereoAngle = fParent->getSensorStereoAngle();
   const G4Box* sSensor = dynamic_cast<const G4Box*>(fLogicSensor->GetSolid());
   G4double sensor_sizeX = 2*sSensor->GetXHalfLength();
+  G4double sensor_sizeY = 2*sSensor->GetYHalfLength();
   G4double wPrime = (sensor_sizeX/2) / cos(sensor_stereoAngle);
 
   // overlap angle that will allow maximum x-separation without any gap
   //
-  G4double overlapAngle = asin( module_sizeZ / wPrime )/2;
+  G4double overlapAngle;
+  G4double xOffset;
+  G4double yOffset;
+  G4double zOffset;
+  switch (fParent->geoConfig()) {
+  case GeometryConfig::ITk:
+    overlapAngle = asin( module_sizeZ/wPrime )/2;
+    xOffset = wPrime * cos(overlapAngle);
+    yOffset = 0;
+    zOffset = 0;
+    break;
+  case GeometryConfig::SCT:
+    overlapAngle = 0;
+    // minimum of overlap of 5 * (strip pitch) => 4 mm min. => 2 mm min. each
+    xOffset = 0.5*sensor_sizeX - 2.0*mm; // +/-(0.5*(sensor center) - overlap), since modules have one sensor horizontally
+    yOffset = 0.5*sensor_sizeY - 2.0*mm;     // +/-((sensor center) - overlap), since modules have one "sensor" (two "rows") vertically
+    zOffset = 2.5*mm;
+    break;
+  default:
+    overlapAngle = 0;
+	xOffset = 0;
+    yOffset = 0;
+    zOffset = 0;
+  }
   
-  // corresponding x separation of modules with this angle
-  //
-  G4double xOffset = wPrime * cos(overlapAngle);
-
   // Rotation matrix for module overlap - again, must preserve unchanged until end of job
   //
   fOverlapAngle = new G4RotationMatrix;
   fOverlapAngle->rotateY(overlapAngle);
 
-  // work out the size of the plane box that will contain both modules
+  // work out the size of the plane box that will contain all modules
   //
-  G4double plane_sizeX = 2 * xOffset + module_sizeX * cos(overlapAngle) + module_sizeZ * sin(overlapAngle);
-  G4double plane_sizeY = module_sizeY;
-  G4double plane_sizeZ = module_sizeX * sin(overlapAngle) + module_sizeZ * cos(overlapAngle);
+  G4double plane_sizeX;
+  G4double plane_sizeY;
+  G4double plane_sizeZ;
+  switch (fParent->geoConfig()) {
+  case GeometryConfig::ITk:
+    plane_sizeX = 2 * xOffset + module_sizeX * cos(overlapAngle) + module_sizeZ * sin(overlapAngle);
+    plane_sizeY = module_sizeY;
+    plane_sizeZ = module_sizeX * sin(overlapAngle) + module_sizeZ * cos(overlapAngle);
+  case GeometryConfig::SCT:
+    // overlap angle assumed to be zero here
+    plane_sizeX = 6*xOffset + module_sizeX; // up/down to +/-3 * `xOffset`
+    plane_sizeY = 2*yOffset + module_sizeY; // up/down to +/-1 * `yOffset`
+    plane_sizeZ = 6*zOffset + module_sizeZ; // up/down to +/-3 * `zOffset`
+  }
   G4cout << fName << " plane dimensions: " << plane_sizeX/mm << " mm (X), "
 	 << plane_sizeY/mm << " mm (Y), " << plane_sizeZ/mm << " mm (Z)" << G4endl;
 
@@ -275,22 +346,69 @@ G4LogicalVolume* FaserSensorPlaneConstruction::Construct()
 
   // place modules inside plane
   //
-  new G4PVPlacement(fOverlapAngle,
-		    G4ThreeVector(-xOffset, 0, 0),
-		    fLogicModule,
-		    G4String(fName + "Module_PV"),
-		    logicSensorPlane,
-		    false,
-		    0,
-		    checkOverlaps);
+  int iModule = -1;
+  switch (fParent->geoConfig()) {
 
-  new G4PVPlacement(fOverlapAngle,
-		    G4ThreeVector(+xOffset, 0, 0),
-		    fLogicModule,
-		    G4String(fName + "Module_PV"),
-		    logicSensorPlane,
-		    false,
-		    1,
- 		    checkOverlaps);
+  case GeometryConfig::ITk:
+    new G4PVPlacement(fOverlapAngle,
+            G4ThreeVector(-xOffset, 0, 0),
+            fLogicModule,
+            "Module_PV",
+            logicSensorPlane,
+            false,
+            0,
+            checkOverlaps);
+
+    new G4PVPlacement(fOverlapAngle,
+            G4ThreeVector(+xOffset, 0, 0),
+            fLogicModule,
+            "Module_PV",
+            logicSensorPlane,
+            false,
+            1,
+            checkOverlaps);
+    break;
+
+  case GeometryConfig::SCT:
+    for (int yDelta = -1; yDelta <= 1; yDelta += 2) {
+      for (int xDelta = -3; xDelta <= 3; xDelta += 2) {
+        ++iModule;
+        int zDelta;
+        switch (iModule) {
+          case 0:
+          case 2:
+            zDelta = -3;
+            break;
+          case 1:
+          case 3:
+            zDelta = 1;
+            break;
+          case 4:
+          case 6:
+            zDelta = 3;
+            break;
+          case 5:
+          case 7:
+            zDelta = -1;
+            break;
+          default:
+            ; //throw runtime_error {"FaserDetectorConstruction::ConstructTrackerPlane: invalid module: "+std::to_string(iModule)};
+        }
+        G4cout << "Placing module (" << xDelta*xOffset << ", " << yDelta*yOffset << ", " << zDelta*zOffset << ")\n";
+        new G4PVPlacement(fOverlapAngle,
+                          G4ThreeVector(xDelta*xOffset, yDelta*yOffset, zDelta*zOffset),
+                          fLogicModule,
+                          "Module_PV",
+                          logicSensorPlane,
+                          false,
+                          iModule,
+                          checkOverlaps);
+      }
+    }
+    break;
+
+  default: ;
+  }
+
   return logicSensorPlane;
 }
