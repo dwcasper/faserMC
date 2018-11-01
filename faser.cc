@@ -49,8 +49,8 @@ int main(int argc,char** argv)
   // Detector construction
   auto * detectorConstruction = new FaserDetectorConstruction;
   runManager->SetUserInitialization(detectorConstruction);
-  RootEventIO::GetInstance()->SetTrackerGeo(detectorConstruction->TrackerGeo());
-  RootEventIO::GetInstance()->WriteTrackerGeo();
+  //RootEventIO::GetInstance()->SetTrackerGeo(detectorConstruction->TrackerGeo());
+  //RootEventIO::GetInstance()->WriteTrackerGeo();
 
   // Physics list
   G4VModularPhysicsList* physicsList = new TFTFP_BERT<FaserPhysicsList>();
@@ -73,6 +73,7 @@ int main(int argc,char** argv)
   if ( ! ui ) { 
     // batch mode
     if (argc > 2) RootEventIO::SetFileName(argv[2]);
+    if (argc > 3) RootEventIO::SetTrackerFileName(argv[3]);
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
     UImanager->ApplyCommand(command+fileName);

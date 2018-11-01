@@ -29,7 +29,7 @@ FaserDetectorConstruction::FaserDetectorConstruction()
   : G4VUserDetectorConstruction(),
     fGeoConfig(GeometryConfig::SCT),
     fGeometryMessenger(new FaserGeometryMessenger(this)),
-    fTrackerGeo(new FaserTrackerGeometry),
+    //fTrackerGeo(new FaserTrackerGeometry),
     fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), 
     fLogicSamplerPlane(nullptr), fLogicCaloModule(nullptr), fLogicCaloTower(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
@@ -175,8 +175,17 @@ void FaserDetectorConstruction::ConstructTracker()
     nCentralPlanes = tracker_sensorPlanes/2;
     break;
   case 1:
-    nCentralPlanes = (tracker_sensorPlanes+1)/2;
-    nEndPlanes = (tracker_sensorPlanes - nCentralPlanes)/2;
+    // kludge to do 3-3-3 when we have nine planes
+    if (tracker_sensorPlanes == 9)
+    {
+      nCentralPlanes = 3;
+      nEndPlanes = 3;
+    }
+    else
+    {
+      nCentralPlanes = (tracker_sensorPlanes+1)/2;
+      nEndPlanes = (tracker_sensorPlanes - nCentralPlanes)/2;
+    }
     break;
   case 2:
     // choose 2-2-2 over 1-4-1 even though they are theoretically equivalent
@@ -208,8 +217,8 @@ void FaserDetectorConstruction::ConstructTracker()
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
       G4cout << "Updating tracking geometry: planeZ[" << i << "] = " << zPlane << "\n";
-      fTrackerGeo->planeZ.push_back(zPlane);
-      fTrackerGeo->planeIndices_front.push_back(i);
+      // fTrackerGeo->planeZ.push_back(zPlane);
+      // fTrackerGeo->planeIndices_front.push_back(i);
   }
   
   // Central planes are evenly distributed around z = 0
@@ -228,8 +237,8 @@ void FaserDetectorConstruction::ConstructTracker()
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
       G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes + i << "] = " << zPlane << "\n";
-      fTrackerGeo->planeZ.push_back(zPlane);
-      fTrackerGeo->planeIndices_central.push_back(nEndPlanes + i);
+      // fTrackerGeo->planeZ.push_back(zPlane);
+      // fTrackerGeo->planeIndices_central.push_back(nEndPlanes + i);
   }
 
   // Downstream end planes are symmetrical to upstream
@@ -248,8 +257,8 @@ void FaserDetectorConstruction::ConstructTracker()
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
       G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes + nCentralPlanes + i << "] = " << zPlane << "\n";
-      fTrackerGeo->planeZ.push_back(zPlane);
-      fTrackerGeo->planeIndices_end.push_back(nEndPlanes + nCentralPlanes + i);
+      // fTrackerGeo->planeZ.push_back(zPlane);
+      // fTrackerGeo->planeIndices_end.push_back(nEndPlanes + nCentralPlanes + i);
   }
   // define a region encompassing the tracker
   //

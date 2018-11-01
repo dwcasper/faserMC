@@ -117,7 +117,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void setCalorimeterLength(G4double value) { detector_calorimeterLength = value; }
   virtual G4double getCalorimeterLength() const { return detector_calorimeterLength; }
 
-  FaserTrackerGeometry * TrackerGeo() { return fTrackerGeo; }
+  //FaserTrackerGeometry * TrackerGeo() { return fTrackerGeo; }
 
   static constexpr G4double default_sensor_activeSizeY = 96.669*mm;
   static constexpr G4int    default_sensor_readoutStrips = 1280;

@@ -37,11 +37,11 @@
 #
 # Spacing of detector planes; this is now the minimum spacing between planes
 #
-/faser/geo/planePitch 4.0 cm
+/faser/geo/planePitch 5.0 cm
 #
 # Number of pre-sampler planes;
 #
-/faser/geo/samplerPlanes 2
+/faser/geo/samplerPlanes 0
 #
 # Thickness of calorimeter absorber layers (in radiation lengths)
 # (Graphite -> Copper -> Tungsten)
@@ -60,7 +60,7 @@
 #
 # Number of calo modules in the detector (0, 1, 4 or 9)
 #
-/faser/geo/caloModules 4
+/faser/geo/caloModules 0
 #
 # Thickness of the calorimeter scintillator layers
 #
@@ -82,7 +82,7 @@
 # (it will always be long enough to hold what it contains;
 # this setting is only to a larger gap around it, if desired)
 #
-/faser/geo/samplerLength 10.0 cm
+#/faser/geo/samplerLength 10.0 cm
 #
 # Length of empty air before first detector plane
 #
@@ -98,4 +98,4 @@
 # (it will always be long enough to hold what it contains;
 #  this setting is only to allow a larger gap in front, if desired)
 #
-/faser/geo/calorimeterLength 0.5 m
+#/faser/geo/calorimeterLength 0.5 m

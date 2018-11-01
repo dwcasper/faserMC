@@ -31,5 +31,5 @@
 # Dump generator parameters after initialization
 #
 /faser/generator/dump
-/run/beamOn 1000
+/run/beamOn 20000
 

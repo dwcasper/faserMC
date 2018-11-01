@@ -219,7 +219,7 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4event)
     fFaserTrackerEvent->spacePoints.push_back(trSP);
   }
 
-  G4cout << "Strip hits: " << fFaserEvent->TrackerHits().size() << ", Strip digits: " << fFaserEvent->TrackerDigis().size() << ", Strip clusters: " << fFaserEvent->Clusters().size() << G4endl;
+  G4cout << "Strip hits: " << fFaserEvent->TrackerHits().size() << ", Strip digits: " << fFaserEvent->TrackerDigis().size() << ", Strip clusters: " << fFaserEvent->Clusters().size() << ", Space points: " << fFaserEvent->SpacePoints().size() << G4endl;
   G4cout << "Sampler hits: " << fFaserEvent->SamplerHits().size() << ", Sampler digits: " << fFaserEvent->SamplerDigis().size() << G4endl;
   G4cout << "Calo hits: " << fFaserEvent->CaloHits().size() << ", Calo digits: " << fFaserEvent->CaloDigis().size() << G4endl; 
   //fDrawer->DrawSpacePoints(fFaserEvent);

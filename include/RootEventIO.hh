@@ -17,6 +17,7 @@ public:
 
   static RootEventIO* GetInstance();
   static void SetFileName(G4String name);
+  static void SetTrackerFileName(G4String name);
   void SetTrackerGeo(FaserTrackerGeometry * geo) { fTrackerGeoBranchAdx = geo; }
   void Write(FaserEvent*);
   void Write(FaserGeometry*);

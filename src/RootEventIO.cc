@@ -82,6 +82,22 @@ void RootEventIO::SetFileName(G4String name)
   return;
 }
 
+void RootEventIO::SetTrackerFileName(G4String name)
+{
+  if (name == trackerFileName) return;
+  trackerFileName = name;
+
+  if (instance == nullptr) return;
+
+  G4cout << "Closing previous ROOT file" << G4endl;
+
+  instance->Close();
+  delete instance;
+  instance = nullptr;
+
+  return;
+}
+
 void RootEventIO::Write(FaserEvent* hcont)
 {
   fNevents++;
