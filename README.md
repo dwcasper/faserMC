@@ -10,26 +10,27 @@ You should choose an LCG release, e.g. LCG_94
 
  Create a directory, and change into it; this directory will be referred to as $FASER_ROOT in the following.
 
-bash> cd $FASER_ROOT
-bash> git clone https://github.com/dwcasper/faserMC
-bash> mkdir build
-bash> cd build
+1) cd $FASER_ROOT
+2) git clone https://github.com/dwcasper/faserMC
+3) mkdir build
+4) cd build
 
 You will also need to use binaries appropriate for your system configuration. 
 You can leave the sysconfig argument blank, which will use the default value of "x86_64-slc6-gcc7-opt"..
 
-bash> source ../faserMC/setupLCG.sh <lcg release> <sysconfig>
-bash> source ../faserMC/buildFaser.sh
+5) source ../faserMC/setupLCG.sh (lcg release) (sysconfig)
+ 
+6) source ../faserMC/buildFaser.sh
 
 The program will be installed in $FASER_ROOT/run
 
-bash> cd ../run
-bash> bin/faser
+7) cd ../run
+8) bin/faser
 
 will launch an interactive session. 
 Use /run/beamOn 1 in the viewer window to generate a single dark photon event at a time.
 
-bash> bin/faser init_novis.mac myDataFile.root
+9) bin/faser init_novis.mac myDataFile.root
 
 will launch a batch session and generate 20,000 dark photon events. 
 
