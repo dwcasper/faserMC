@@ -1,0 +1,35 @@
+<lcgdict>
+  <selection>
+    <class name="G4String" />
+    <class name="std::map<G4int, G4double>" />
+    <class name="std::map<G4String, G4String>" />
+    <class name="std::map<G4String, std::map<G4String, G4String>>" />
+    <class name="FaserEvent" />
+    <class name="G4VHit" />
+    <class name="G4VDigi" />
+    <class name="G4ThreeVector" />
+    <class name="FaserTruthParticle" />
+    <class name="FaserSensorHit" />
+    <class name="FaserCaloHit" />
+    <class name="FaserDigi" />
+    <class name="FaserCaloDigi" />
+    <class name="FaserCluster" />
+    <class name="FaserSpacePoint" />
+    <class name="G4AffineTransform" />
+    <class name="G4AttDef" />
+  </selection>
+  <exclusion>
+    <class name="FaserSensorHit">
+      <method name="Draw"/>
+    </class>
+    <class name="FaserCaloHit">
+      <method name="Draw"/>
+    </class>
+    <class name="FaserDigi">
+      <method name="Draw"/>
+    </class>
+    <class name="FaserCaloDigi">
+      <method name="Draw"/>
+    </class>
+  </exclusion>
+</lcgdict>
