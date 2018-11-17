@@ -10,7 +10,8 @@
 FaserDigiMessenger::FaserDigiMessenger(FaserDigitizer* digitizer)
   : fDigitizer(digitizer)
 {
-  new G4UnitDefinition("femtoCoulomb", "fC", "Electric charge", coulomb/1e15);
+  //  G4cout << "Defining femtoCoulomb" << G4endl;
+  //  new G4UnitDefinition("femtoCoulomb", "fC", "Electric charge", coulomb/1e15);
 
   digiDirectory = new G4UIdirectory("/faser/digi/");
   digiDirectory->SetGuidance("Sensor parameters for charge-spreading and conversion to ADC");

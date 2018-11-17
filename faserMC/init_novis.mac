@@ -6,12 +6,16 @@
 /control/saveHistory
 /run/verbose 2
 #
+# Store trajectories to write MC truth particles on output
+#
+/tracking/storeTrajectory 1
+#
 # Read FASER detector geometry (must be done before initialization)
 #
 /control/execute faserGeo.mac
 #
 # Change the default number of threads (in multi-threaded mode)
-#/run/numberOfThreads 4
+/run/numberOfThreads 1
 #
 # Initialize kernel
 /run/initialize
@@ -22,8 +26,10 @@
 /control/execute faserDigi.mac
 #
 # Visualization setting
-/control/execute vis.mac
+#/control/execute vis.mac
 #
 # Dump generator parameters after initialization
 #
 /faser/generator/dump
+/run/beamOn 20000
+

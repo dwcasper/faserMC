@@ -1,8 +1,13 @@
 #include "FaserPhysicsList.hh"
 #include "FaserPhysicsMessenger.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 
 FaserPhysicsList::FaserPhysicsList() : G4VModularPhysicsList(), fDarkPhotonMass(default_darkPhoton_mass)
 { 
+  G4cout << "Defining femtoCoulomb" << G4endl;                                                                                  
+  new G4UnitDefinition("femtoCoulomb", "fC", "Electric charge", coulomb/1e15);                                                 
+
   fPhysicsMessenger = new FaserPhysicsMessenger(this);
 }
 

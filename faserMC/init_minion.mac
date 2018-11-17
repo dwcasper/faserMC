@@ -15,14 +15,14 @@
 /control/execute faserGeo.mac
 #
 # Change the default number of threads (in multi-threaded mode)
-#/run/numberOfThreads 4
+/run/numberOfThreads 1
 #
 # Initialize kernel
 /run/initialize
 #
 # Adjust physics and digitization parameters (must be done after initialization)
 #
-/control/execute faserPhys.mac
+/control/execute faserPhysMinIon.mac
 /control/execute faserDigi.mac
 #
 # Visualization setting
@@ -31,5 +31,5 @@
 # Dump generator parameters after initialization
 #
 /faser/generator/dump
-/run/beamOn 20000
+/run/beamOn 100000
 
