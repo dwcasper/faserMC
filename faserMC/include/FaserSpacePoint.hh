@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FaserCluster.hh"
-#include "FaserCircleFit.hh"
 #include "TVector3.h"
 #include <vector>
 
@@ -40,7 +39,6 @@ public:
   void Debug() const;
 
   double DistanceTo(const FaserSpacePoint & other) const;
-  double DistanceTo(const FaserCircleFit & fit) const;
 
 };
 

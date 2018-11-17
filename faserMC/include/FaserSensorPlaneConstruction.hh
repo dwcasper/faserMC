@@ -10,8 +10,6 @@ class FaserSensorPlaneConstruction
 {
     public:
 
-    using GeometryConfig = FaserDetectorConstruction::GeometryConfig;
-
     FaserSensorPlaneConstruction(FaserDetectorConstruction* parent, G4String name);
     virtual ~FaserSensorPlaneConstruction();
 

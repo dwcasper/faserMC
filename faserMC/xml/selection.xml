@@ -1,11 +1,9 @@
 <lcgdict>
   <selection>
-    <class name="std::basic_string<char>" />
+    <class name="G4String" />
     <class name="std::map<G4int, G4double>" />
     <class name="std::map<G4String, G4String>" />
     <class name="std::map<G4String, std::map<G4String, G4String>>" />
-    <class name="G4String" />
-    <class name="FaserGeometry" />
     <class name="FaserEvent" />
     <class name="G4VHit" />
     <class name="G4VDigi" />

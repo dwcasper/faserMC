@@ -19,9 +19,9 @@ FaserCluster::FaserCluster()
 
 FaserCluster::FaserCluster(const FaserCluster& right)
     : fIndex(right.fIndex)
-    , fCharge(right.fCharge)
     , fDigis(right.fDigis)
     , fMaxima(right.fMaxima)
+    , fCharge(right.fCharge)
     , fWeightedStrip(right.fWeightedStrip)
     , fGlobalPos(right.fGlobalPos) { }
 

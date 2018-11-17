@@ -11,7 +11,6 @@
 
 class FaserSensorPlaneConstruction;
 class FaserGeometryMessenger;
-class FaserTrackerGeometry;
 class FaserFieldSetup;
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -24,8 +23,6 @@ class G4Region;
 class FaserDetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-
-  enum struct GeometryConfig { ITk, SCT };
 
   FaserDetectorConstruction();
   virtual ~FaserDetectorConstruction();
@@ -41,9 +38,6 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
   virtual void ConstructCalorimeter();
 
   virtual G4NistManager* getNistManager() const { return nist; }
-
-  GeometryConfig geoConfig() { return fGeoConfig; }
-  virtual void setGeoConfig(GeometryConfig config) { fGeoConfig = config; }
 
   virtual void setReadoutStrips(G4int value) { sensor_readoutStrips = value; }
   virtual G4int getReadoutStrips() const { return sensor_readoutStrips; }
@@ -155,9 +149,7 @@ class FaserDetectorConstruction : public G4VUserDetectorConstruction
 
   protected:
 
-  GeometryConfig  fGeoConfig;
   FaserGeometryMessenger* fGeometryMessenger;
-  FaserTrackerGeometry* fTrackerGeo;
   G4LogicalVolume* fLogicCalorimeter;
   G4LogicalVolume* fLogicSampler;
   G4LogicalVolume* fLogicAbsorber;

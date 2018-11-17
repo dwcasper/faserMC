@@ -83,15 +83,15 @@ void FaserDrawer::DrawPropagatedTrajectory(FaserEvent * event) {
     //double yMin =  -80.; // mm
     //double yMax =   80.; // mm
     G4Point3D curPos {tr.x0, tr.y0, tr.z0};
-    double s = 0.;
+    double sArc = 0.;
     int maxIter = 1000000;
     int iter = -1;
     while (true) { // 10-mm increments
       ++iter;
       if (iter > maxIter) break;
 
-      curPos = TrackPosAtS(tr, s);
-      s += 100.;
+      curPos = TrackPosAtS(tr, sArc);
+      sArc += 100.;
 
       if (
         curPos.z() > zMax)
@@ -116,11 +116,11 @@ void FaserDrawer::DrawPropagatedTrajectory(FaserEvent * event) {
 
 //------------------------------------------------------------------------------
 
-G4Point3D FaserDrawer::TrackPosAtS(const HelixTrajectory & tr, double s) {
+G4Point3D FaserDrawer::TrackPosAtS(const HelixTrajectory & tr, double sArc) {
 
-  double x = tr.x0 + tr.R*(TMath::Sin(tr.phi0 + tr.h*s*TMath::Cos(tr.lambda)/tr.R) - TMath::Sin(tr.phi0));
-  double y = tr.y0 + s*TMath::Sin(tr.lambda);
-  double z = tr.z0 + tr.R*(TMath::Cos(tr.phi0 + tr.h*s*TMath::Cos(tr.lambda)/tr.R) - TMath::Cos(tr.phi0));
+  double x = tr.x0 + tr.R*(TMath::Sin(tr.phi0 + tr.h*sArc*TMath::Cos(tr.lambda)/tr.R) - TMath::Sin(tr.phi0));
+  double y = tr.y0 + sArc*TMath::Sin(tr.lambda);
+  double z = tr.z0 + tr.R*(TMath::Cos(tr.phi0 + tr.h*sArc*TMath::Cos(tr.lambda)/tr.R) - TMath::Cos(tr.phi0));
 
   return {x, y, z};
 }
@@ -131,11 +131,11 @@ G4Point3D FaserDrawer::TrackPosAtZ(const HelixTrajectory & tr, double z) {
 
   // TODO: The calculation of `s` here needs to be account for the case of
   //       `(z - z0)/R + cos(phi0)` being outside the range of [0, pi].
-  double s = tr.R/(tr.h * TMath::Cos(tr.lambda)) *
+  double sArc = tr.R/(tr.h * TMath::Cos(tr.lambda)) *
                (TMath::ACos((z - tr.z0)/tr.R + TMath::Cos(tr.phi0)) - tr.phi0);
 
-  double x = tr.x0 + tr.R*(TMath::Sin(tr.phi0 + tr.h*s*TMath::Cos(tr.lambda)/tr.R) - TMath::Sin(tr.phi0));
-  double y = tr.y0 + s*TMath::Sin(tr.lambda);
+  double x = tr.x0 + tr.R*(TMath::Sin(tr.phi0 + tr.h*sArc*TMath::Cos(tr.lambda)/tr.R) - TMath::Sin(tr.phi0));
+  double y = tr.y0 + sArc*TMath::Sin(tr.lambda);
 
   return {x, y, z};
 }

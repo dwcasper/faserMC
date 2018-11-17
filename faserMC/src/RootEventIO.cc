@@ -12,10 +12,17 @@
 #include "G4HCofThisEvent.hh"
 #include "G4EventManager.hh"
 #include "G4Event.hh"
+#include "G4AutoLock.hh"
 
-static G4String fileName = "FaserMCEvent_sim.root";
-static G4String treeName = "faser";
-static RootEventIO* instance = nullptr;
+namespace
+{
+  G4Mutex rootIoMutex = G4MUTEX_INITIALIZER;
+  G4Mutex rootIoDataMutex = G4MUTEX_INITIALIZER;
+}
+
+G4String RootEventIO::sFileName = "FaserMCEvent_sim.root";
+G4String RootEventIO::sTreeName = "faser";
+RootEventIO* RootEventIO::sInstance = nullptr;
 
 RootEventIO::RootEventIO()
   : fNevents(0)
@@ -24,51 +31,54 @@ RootEventIO::RootEventIO()
   // initialize ROOT
   TSystem ts;
   gSystem->Load("libFaserRootClassesDict");
-  gSystem->Load("libFaserTrackerClassesDict");
 
-  fFile = new TFile(fileName, "RECREATE");
-  fTree = new TTree(treeName, "an event tree");
+  fFile = new TFile(sFileName, "RECREATE");
+  fTree = new TTree(sTreeName, "an event tree");
 }
 
 RootEventIO::~RootEventIO()
 {
-  Close();
+  G4cout << "Deleting RootEventIO instance" << G4endl;
 }
 
 RootEventIO* RootEventIO::GetInstance()
 {
-  if (instance == nullptr)
+  G4AutoLock l(&rootIoMutex);
+
+  if (sInstance == nullptr)
   {
-      instance = new RootEventIO();
+      sInstance = new RootEventIO();
   }
-  return instance;
+  return sInstance;
 }
 
 void RootEventIO::SetFileName(G4String name)
 {
-  if (name == fileName) return;
-  fileName = name;
+  G4AutoLock l(&rootIoDataMutex);
+  if (name == sFileName) return;
+  sFileName = name;
 
-  if (instance == nullptr) return;
+  if (sInstance == nullptr) return;
 
   G4cout << "Closing previous ROOT file" << G4endl;
 
-  instance->Close();
-  delete instance;
-  instance = nullptr;
+  sInstance->Close();
+  delete sInstance;
+  sInstance = nullptr;
 
   return;
 }
 
 void RootEventIO::Write(FaserEvent* hcont)
 {
+  G4AutoLock l(&rootIoDataMutex);
   fNevents++;
 
   std::ostringstream os;
   os << fNevents;
   std::string stevt = "Event_" + os.str();
-  G4cout << "Writing " << stevt << " to " << treeName << " in "
-         << fileName << "...";
+  G4cout << "Writing " << stevt << " to " << sTreeName << " in "
+         << sFileName << "...";
 
   if (fBranchAdx == nullptr)
   {
@@ -86,17 +96,18 @@ void RootEventIO::Write(FaserEvent* hcont)
 
 void RootEventIO::Close()
 {
+  G4AutoLock l(&rootIoDataMutex);
   if (fFile != nullptr)
   {
     fFile->cd();
     if (fTree != nullptr)
     {
       fTree->Write();
-      fTree = nullptr;
     }
-    if (fNevents > 0) G4cout << "Wrote a total of " << fNevents << " events to " << fileName << G4endl;
+    if (fNevents > 0) G4cout << "Wrote a total of " << fNevents << " events to " << sFileName << G4endl;
     fFile->Close();
-    fFile = nullptr;
   }
+  sInstance = nullptr;
   fNevents = 0;
+  delete this;
 }

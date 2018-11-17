@@ -5,6 +5,7 @@
 #include "G4Colour.hh"
 #include "G4VisAttributes.hh"
 #include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
 
 #include <iomanip>
 
@@ -65,8 +66,21 @@ void FaserCaloHit::Draw()
 {
   if (fDetectorConstruction == nullptr)
   {
-    fDetectorConstruction = static_cast<const FaserDetectorConstruction*>(
+    G4MTRunManager* master = G4MTRunManager::GetMasterRunManager();
+    if (master != nullptr)
+    {
+      fDetectorConstruction = static_cast<const FaserDetectorConstruction*>(master->GetUserDetectorConstruction());
+    }
+    else 
+    {
+      fDetectorConstruction = static_cast<const FaserDetectorConstruction*>(
 					G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+    }
+  }
+
+  if (fDetectorConstruction == nullptr)
+  {
+    G4cout << "FaserCaloHit::Draw unable to obtain detector construction" << G4endl;
   }
 
   G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();

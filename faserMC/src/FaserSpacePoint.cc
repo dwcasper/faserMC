@@ -190,10 +190,4 @@ double FaserSpacePoint::DistanceTo(const FaserSpacePoint & other) const {
     return (GlobalPos() - other.GlobalPos()).Mag();
 }
 
-//------------------------------------------------------------------------------
-
-double FaserSpacePoint::DistanceTo(const FaserCircleFit & fit) const {
-    TVector3 pos = GlobalPos();
-    return fit.FitFunction()->DistancetoPrimitive(pos.Z(), pos.X());
-}
 

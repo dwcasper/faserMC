@@ -1,5 +1,4 @@
-#ifndef INCLUDE_ROOTEVENTIO_HH
-#define INCLUDE_ROOTEVENTIO_HH 1
+#pragma once
 
 #include "G4String.hh"
 
@@ -9,22 +8,22 @@ class TTree;
 
 class RootEventIO
 {
-public:
-  virtual ~RootEventIO();
-
-  static RootEventIO* GetInstance();
-  static void SetFileName(G4String name);
-  void Write(FaserEvent*);
-  void Close();
-
-protected:
+private:
+  static RootEventIO* sInstance;
   RootEventIO();
 
-private:
   TFile* fFile;
   TTree* fTree;
   int fNevents;
   FaserEvent* fBranchAdx;
+  static G4String sFileName;
+  static G4String sTreeName;
+
+public:
+  ~RootEventIO();
+  static RootEventIO* GetInstance();
+  static void SetFileName(G4String name);
+  void Write(FaserEvent*);
+  void Close();
 };
 
-#endif

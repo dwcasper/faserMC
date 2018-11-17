@@ -1,8 +1,5 @@
 // adapted from Geant4 example
 
-#include "FaserDetectorConstruction.hh"
-#include "FaserActionInitialization.hh"
-
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else
@@ -11,12 +8,13 @@
 
 #include "G4UImanager.hh"
 #include "FTFP_BERT.hh"
-#include "FaserPhysicsList.hh"
-
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
-
 #include "Randomize.hh"
+
+#include "FaserDetectorConstruction.hh"
+#include "FaserActionInitialization.hh"
+#include "FaserPhysicsList.hh"
 #include "RootEventIO.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -32,7 +30,7 @@ int main(int argc,char** argv)
 
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
-  
+
   // Construct the default run manager
   //
 #ifdef G4MULTITHREADED
@@ -49,18 +47,16 @@ int main(int argc,char** argv)
   // Detector construction
   auto * detectorConstruction = new FaserDetectorConstruction;
   runManager->SetUserInitialization(detectorConstruction);
-  //RootEventIO::GetInstance()->SetTrackerGeo(detectorConstruction->TrackerGeo());
-  //RootEventIO::GetInstance()->WriteTrackerGeo();
 
   // Physics list
   G4VModularPhysicsList* physicsList = new TFTFP_BERT<FaserPhysicsList>();
   physicsList->SetVerboseLevel(1);
   UImanager->ApplyCommand("/control/execute faserPhysicsList.mac");  
   runManager->SetUserInitialization(physicsList);
-    
+
   // User action initialization
   runManager->SetUserInitialization(new FaserActionInitialization());
-  
+
   // Initialize visualization
   //
   G4VisManager* visManager = new G4VisExecutive;
@@ -73,7 +69,7 @@ int main(int argc,char** argv)
   if ( ! ui ) { 
     // batch mode
     if (argc > 2) RootEventIO::SetFileName(argv[2]);
-    if (argc > 3) RootEventIO::SetTrackerFileName(argv[3]);
+    //if (argc > 3) RootEventIO::SetTrackerFileName(argv[3]);
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
     UImanager->ApplyCommand(command+fileName);
@@ -89,9 +85,10 @@ int main(int argc,char** argv)
   // Free the store: user actions, physics_list and detector_description are
   // owned and deleted by the run manager, so they should not be deleted 
   // in the main() program !
-  
   delete visManager;
   delete runManager;
+
+  G4cout << "faserMC exiting" << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....

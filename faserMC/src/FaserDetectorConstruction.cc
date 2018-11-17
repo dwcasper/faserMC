@@ -3,7 +3,6 @@
 #include "FaserDetectorConstruction.hh"
 #include "FaserSensorPlaneConstruction.hh"
 #include "FaserGeometryMessenger.hh"
-#include "FaserTrackerGeometry.hh"
 #include "FaserSensorSD.hh"
 #include "FaserCaloSD.hh"
 #include "FaserFieldSetup.hh"
@@ -27,9 +26,7 @@
 
 FaserDetectorConstruction::FaserDetectorConstruction()
   : G4VUserDetectorConstruction(),
-    fGeoConfig(GeometryConfig::SCT),
     fGeometryMessenger(new FaserGeometryMessenger(this)),
-    //fTrackerGeo(new FaserTrackerGeometry),
     fLogicTracker(nullptr), fLogicTrackerPlane(nullptr), 
     fLogicSamplerPlane(nullptr), fLogicCaloModule(nullptr), fLogicCaloTower(nullptr),
     sensor_readoutStrips(default_sensor_readoutStrips),
@@ -217,8 +214,6 @@ void FaserDetectorConstruction::ConstructTracker()
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
       G4cout << "Updating tracking geometry: planeZ[" << i << "] = " << zPlane << "\n";
-      // fTrackerGeo->planeZ.push_back(zPlane);
-      // fTrackerGeo->planeIndices_front.push_back(i);
   }
   
   // Central planes are evenly distributed around z = 0
@@ -237,8 +232,6 @@ void FaserDetectorConstruction::ConstructTracker()
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
       G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes + i << "] = " << zPlane << "\n";
-      // fTrackerGeo->planeZ.push_back(zPlane);
-      // fTrackerGeo->planeIndices_central.push_back(nEndPlanes + i);
   }
 
   // Downstream end planes are symmetrical to upstream
@@ -257,8 +250,6 @@ void FaserDetectorConstruction::ConstructTracker()
 
       double zPlane = 996.01 + firstPlaneZ + i*detector_planePitch;
       G4cout << "Updating tracking geometry: planeZ[" << nEndPlanes + nCentralPlanes + i << "] = " << zPlane << "\n";
-      // fTrackerGeo->planeZ.push_back(zPlane);
-      // fTrackerGeo->planeIndices_end.push_back(nEndPlanes + nCentralPlanes + i);
   }
   // define a region encompassing the tracker
   //
@@ -689,8 +680,6 @@ G4VPhysicalVolume* FaserDetectorConstruction::Construct()
                       false,                 //no boolean operation
                       0,                     //copy number
                       checkOverlaps);        //overlaps checking
-
-  //fTrackerGeo->WriteToFile("faserTrackerGeo.root");
 
   //
   //always return the physical World

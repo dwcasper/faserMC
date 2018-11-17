@@ -9,12 +9,11 @@
 #include "FaserCaloHit.hh"
 #include "FaserCaloDigi.hh"
 #include "FaserTruthParticle.hh"
+#include "G4String.hh"
 #include "G4AttDef.hh"
 #include "G4AttValue.hh"
 #include "FaserCluster.hh"
 #include "FaserSpacePoint.hh"
-#include "TF1.h"
-#include "FaserGeometry.hh"
 
 std::vector<FaserSensorHit*> aGarbage;
 std::vector<FaserCaloHit*> aaGarbage;
@@ -31,4 +30,4 @@ std::map<G4int, G4double> fGarbage;
 std::map<G4String, G4String> jjGarbage;
 std::map<G4String, std::map<G4String, G4String>> jGarbage;
 
-#undef __G4String
+
