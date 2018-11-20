@@ -114,7 +114,7 @@ void FaserEvent::SetSpacePoints()
 
       auto sp = new FaserSpacePoint;
       sp->AddCluster(cl_i);
-      sp->AddCluster(cl_j);
+      sp->AddCluster(cl_j);     
       fSpacePoints.push_back(sp);
     }
   }

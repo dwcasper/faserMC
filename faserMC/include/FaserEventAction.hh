@@ -1,12 +1,11 @@
 // adapted from Geant4 example
-#pragma once
+#ifndef FASER_EVENTACTION_HH
+#define FASER_EVENTACTION_HH 1
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 
 class FaserRunAction;
-class FaserEvent;
-class FaserDrawer;
 
 /// Event action class
 ///
@@ -26,5 +25,5 @@ class FaserEventAction : public G4UserEventAction
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+#endif
 
-    

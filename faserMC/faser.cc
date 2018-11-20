@@ -8,6 +8,7 @@
 
 #include "G4UImanager.hh"
 #include "FTFP_BERT.hh"
+#include "FaserVisAction.hh"
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
@@ -63,13 +64,16 @@ int main(int argc,char** argv)
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
   // G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
+  if (ui)
+  {
+     visManager->RegisterEndOfEventUserVisAction("FaserSpacePoints", new FaserVisAction(), G4VisExtent());
+  }
 
   // Process macro or start UI session
   //
   if ( ! ui ) { 
     // batch mode
     if (argc > 2) RootEventIO::SetFileName(argv[2]);
-    //if (argc > 3) RootEventIO::SetTrackerFileName(argv[3]);
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
     UImanager->ApplyCommand(command+fileName);

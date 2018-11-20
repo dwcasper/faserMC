@@ -36,7 +36,7 @@ public:
     std::vector<G4int> LocalMaxima() const { return fMaxima; }
     G4double Charge() const { return fCharge; }
     G4double WeightedStrip() const { return fWeightedStrip; }
-    G4ThreeVector GlobalPos() const { return fGlobalPos; }
+    G4ThreeVector GlobalPosition() const { return fGlobalPos; }
 
 private:
     G4int fIndex;

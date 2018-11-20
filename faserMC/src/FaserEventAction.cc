@@ -4,6 +4,9 @@
 #include "FaserRunAction.hh"
 
 #include "G4Event.hh"
+#include "FaserEvent.hh"
+#include "FaserEventInformation.hh"
+
 #include "G4RunManager.hh"
 
 #include "FaserSensorHit.hh"
@@ -15,8 +18,6 @@
 
 #include "FaserDigi.hh"
 #include "FaserCaloDigi.hh"
-
-#include "FaserDrawer.hh"
 
 #include "TVector3.h"
 
@@ -47,7 +48,62 @@ void FaserEventAction::BeginOfEventAction(const G4Event*)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void FaserEventAction::EndOfEventAction(const G4Event*)
-{ }
+void FaserEventAction::EndOfEventAction(const G4Event* g4Evt)
+{ 
+  FaserEvent* faserEvent = new FaserEvent();
+
+  G4DigiManager* digiMan = G4DigiManager::GetDMpointer();
+
+  FaserDigitizer* trackerDigiModule = (FaserDigitizer*) digiMan->FindDigitizerModule("FaserTrackerDigitizer");
+  trackerDigiModule->Digitize();
+
+  FaserDigitizer* samplerDigiModule = (FaserDigitizer*) digiMan->FindDigitizerModule("FaserSamplerDigitizer");
+  samplerDigiModule->Digitize();
+
+  FaserCaloDigitizer* caloDigiModule = (FaserCaloDigitizer*) digiMan->FindDigitizerModule("FaserCaloDigitizer");
+  caloDigiModule->Digitize();
+
+  G4int trackerDigiID = digiMan->GetDigiCollectionID("FaserTrackerDigiCollection");
+  FaserDigiCollection* tdc = (FaserDigiCollection*)
+    digiMan->GetDigiCollection(trackerDigiID);
+
+  G4int samplerDigiID = digiMan->GetDigiCollectionID("FaserSamplerDigiCollection");
+  FaserDigiCollection* sdc = (FaserDigiCollection*)
+    digiMan->GetDigiCollection(samplerDigiID);
+
+  G4int caloDigiID = digiMan->GetDigiCollectionID("FaserCaloDigiCollection");
+  FaserCaloDigiCollection* cdc = (FaserCaloDigiCollection*)
+    digiMan->GetDigiCollection(caloDigiID);
+
+  G4int trackerID = digiMan->GetHitsCollectionID("FaserTrackerHitsCollection");
+  FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*)
+    digiMan->GetHitsCollection(trackerID);
+
+  /*
+  G4int samplerID = digiMan->GetHitsCollectionID("FaserSamplerHitsCollection");
+  FaserSensorHitsCollection* sc = (FaserSensorHitsCollection*)
+    digiMan->GetHitsCollection(samplerID);
+
+  G4int caloID = digiMan->GetHitsCollectionID("FaserCaloHitsCollection");
+  FaserCaloHitsCollection* cc = (FaserCaloHitsCollection*)
+    digiMan->GetHitsCollection(caloID);
+  */
+
+  faserEvent->SetParticles(g4Evt->GetTrajectoryContainer());
+  faserEvent->SetTrackerHits(hc);
+  // faserEvent->SetSamplerHits(sc);
+  // fFaserEvent->SetCaloHits(cc);                                                                                                  
+  faserEvent->SetTrackerDigis(tdc);
+  faserEvent->SetSamplerDigis(sdc);
+  faserEvent->SetCaloDigis(cdc);
+  faserEvent->SetClusters();
+  faserEvent->SetSpacePoints();
+
+  // Attach our event to the G4Event so it can be retrieved elsewhere (for I/O and visualization)
+  // G4 will manage the memory after this call
+  G4EventManager::GetEventManager()->SetUserInformation(new FaserEventInformation(faserEvent));
+  g4Evt->GetUserInformation()->Print();
+
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

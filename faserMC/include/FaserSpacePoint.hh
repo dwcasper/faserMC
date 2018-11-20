@@ -10,9 +10,11 @@
 //
 
 class FaserSpacePoint {
-
+private:
   //long fIdentifier;
   std::vector<FaserCluster*> fClusters;
+  TVector3 fGlobalPosition;
+  void ComputePosition();
 
 public:
 
@@ -33,7 +35,7 @@ public:
   int Row()    const { return fClusters.size()==0 ? -1 : fClusters[0]->Row(); }
 
   double Charge() const;
-  TVector3 GlobalPos() const;
+  TVector3 GlobalPosition() const { return fGlobalPosition; }
 
   void Print() const;
   void Debug() const;

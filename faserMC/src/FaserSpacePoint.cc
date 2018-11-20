@@ -1,4 +1,5 @@
 #include "FaserSpacePoint.hh"
+#include "G4MTRunManager.hh"
 #include "G4RunManager.hh"
 #include "FaserDetectorConstruction.hh"
 
@@ -17,6 +18,7 @@ using std::runtime_error;
 
 FaserSpacePoint::FaserSpacePoint()
   : fClusters {}
+  , fGlobalPosition {0., 0.,  0.}
 {
   ;
 }
@@ -25,6 +27,7 @@ FaserSpacePoint::FaserSpacePoint()
 
 FaserSpacePoint::FaserSpacePoint(std::vector<FaserCluster*> & clusters)
   : fClusters {}
+  , fGlobalPosition {0., 0., 0. }
 {
   for (FaserCluster * clus : clusters) {
     AddCluster(clus);
@@ -55,11 +58,21 @@ double FaserSpacePoint::Charge() const
 
 //------------------------------------------------------------------------------
 
-TVector3 FaserSpacePoint::GlobalPos() const
+void FaserSpacePoint::ComputePosition()
 {
   // todo: make this a static member variable if possible (not sure whether it complicates I/O)
-  const FaserDetectorConstruction* detectorConstruction = static_cast<const FaserDetectorConstruction*>(
-					    G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+  const FaserDetectorConstruction* detectorConstruction = nullptr;
+  G4MTRunManager* master = G4MTRunManager::GetMasterRunManager();
+  if (master != nullptr)
+  {
+    detectorConstruction = static_cast<const FaserDetectorConstruction*>(master->GetUserDetectorConstruction());
+  }
+  else
+  {
+    detectorConstruction = static_cast<const FaserDetectorConstruction*>(
+			  G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+  }
+
   double stereoAngle = 20.0*mrad;
   if ( detectorConstruction != nullptr )
   {
@@ -68,10 +81,10 @@ TVector3 FaserSpacePoint::GlobalPos() const
   else 
   {
     G4ExceptionDescription msg;
-    msg << "Sensor stero angle not found.\n"; 
+    msg << "Detector construction not found.\n"; 
     msg << "Perhaps you have changed geometry.\n";
     msg << "A default stereo angle of 20 mrad will be used.";
-    G4Exception("FaserSpacePoint::GlobalPos()",
+    G4Exception("FaserSpacePoint::ComputePosition()",
 		"MyCode0004",JustWarning,msg);
   }
 
@@ -87,12 +100,12 @@ TVector3 FaserSpacePoint::GlobalPos() const
     {
       if (sensor==1 || sensor==3) 
       {
-        frontPos += clus->GlobalPos();
+        frontPos += clus->GlobalPosition();
         frontCount++;
       } 
       else if (sensor==0 || sensor==2)
       {
-        backPos += clus->GlobalPos();
+        backPos += clus->GlobalPosition();
         backCount++;
       }
     }
@@ -101,7 +114,7 @@ TVector3 FaserSpacePoint::GlobalPos() const
   // Reject space point unless both front and back clusters are present
   if (frontCount == 0 || backCount == 0) 
   {
-    return {-10000., -10000., -10000.};
+    return;
   }
 
   // Average of front and back; not clear if possible...
@@ -112,7 +125,7 @@ TVector3 FaserSpacePoint::GlobalPos() const
   double y = 0.5*(frontPos.y() + backPos.y() - (backPos.x() - frontPos.x())/tan(stereoAngle));
   double z = 0.5*(frontPos.z() + backPos.z());
 
-  return {x, y, z};
+  fGlobalPosition = TVector3(x, y, z);
 }
 
 //------------------------------------------------------------------------------
@@ -137,6 +150,7 @@ void FaserSpacePoint::AddCluster(FaserCluster * cluster)
   if (cluster->Row() != Row()) throw runtime_error {"FaserSpacePoint::AddCluster: incompatible rows"};
 
   fClusters.push_back(cluster);
+  ComputePosition();
 }
 
 //------------------------------------------------------------------------------
@@ -151,10 +165,10 @@ void FaserSpacePoint::Print() const
     FaserCluster * c = fClusters[i];
     cout << "    Cluster " << i << "  plane=" << c->Plane() << ", module=" << c->Module() << ", sensor=" << c->Sensor()
                            << ", row=" << c->Row() << ", charge=" << c->Charge() << ", weightedStrip=" << c->WeightedStrip()
-                           << ", globalPos=" << c->GlobalPos() <<"\n";
+                           << ", globalPos=" << c->GlobalPosition() <<"\n";
   }
 
-  TVector3 pos = GlobalPos();
+  TVector3 pos = GlobalPosition();
   double x = pos.X();
   double y = pos.Y();
   double z = pos.Z();
@@ -173,7 +187,7 @@ void FaserSpacePoint::Debug() const
     FaserCluster * c = fClusters[i];
     cout << "DEBUG_CLUSTERS  " << i << ";" << c->Plane() << ";" << c->Module() << ";" << c->Sensor()
                                << ";" << c->Row() << ";" << c->WeightedStrip() << ";" << c->Charge()
-                               << ";" << c->GlobalPos() << "\n";
+                               << ";" << c->GlobalPosition() << "\n";
   }
 
   //TVector3 pos = GlobalPos();
@@ -187,7 +201,7 @@ void FaserSpacePoint::Debug() const
 //------------------------------------------------------------------------------
 
 double FaserSpacePoint::DistanceTo(const FaserSpacePoint & other) const {
-    return (GlobalPos() - other.GlobalPos()).Mag();
+    return (GlobalPosition() - other.GlobalPosition()).Mag();
 }
 
 
