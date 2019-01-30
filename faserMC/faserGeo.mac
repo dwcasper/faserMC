@@ -28,8 +28,12 @@
 /faser/geo/stereoAngle 20.0 mrad
 #
 # Thickness of the support structure that the sensors are glued to
+# The correct *physical* value of this parameter is 0.430 mm (= 0.83% X0 per module, including the silicon layers as well)
+# The value is inflated to 1.15 mm to reflect electronics, cooling and other support services not included in the geometry model (= 1.2% X0 per module)
+# The value should be further inflated to 1.93 mm to account for missing scintillator material, if desired (= 14.5% X0 for entire tracker)
+# Each *further* 1.93 mm of thickness adds one radiation length of material to each SCT module
 #
-/faser/geo/supportSizeZ 0.430 mm
+/faser/geo/supportSizeZ 1.15 mm
 #
 # Number of detector planes
 #
