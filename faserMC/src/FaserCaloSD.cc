@@ -23,7 +23,8 @@ FaserCaloSD::~FaserCaloSD()
 G4bool FaserCaloSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
   G4double edep = aStep->GetTotalEnergyDeposit();
-  if (edep == 0.0) return false;
+  // Disable hit generation in calorimeter due to memory issues
+  if (edep == 0.0 || true) return false;
 
   FaserCaloHit* newHit = new FaserCaloHit();
 

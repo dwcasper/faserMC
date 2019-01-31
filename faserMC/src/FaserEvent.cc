@@ -20,23 +20,32 @@ FaserEvent::FaserEvent()
 
 FaserEvent::~FaserEvent()
 { 
-  // TODO: Delete these containers to avoid leaking memory
-  // (currently seg faults if the following lines are uncommented)
+  for (auto h : fTrackerHits) if (h) delete h;
+  fTrackerHits.clear();
 
-  //for (auto h : fHits) if (h) delete h;
-  //fHits.clear();
+  for (auto h : fSamplerHits) if (h) delete h;
+  fSamplerHits.clear();
 
-  //for (auto d : fDigis) if (d) delete d;
-  //fDigis.clear();
+  for (auto h : fCaloHits) if (h) delete h;
+  fCaloHits.clear();
 
-  //for (auto c : fClusters) if (c) delete c;
-  //fClusters.clear();
+  for (auto d : fTrackerDigis) if (d) delete d;
+  fTrackerDigis.clear();
 
-  //for (auto s : fSpacePoints) if (s) delete s;
-  //fSpacePoints.clear();
+  for (auto d : fSamplerDigis) if (d) delete d;
+  fSamplerDigis.clear();
 
-  //for (auto p : fParticles) if (p) delete p;
-  //fParticles.clear();
+  for (auto d : fCaloDigis) if (d) delete d;
+  fCaloDigis.clear();
+
+  for (auto c : fClusters) if (c) delete c;
+  fClusters.clear();
+
+  for (auto s : fSpacePoints) if (s) delete s;
+  fSpacePoints.clear();
+
+  for (auto p : fParticles) if (p) delete p;
+  fParticles.clear();
 }
 
 //------------------------------------------------------------------------------
