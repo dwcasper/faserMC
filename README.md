@@ -52,6 +52,6 @@ to your login script (this assumes that you have also defined FASER_ROOT to poin
 
 To read the output file, you will want to load the dictionary library
 
-$FASER_ROOT/run/lib64/LibFaserRootClassesDict.so
+$FASER_ROOT/run/lib64/libFaserRootClassesDict.so
 
 inside ROOT.
