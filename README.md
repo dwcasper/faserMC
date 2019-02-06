@@ -50,5 +50,8 @@ export LD_LIBRARY_PATH=$FASER_ROOT/run/lib64:$LD_LIBRARY_PATH
 
 to your login script (this assumes that you have also defined FASER_ROOT to point to your installation area).
 
+To read the output file, you will want to load the dictionary library
 
+$FASER_ROOT/run/lib64/libFaserRootClassesDict.so
 
+inside ROOT.

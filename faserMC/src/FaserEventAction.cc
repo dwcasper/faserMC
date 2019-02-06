@@ -79,7 +79,6 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4Evt)
   FaserSensorHitsCollection* hc = (FaserSensorHitsCollection*)
     digiMan->GetHitsCollection(trackerID);
 
-  /*
   G4int samplerID = digiMan->GetHitsCollectionID("FaserSamplerHitsCollection");
   FaserSensorHitsCollection* sc = (FaserSensorHitsCollection*)
     digiMan->GetHitsCollection(samplerID);
@@ -87,12 +86,12 @@ void FaserEventAction::EndOfEventAction(const G4Event* g4Evt)
   G4int caloID = digiMan->GetHitsCollectionID("FaserCaloHitsCollection");
   FaserCaloHitsCollection* cc = (FaserCaloHitsCollection*)
     digiMan->GetHitsCollection(caloID);
-  */
+  
 
   faserEvent->SetParticles(g4Evt->GetTrajectoryContainer());
   faserEvent->SetTrackerHits(hc);
-  // faserEvent->SetSamplerHits(sc);
-  // fFaserEvent->SetCaloHits(cc);                                                                                                  
+  faserEvent->SetSamplerHits(sc);
+  faserEvent->SetCaloHits(cc);                                                                                                  
   faserEvent->SetTrackerDigis(tdc);
   faserEvent->SetSamplerDigis(sdc);
   faserEvent->SetCaloDigis(cdc);

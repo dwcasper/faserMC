@@ -30,23 +30,24 @@ public:
   std::vector<FaserTruthParticle*>& Particles() { return fParticles; }
   void SetParticles(G4TrajectoryContainer* particles);
 
+  // create owned copies of objects managed by G4
   std::vector<FaserSensorHit*>& TrackerHits() { return fTrackerHits; }
-  void SetTrackerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fTrackerHits.push_back((*hits)[i]); }
+  void SetTrackerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fTrackerHits.push_back(new FaserSensorHit(*(*hits)[i])); }
 
   std::vector<FaserSensorHit*>& SamplerHits() { return fSamplerHits; }
-  void SetSamplerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamplerHits.push_back((*hits)[i]); }
+  void SetSamplerHits(const FaserSensorHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fSamplerHits.push_back(new FaserSensorHit(*(*hits)[i])); }
 
   std::vector<FaserCaloHit*>& CaloHits() { return fCaloHits; }
-  void SetCaloHits(const FaserCaloHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fCaloHits.push_back((*hits)[i]); }
+  void SetCaloHits(const FaserCaloHitsCollection* hits) { for (G4int i=0; i < hits->entries(); i++) fCaloHits.push_back(new FaserCaloHit(*(*hits)[i])); }
 
   std::vector<FaserDigi*> TrackerDigis()& { return fTrackerDigis; }
-  void SetTrackerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fTrackerDigis.push_back((*digis)[i]); }
+  void SetTrackerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fTrackerDigis.push_back(new FaserDigi(*(*digis)[i])); }
 
   std::vector<FaserDigi*> SamplerDigis()& { return fSamplerDigis; }
-  void SetSamplerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fSamplerDigis.push_back((*digis)[i]); }
+  void SetSamplerDigis(const FaserDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fSamplerDigis.push_back(new FaserDigi(*(*digis)[i])); }
 
   std::vector<FaserCaloDigi*> CaloDigis()& { return fCaloDigis; }
-  void SetCaloDigis(const FaserCaloDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fCaloDigis.push_back((*digis)[i]); }
+  void SetCaloDigis(const FaserCaloDigiCollection* digis) { for (G4int i=0; i < digis->entries(); i++) fCaloDigis.push_back(new FaserCaloDigi(*(*digis)[i])); }
 
   std::vector<FaserCluster*>& Clusters() { return fClusters; }
   void SetClusters();
