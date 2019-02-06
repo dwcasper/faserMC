@@ -3,3 +3,4 @@ faserMC_run/
 include/.vscode/c_cpp_properties.json
 .vscode/tasks.json
 .vscode/c_cpp_properties.json
+.vscode/settings.json
