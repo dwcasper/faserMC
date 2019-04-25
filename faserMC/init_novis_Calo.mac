@@ -1,0 +1,35 @@
+# Macro file for the initialization of faser
+# in interactive session
+#
+# Set some default verbose
+/control/verbose 2
+/control/saveHistory
+/run/verbose 2
+#
+# Store trajectories to write MC truth particles on output
+#
+/tracking/storeTrajectory 1
+#
+# Read FASER detector geometry (must be done before initialization)
+#
+/control/execute faserGeoCalo.mac
+#
+# Change the default number of threads (in multi-threaded mode)
+/run/numberOfThreads 4
+#
+# Initialize kernel
+/run/initialize
+#
+# Adjust physics and digitization parameters (must be done after initialization)
+#
+/control/execute faserPhys.mac
+/control/execute faserDigi.mac
+#
+# Visualization setting
+#/control/execute vis.mac
+#
+# Dump generator parameters after initialization
+#
+/faser/generator/dump
+/run/beamOn 1000
+

@@ -92,9 +92,19 @@ target_link_libraries(faser FaserRootClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBR
 set(FASER_SCRIPTS
     init_vis.mac
     init_novis.mac
+    init_novis_NoCalo.mac
+    init_novis_Calo.mac
+    init_novis_CaloPb.mac
+    init_novis_CaloPbC.mac
+    init_novis_CaloPbCu.mac
     init_minion.mac
     vis.mac
     faserGeo.mac
+    faserGeoNoCalo.mac
+    faserGeoCalo.mac
+    faserGeoCaloPb.mac
+    faserGeoCaloPbC.mac
+    faserGeoCaloPbCu.mac
     faserPhys.mac
     faserPhysMinIon.mac
     faserPhys_muMinus.mac
