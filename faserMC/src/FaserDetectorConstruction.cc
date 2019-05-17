@@ -427,7 +427,7 @@ void FaserDetectorConstruction::ConstructAbsorberPlane()
   G4Material* air_mat = nist->FindOrBuildMaterial("G4_AIR");
   G4Material* absorber_C = nist->FindOrBuildMaterial("G4_GRAPHITE"); // Graphite
   G4Material* absorber_Cu = nist->FindOrBuildMaterial("G4_Cu"); // Copper
-  G4Material* absorber_W = nist->FindOrBuildMaterial("G4_W"); // Tungsten
+  G4Material* absorber_W = nist->FindOrBuildMaterial("G4_Pb"); // Actually Lead instead of Tungsten
   G4double tungstenThickness = sampler_absorberW * absorber_W->GetRadlen();
   G4double copperThickness = sampler_absorberCu * absorber_Cu->GetRadlen();
   G4double graphiteThickness = sampler_absorberC * absorber_C->GetRadlen();
@@ -479,8 +479,9 @@ void FaserDetectorConstruction::ConstructSampler()
 {
   fLogicSamplerPlane = fSamplerFactory->Construct();
 
-  const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicSamplerPlane->GetSolid());
-  G4double plane_sizeZ = 2*sPlane->GetZHalfLength();
+  // const G4Box* sPlane = dynamic_cast<const G4Box*>(fLogicSamplerPlane->GetSolid());
+  //G4double plane_sizeZ = 2*sPlane->GetZHalfLength();
+  G4double plane_sizeZ = 0.0;
 
   const G4Box* sTracker = dynamic_cast<const G4Box*>(fLogicTracker->GetSolid());
   G4double sampler_sizeX = 2*sTracker->GetXHalfLength();
@@ -522,7 +523,7 @@ void FaserDetectorConstruction::ConstructSampler()
   {
       G4double thisMidpoint = firstMidpoint + i * (plane_sizeZ + absorber_sizeZ + detector_planePitch);
       G4double thisAbsorberZ = thisMidpoint - plane_sizeZ/2.0;
-      G4double thisPlaneZ = thisMidpoint + absorber_sizeZ/2.0;
+      // G4double thisPlaneZ = thisMidpoint + absorber_sizeZ/2.0;
       G4RotationMatrix* theRotation = ( i%2 > 0 ? fSamplerRotation : nullptr);
 
       new G4PVPlacement(theRotation,
@@ -534,14 +535,14 @@ void FaserDetectorConstruction::ConstructSampler()
       i,
       checkOverlaps);
 
-      new G4PVPlacement(theRotation,
-			G4ThreeVector(0, 0, thisPlaneZ) ,
-			fLogicSamplerPlane,
-			"SamplerPlane_PV",
-			fLogicSampler,
-			false,
-			i,
-			checkOverlaps);
+      // new G4PVPlacement(theRotation,
+			// G4ThreeVector(0, 0, thisPlaneZ) ,
+			// fLogicSamplerPlane,
+			// "SamplerPlane_PV",
+			// fLogicSampler,
+			// false,
+			// i,
+			// checkOverlaps);
   }
 
   fLogicSampler->SetRegion(fRegCalorimeter);
